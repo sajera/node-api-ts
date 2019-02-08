@@ -1,0 +1,24 @@
+{
+    "server": {
+        "log": true,
+        "port": 4000
+    },
+    "static": {
+        "log": false,
+        "redirect": false,
+        "lastModified": false,
+        "resources":  ["/public"]
+    },
+    "urlencodedParse": {
+        "log": false,
+        "extended":  false
+    },
+    "jsonParse": {
+        "log": false,
+        "strict": false
+    },
+    "cors": {
+        "log": false,
+        "origin":  ["http://localhost", "127.0.0.1"]
+    }
+}

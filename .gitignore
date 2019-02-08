@@ -1,0 +1,67 @@
+# See https://help.github.com/ignore-files/ for more about ignoring files.
+
+# IDE Files #
+############
+*.iml
+.classpath
+.project
+.settings/
+.idea
+
+# Visual Studia Code Files #
+############
+.vscode
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and databases #
+######################
+*.log
+npm-debug.log*
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.actionScriptProperties
+.flexConfig.xml
+.flexProperties
+.tmp
+.sass-cache
+.sourceMate
+*/.settings
+
+# temporary or auto generated data
+##################################
+org.eclipse.jdt.core.prefs
+node_modules
+
+# deploy keys
+credentials.json
+
+# source of ui design
+wiki
+
+# app ignores
+data
+es5
+
+# local environment config
+local.*
+*.local.*
