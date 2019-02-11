@@ -37,7 +37,7 @@ export function WithAuth (target: Controller, property: string, descriptor: any)
             // NOTE care about previous check
             if ( !target.authorized ) {
                 // TODO common check authorization method from Controller
-                await target.checkAuth.call(target, request, response);
+                await target._checkAuth.call(target, request, response);
             }
             // NOTE care about status of response
             if ( response.headersSent ) { return; }
@@ -68,13 +68,13 @@ export function WithSelf (options: SelfOptions = {user: true}) {
             value: async (request: Request, response: Response) => {
                 if ( !target.authorized ) {
                     // TODO common check authorization method from Controller
-                    await target.checkAuth.call(target, request, response);
+                    await target._checkAuth.call(target, request, response);
                 }
                 // NOTE care about status of response
                 if ( response.headersSent ) { return; }
                 // NOTE common get authorized user
                 if ( options.user ) {
-                    await target.getSelf.call(target, request, response);
+                    await target._getSelf.call(target, request, response);
                 }
                 // TODO common get authorized any else data
 

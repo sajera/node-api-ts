@@ -12,6 +12,7 @@ import { RoutOptions } from './interface';
  */
 export class Controller {
     private static routes: RoutOptions[] = [];
+    public static readonly prefix: string = '';
     public static readonly router: Router = Router();
 
     /**
@@ -19,7 +20,7 @@ export class Controller {
      */
     public static initialize (router: Router) {
         this.setupRoutes(this.router);
-        router.use(this.router);
+        router.use(this.prefix, this.router);
     }
 
     /**
@@ -97,22 +98,22 @@ export class Controller {
  */
 export default class WithAuthorization extends Controller {
     public self?: object; // TODO must be a User
-    public authorized?: boolean; // TODO may be another data
+    public authorized?: boolean;
 
     // ------------------------ [TODO] ------------------------------------------------
 
     /**
      *
      */
-    public async checkSelfPermissions (request: Request, response: Response) {
+    public async _checkSelfPermissions (request: Request, response: Response) {
         console.info('checkSelfPermissions => allow to all', this.self);
     }
 
     /**
      *
      */
-    public async getSelf (request: Request, response: Response) {
-        return await (new Promise((resolve, reject) => {
+    public async _getSelf (request: Request, response: Response) {
+        this.self = await (new Promise((resolve, reject) => {
             // NOTE fake self
             resolve({
                 name: 'Fake',
@@ -125,13 +126,12 @@ export default class WithAuthorization extends Controller {
     /**
      *
      */
-    public async checkAuth (request: Request, response: Response) {
+    public async _checkAuth (request: Request, response: Response) {
         const { authorization } = request.headers;
         // NOTE fake authorization
         if ( authorization !== 'my_fake_authorization_token' ) {
             response.status(401).send('Authentication failed');
         }
     }
-
 
 }
