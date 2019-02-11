@@ -6,11 +6,14 @@ import { Request, Response } from 'express';
 import Configuration from '../configuration';
 import Controller, { METHOD, WithSelf } from './base';
 
+/**
+ * system endpoints which not belong to any controllers and mostly unique
+ */
 export default class System extends Controller {
     public static readonly prefix: string = '/system';
 
     /**
-     * implement user sign in
+     * implement user self
      */
     @WithSelf()
     @System.Endpoint({action: 'getSelf', path: '/self', method: METHOD.GET})
@@ -22,7 +25,7 @@ export default class System extends Controller {
     }
 
     /**
-     * implement user sign in
+     * implement user sign up
      */
     @System.Endpoint({action: 'signUp', path: '/sign-up', method: METHOD.POST})
     public async signUp (request: Request, response: Response) {

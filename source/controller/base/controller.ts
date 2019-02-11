@@ -11,9 +11,9 @@ import { RoutOptions } from './interface';
  * @abstract
  */
 export class Controller {
-    private static routes: RoutOptions[] = [];
+    public static router: Router;
+    public static routes: RoutOptions[];
     public static readonly prefix: string = '';
-    public static readonly router: Router = Router();
 
     /**
      * common initialization method
@@ -28,6 +28,10 @@ export class Controller {
      */
     public static setupRoutes (router: Router) {
         const Controller = this;
+        console.info(
+            `\n[CONTROLLER: ${Controller.name}] endpoints:\n`
+            , Controller.routes.map(rout => `method: ${rout.method} path: ${Controller.prefix}${rout.path}`).join('\n')
+        );
         for ( const { method, path, action } of Controller.routes ) {
             router[method](path, Controller.lifeCycle(action));
         }
@@ -68,15 +72,17 @@ export class Controller {
      * @decorator
      */
     public static Endpoint (rout: RoutOptions) {
+        // NOTE create own router and routes
+        if ( !this.routes ) { this.routes = []; }
+        if ( !this.router ) { this.router = Router(); }
         // NOTE controller must provide all it endpoints using decorator
         this.routes.push(rout);
-        // NOTE du not known but it has type error when used interface PropertyDescriptor
+        // console.info(`[CONTROLLER: ${this.name}: ${this.prefix}] add endpoint =>`, rout);
         return (t: Controller, p: string, d: any) => ({ value: d.value });
     }
 
 
     // ---------- LIFE CYCLE -----------------------
-    // NOTE in order to care about typing suggestions instead us
     public constructor (public readonly request: Request, public readonly response: Response, next?: NextFunction) {}
 
     /**

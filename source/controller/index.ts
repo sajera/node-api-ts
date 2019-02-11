@@ -23,7 +23,7 @@ export class IndexController {
     }
 
     public static async initialize (server: Server) {
-        console.info(`-------------- [API: ${this.instance.apiPath}/*] --------------`);
+        // console.info(`---------------- [API: ${this.instance.apiPath}/*] ----------------`);
         server.app.use(this.instance.apiPath, this.instance.router);
     }
 }
