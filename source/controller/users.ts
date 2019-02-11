@@ -5,9 +5,10 @@ import { Request, Response } from 'express';
 
 // local dependencies
 import Configuration from '../configuration';
-import ExpressController, { METHOD } from './express-controller';
+import Controller, { METHOD, WithAuth, WithSelf } from './base';
 
-export default class Test extends ExpressController {
+
+export default class Users extends Controller {
 
 
     private async preTest (request?: Request, response?: Response) {
@@ -18,8 +19,9 @@ export default class Test extends ExpressController {
         }));
     }
 
-    @Test.Endpoint({action: 'test', path: '/test', method: METHOD.GET})
-    public async test (request: Request, response: Response) {
+    @WithSelf()
+    @Users.Endpoint({action: 'filter', path: '/users/filter', method: METHOD.POST})
+    public async filter (request: Request, response: Response) {
         // NOTE each await will freeze endpoint until it done
         const thisElse = await this.preTest();
 
@@ -29,6 +31,24 @@ export default class Test extends ExpressController {
         }));
 
         console.log('test', thisElse);
+
+        // this.
+
+        await response.status(200).type('json')
+            .send({user: 'Super useful user data', id: request.params.id, data, thisElse});
+    }
+
+    @WithAuth
+    @WithSelf()
+    @Users.Endpoint({action: 'byId', path: '/users/:id', method: METHOD.GET})
+    public async byId (request: Request, response: Response) {
+        // NOTE each await will freeze endpoint until it done
+        const thisElse = await this.preTest();
+
+        const data = await (new Promise((resolve, reject) => {
+            resolve({data: true});
+            // reject({error: true});
+        }));
 
         await response.status(200).type('json')
             .send({user: 'Super useful user data', id: request.params.id, data, thisElse});

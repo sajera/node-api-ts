@@ -5,8 +5,8 @@ import { Router } from 'express';
 import Server from '../server';
 import Configuration from '../configuration';
 // controllers
-import TestController from './test-ec';
-// import UsersController from './users';
+import UsersController from './users';
+import SystemController from './system';
 
 export class IndexController {
     // NOTE is singleton
@@ -17,7 +17,8 @@ export class IndexController {
     private apiPath: string = Configuration.get('apiPath', '/api');
     private constructor (public router: Router) {
         // NOTE initialize API Controllers
-        TestController.initialize(this.router);
+        SystemController.initialize(this.router);
+        UsersController.initialize(this.router);
     
     }
 

@@ -8,6 +8,6 @@ In order to speed up starting of development process - was implemented dummy app
 In order to provide expandable and scalable application. Each build process start from setup `configuration`. Application config may be split by environment and configuration. Implemented behavior for `*.env` (environment configuration) and `*.json` (application configuration). Within application present `.env` file in root directory with example of supported flags and `./source/configuration/development.json` as default application configuration with supported parameters.
 
 
-## Server
+### Server
 
 
