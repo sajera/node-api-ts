@@ -5,8 +5,8 @@
   "description": "Project created as dummy to fast setup base structure for expandable and scalable applications",
   "main": "index.js",
   "scripts": {
-    "lint": "echo \"Error: no test specified\" && exit 1",
-    "lint-auto-fix": "echo \"Error: no test specified\" && exit 1",
+    "lint": "tslint source",
+    "lint-auto-fix": "tslint source --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm-run-all start-api start-cron",
     "start-api": "ts-node source/api.ts",
