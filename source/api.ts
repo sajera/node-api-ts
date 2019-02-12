@@ -32,7 +32,7 @@ class API {
     }
 }
 
-API.start().then(() => console.info(`\n[API: ${pkg.name} -v ${pkg.version}] Successfully running\n`) )
+API.start().then(() => console.info(`\n[API: ${pkg.name} -v ${pkg.version}] Successfully running\n`))
     .catch(async (error: any) => {
         await API.stop();
         console.error(`\n[API: ${pkg.name} -v ${pkg.version}] was stopped with error:` , error);

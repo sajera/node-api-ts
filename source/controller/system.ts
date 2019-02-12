@@ -21,7 +21,7 @@ export default class System extends Controller {
         // TODO must prepare user self data to send only public information
         const user = this.self;
         // NOTE very simple solution to take logged user using decorator "WithSelf"
-        return await response.status(200).type('json').send(user);
+        await response.status(200).type('json').send(user);
     }
 
     /**
@@ -32,7 +32,7 @@ export default class System extends Controller {
         // TODO implement user creation
         const user = request.body;
         // NOTE very simple solution without email verification to delegate authorization to authorization action
-        return await this.signIn(request, response);
+        await this.signIn(request, response);
     }
 
     /**
@@ -42,7 +42,7 @@ export default class System extends Controller {
     public async signIn (request: Request, response: Response) {
         // TODO implement authorization flow
         // NOTE currently fake authorization token
-        return await response.status(200).type('json').send({
+        await response.status(200).type('json').send({
             access_token: 'my_fake_authorization_token',
             refresh_token: '',
         });
@@ -62,7 +62,7 @@ export default class System extends Controller {
             resolve({});
         }));
         // NOTE in any case 200: "ok"
-        return await response.status(200).type('json').send({});
+        await response.status(200).type('json').send({});
     }
     
     /**
@@ -70,7 +70,7 @@ export default class System extends Controller {
      */
     @System.Endpoint({action: 'information', path: '/info', method: METHOD.GET})
     public async information (request: Request, response: Response) {
-        return await response.status(200).type('json').send({
+        await response.status(200).type('json').send({
             base: false,
             health: 'UP',
             auth: 'Authorization',
