@@ -29,8 +29,10 @@ export class Controller {
     public static setupRoutes (router: Router) {
         const Controller = this;
         console.info(
-            `\n[CONTROLLER: ${Controller.name}] endpoints:\n`
-            , Controller.routes.map(rout => `method: ${rout.method} path: ${Controller.prefix}${rout.path}`).join('\n')
+            `\n[CONTROLLER: ${Controller.name}] endpoints:`
+            , Controller.routes
+                .map(rout => `\n\t${rout.method.toUpperCase()}: ${Controller.prefix}${rout.path} => (${rout.action})`)
+                .join('')
         );
         for ( const { method, path, action } of Controller.routes ) {
             router[method](path, Controller.lifeCycle(action));

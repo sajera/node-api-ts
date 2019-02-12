@@ -11,6 +11,7 @@ import Controller, { METHOD, WithAuth } from './base';
  */
 export default class Users extends Controller {
     public static readonly prefix: string = '/users';
+    public transit: any;
     
     /**
      * endpoint to provide functionality to build lists
@@ -18,7 +19,6 @@ export default class Users extends Controller {
     @WithAuth
     @Users.Endpoint({action: 'filter', path: '/filter', method: METHOD.POST})
     public async filter (request: Request, response: Response) {
-        console.log('filter');
         // TODO get filtered page with users
         const data = await (new Promise((resolve, reject) => {
             // reject({error: true});
@@ -36,9 +36,8 @@ export default class Users extends Controller {
      * endpoint to get item by id
      */
     @WithAuth
-    @Users.Endpoint({action: 'byId', path: '/:id', method: METHOD.GET})
+    @Users.Endpoint({action: 'byId', path: '/id/:id', method: METHOD.GET})
     public async byId (request: Request, response: Response) {
-        console.log('byId');
         const data = await (new Promise((resolve, reject) => {
             // reject({error: true});
             resolve({data: true});
@@ -50,9 +49,8 @@ export default class Users extends Controller {
      * endpoint to create item
      */
     @WithAuth
-    @Users.Endpoint({action: 'create', path: '/', method: METHOD.POST})
+    @Users.Endpoint({action: 'create', path: '/new', method: METHOD.POST})
     public async create (request: Request, response: Response) {
-        console.log('create');
         const data = await (new Promise((resolve, reject) => {
             // reject({error: true});
             resolve({data: true});
@@ -66,12 +64,45 @@ export default class Users extends Controller {
     @WithAuth
     @Users.Endpoint({action: 'update', path: '/:id', method: METHOD.PUT})
     public async update (request: Request, response: Response) {
-        console.log('update');
         const data = await (new Promise((resolve, reject) => {
             // reject({error: true});
             resolve({data: true});
         }));
         await response.status(200).type('json').send(data);
+    }
+
+    /**
+     * endpoint to remove item
+     */
+    @WithAuth
+    @Users.Endpoint({action: 'remove', path: '/id/:id', method: METHOD.DELETE})
+    public async remove (request: Request, response: Response) {
+        // NOTE provide ability to transit data from one action to another such as from remove list to remove item
+        const id = this.transit ? this.transit : request.params.id;
+        // TODO entity remove
+        const data = await (new Promise((resolve, reject) => {
+            // reject({error: true});
+            resolve({data: true});
+        }));
+        // NOTE provide ability to transit closing request to caller
+        if ( this.transit ) { return; }
+        await response.status(200).type('json').send(data);
+    }
+
+    /**
+     * endpoint to remove list item
+     */
+    @WithAuth
+    @Users.Endpoint({action: 'removeList', path: '/list', method: METHOD.DELETE})
+    public async removeList (request: Request, response: Response) {
+        // TODO get user list from body
+        const list = [{id: '100'}, {id: '200'}];
+        for ( const { id } of list ) {
+            this.transit = id;
+            // NOTE delegate execution for each item to another action within controller
+            await this.remove(request, response);
+        }
+        await response.status(200).type('json').send(list);
     }
 
 }
