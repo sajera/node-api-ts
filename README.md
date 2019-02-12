@@ -11,3 +11,31 @@ In order to provide expandable and scalable application. Each build process star
 ### Server
 
 
+
+# Root TODO`s
+* Decorator @validate({ ... props to validate from body, query, or params ... })
+    * Try to use instead "own custom helper" something similar as PropTypes from react
+    * If no solution found implement validate helpers
+
+* Server parse Multipart form data
+    * Provide customization from configuration files such as for cors and others
+
+* Server parse and storing session (Not authorization session)
+    * Provide customization from configuration files such as for cors and others
+    * Session for unauthorized and authorized users
+    * Probably should contain information about location, language etc.
+
+* Database connection
+    * Provide customization from configuration file
+    * MongoDB (Mongoose optional)
+    * PostgreSQL based on "pg"
+
+* Model connection
+    * Abstract helpers for model creation such as (Base)Controller
+    * Example implementation for MongoDB
+    * Example implementation for PostgreSQL
+    * Example implementation for MongoDB with Mongoose
+
+* Examples for services
+
+* Swagger ...
