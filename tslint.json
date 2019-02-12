@@ -1,5 +1,5 @@
 {
-    "extends": "tslint:recommended",
+    "extends": "tslint:latest",
     "__rulesDirectory": ["path/to/custom/rules/directory/", "another/path/"],
     "rules": {
         "max-line-length": {
@@ -11,6 +11,8 @@
         "interface-name": false,
         "ordered-imports": false,
         "member-ordering": false,
+        "no-this-assignment": false,
+        "space-within-parens": false,
         "no-shadowed-variable": false,
         "no-conditional-assignment": true,
         "object-literal-sort-keys": false,
@@ -23,9 +25,7 @@
         "trailing-comma": [true, {"multiline": "ignore", "singleline": "ignore"}],
         "no-trailing-whitespace": [true, "ignore-template-strings", "ignore-blank-lines"],
         "variable-name": [true, "check-format", "allow-leading-underscore", "allow-pascal-case"],
-        "no-console": { "severity": "warning", "options": ["debug", "log", "time", "timeEnd", "trace"] },
-
-        "": ""
+        "no-console": { "severity": "warning", "options": ["debug", "log", "time", "timeEnd", "trace"] }
     },
     "jsRules": {
         "max-line-length": {
