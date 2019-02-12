@@ -12,8 +12,8 @@ class API {
 
         // TODO initialize database connection
         // DB.initialize();
-        // TODO initialize models / or it can be done from database initialization ?
-        // IndexModel.initialize(DB);
+        // TODO initialize models
+        // Model.initialize(DB);
         // TODO initialize controller
         await Controller.initialize(Server.instance);
         // NOTE initialize express server
@@ -26,7 +26,7 @@ class API {
 
     public static async stop () {
         // TODO stop database connection
-
+        // await DB.stop();
         // NOTE stop express server
         await Server.stop();
     }

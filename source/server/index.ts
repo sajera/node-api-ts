@@ -45,13 +45,13 @@ export class Server {
     }
 
     private handleLogConnection (request: express.Request, response: express.Response, next: express.NextFunction) {
-        console.info(`[SERVER:CONNECT] ${request.originalUrl}`);
+        console.info(`[SERVER:CONNECT] ${request.method}: ${request.originalUrl}`);
         return next();
     }
 
     private handleError (request: express.Request, response: express.Response) {
         // NOTE actually it should not be used
-        console.error(`[SERVER:404] path: ${request.originalUrl}`);
+        console.error(`[SERVER:404] ${request.method}: ${request.originalUrl}`);
         return response.status(404).send('Not Found');
     }
 

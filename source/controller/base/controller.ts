@@ -11,15 +11,16 @@ import { RoutOptions } from './interface';
  * @abstract
  */
 export class Controller {
-    private static routes: RoutOptions[] = [];
-    public static readonly router: Router = Router();
+    public static router: Router;
+    public static routes: RoutOptions[];
+    public static readonly prefix: string = '';
 
     /**
      * common initialization method
      */
     public static initialize (router: Router) {
         this.setupRoutes(this.router);
-        router.use(this.router);
+        router.use(this.prefix, this.router);
     }
 
     /**
@@ -27,6 +28,12 @@ export class Controller {
      */
     public static setupRoutes (router: Router) {
         const Controller = this;
+        console.info(
+            `\n[CONTROLLER: ${Controller.name}] endpoints:`
+            , Controller.routes
+                .map(rout => `\n\t${rout.method.toUpperCase()}: ${Controller.prefix}${rout.path} => (${rout.action})`)
+                .join('')
+        );
         for ( const { method, path, action } of Controller.routes ) {
             router[method](path, Controller.lifeCycle(action));
         }
@@ -67,15 +74,17 @@ export class Controller {
      * @decorator
      */
     public static Endpoint (rout: RoutOptions) {
+        // NOTE create own router and routes
+        if ( !this.routes ) { this.routes = []; }
+        if ( !this.router ) { this.router = Router(); }
         // NOTE controller must provide all it endpoints using decorator
         this.routes.push(rout);
-        // NOTE du not known but it has type error when used interface PropertyDescriptor
+        // console.info(`[CONTROLLER: ${this.name}: ${this.prefix}] add endpoint =>`, rout);
         return (t: Controller, p: string, d: any) => ({ value: d.value });
     }
 
 
     // ---------- LIFE CYCLE -----------------------
-    // NOTE in order to care about typing suggestions instead us
     public constructor (public readonly request: Request, public readonly response: Response, next?: NextFunction) {}
 
     /**
@@ -97,22 +106,22 @@ export class Controller {
  */
 export default class WithAuthorization extends Controller {
     public self?: object; // TODO must be a User
-    public authorized?: boolean; // TODO may be another data
+    public authorized?: boolean;
 
     // ------------------------ [TODO] ------------------------------------------------
 
     /**
      *
      */
-    public async checkSelfPermissions (request: Request, response: Response) {
+    public async _checkSelfPermissions (request: Request, response: Response) {
         console.info('checkSelfPermissions => allow to all', this.self);
     }
 
     /**
      *
      */
-    public async getSelf (request: Request, response: Response) {
-        return await (new Promise((resolve, reject) => {
+    public async _getSelf (request: Request, response: Response) {
+        this.self = await (new Promise((resolve, reject) => {
             // NOTE fake self
             resolve({
                 name: 'Fake',
@@ -125,13 +134,12 @@ export default class WithAuthorization extends Controller {
     /**
      *
      */
-    public async checkAuth (request: Request, response: Response) {
+    public async _checkAuth (request: Request, response: Response) {
         const { authorization } = request.headers;
         // NOTE fake authorization
         if ( authorization !== 'my_fake_authorization_token' ) {
             response.status(401).send('Authentication failed');
         }
     }
-
 
 }

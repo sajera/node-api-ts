@@ -19,6 +19,8 @@
     },
     "cors": {
         "log": false,
-        "origin":  ["http://localhost", "127.0.0.1"]
+        "origin": ["http://localhost", "127.0.0.1"],
+        "exposedHeaders": ["Content-Range", "X-Content-Range"],
+        "allowedHeaders": ["Origin", "X-Requested-With", "Content-Type", "Authorization", "Token"]
     }
 }
