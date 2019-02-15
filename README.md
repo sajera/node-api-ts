@@ -19,10 +19,10 @@ In order to provide expandable and scalable application. Each build process star
     * [x] Provide ability to easy setup configuration for different environment and project requirement
     * [x] Provide API initialization flow which may apply a lot of changes with same initialization rules
     * [x] Include Server(s) life cycle
-    * [-] Include Controllers life cycle
-    * [-] Include Database(s) life cycle
-    * [-] Include models life cycle
-    * [-] Generate documentation (Swagger or ...)
+    * [ ] Include Controllers life cycle
+    * [ ] Include Database(s) life cycle
+    * [ ] Include models life cycle
+    * [ ] Generate documentation (Swagger or ...)
     * [x] Provide configurable lint rules
     * [x] Provide intuitive developer process (care about helps from IDE of developers)
 
@@ -32,10 +32,10 @@ In order to provide expandable and scalable application. Each build process star
     * [x] Implement getting project configuration from **${environment}.json** file
     * [x] Provide ability to get configuration data on **any stage of project life cycle**
     * > Priority rules for `.env` files from lowest:
-        * 1. `${root}/.env`
-        * 2. `${root}/${environment}.env`
-        * 3. `${root}/${configStore}/.env`
-        * 4. `${root}/${configStore}/${environment}.env`
+        * min: `${root}/.env`
+        * `${root}/${environment}.env`
+        * `${root}/${configStore}/.env`
+        * max: `${root}/${configStore}/${environment}.env`
 
 * [ ] `Server` Project server life cycle
     * [x] **[express server](https://expressjs.com/ "express")** and provide to use original express with options from project config 
@@ -57,12 +57,9 @@ In order to provide expandable and scalable application. Each build process star
         * [x] @`${name}`.Endpoint({...options...}) - define `public async` method as endpoint of controller
         * [x] @WithAuth - check authorization to allow endpoint only for logged users (handle 401)
         * [x] @WithSelf({...options...}) - add to controller instance data of logged user (handle 401)
-        * [-] @WithPermission({...options...}) - before allow endpoint check permissions logged user (handle 403)
-        * [-] @allowOption - define how many checks (other decorators) may run for `OPTIONS` request for current endpoint
+        * [ ] @WithPermission({...options...}) - before allow endpoint check permissions logged user (handle 403)
+        * [ ] @allowOption - define how many checks (other decorators) may run for `OPTIONS` request for current endpoint
         * [x] @validate({...options...}) - check data within request to make sure the data is correct for endpoint (handle 400/406)
-        * [x] @WithPermission - before allow endpoint check permissions logged user (handle 403)
-        * [x] @WithPermission - before allow endpoint check permissions logged user (handle 403)
-        * [x] @WithPermission - before allow endpoint check permissions logged user (handle 403)
 
 * [ ] `DB` Project database life cycle
     * [ ] Provide customization from configuration file
