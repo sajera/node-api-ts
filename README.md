@@ -31,11 +31,11 @@ In order to provide expandable and scalable application. Each build process star
     * [x] Implement expanding of **process.env** from **.env** files by priority
     * [x] Implement getting project configuration from **${environment}.json** file
     * [x] Provide ability to get configuration data on **any stage of project life cycle**
-        > Priority rules for `.env` files from lowest:
-            1. `${root}/.env`
-            2. `${root}/${environment}.env`
-            3. `${root}/${configStore}/.env`
-            4. `${root}/${configStore}/${environment}.env`
+    * > Priority rules for `.env` files from lowest:
+        * 1. `${root}/.env`
+        * 2. `${root}/${environment}.env`
+        * 3. `${root}/${configStore}/.env`
+        * 4. `${root}/${configStore}/${environment}.env`
 
 * [ ] `Server` Project server life cycle
     * [x] **[express server](https://expressjs.com/ "express")** and provide to use original express with options from project config 
