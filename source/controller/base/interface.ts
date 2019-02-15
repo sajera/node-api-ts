@@ -16,7 +16,13 @@ export interface RoutOptions {
     action: string;
 }
 
-export interface SelfOptions {
-    user: boolean;
+export interface PermissionOptions {
+    any?: any;
     // TODO add more options
+}
+
+export interface ValidateOptions {
+    body: any;
+    query: any;
+    params: any;
 }

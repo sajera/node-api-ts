@@ -3,7 +3,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 
 // local dependencies
-import { RoutOptions } from './interface';
+import { RoutOptions, ValidateOptions } from './interface';
 
 /**
  * Implemented base reusable functionality to inheritance of application controller
@@ -104,7 +104,7 @@ export class Controller {
  *
  * @abstract
  */
-export default class WithAuthorization extends Controller {
+export class WithAuthorization extends Controller {
     public self?: object; // TODO must be a User
     public authorized?: boolean;
 
@@ -138,8 +138,32 @@ export default class WithAuthorization extends Controller {
         const { authorization } = request.headers;
         // NOTE fake authorization
         if ( authorization !== 'my_fake_authorization_token' ) {
-            response.status(401).send('Authentication failed');
+            await response.status(401).send('Authentication failed');
         }
     }
 
+}
+
+/**
+ * in order to care about typing suggestions instead using decorators we should use inline inheritance
+ * extend base controller to provide functionality of validation
+ *
+ * @abstract
+ */
+export default class WithValidation extends WithAuthorization {
+    public invalid?: any;
+    
+    /**
+     *
+     */
+    public async _validate (request: Request, response: Response, options: ValidateOptions) {
+        
+        // NOTE to test life cycle
+        this.invalid = true;
+
+        // NOTE if we have some validation errors send it back
+        if ( this.invalid ) {
+            await response.status(400).send(this.invalid);
+        }
+    }
 }
