@@ -1,7 +1,5 @@
 
 // outsource dependencies
-import { get } from 'lodash';
-import * as is from 's-is';
 import { Request, Response } from 'express';
 
 // local dependencies
@@ -48,3 +46,4 @@ export function Validate (options: ValidateOptions ) {
     };
 }
 
+export default Validate;

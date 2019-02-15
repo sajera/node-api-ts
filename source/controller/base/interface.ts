@@ -21,8 +21,7 @@ export interface PermissionOptions {
     // TODO add more options
 }
 
+export type validateFn = (value: any) => string | null | void;
 export interface ValidateOptions {
-    body: any;
-    query: any;
-    params: any;
+    [key: string]: validateFn;
 }

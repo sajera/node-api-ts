@@ -3,7 +3,7 @@
 import { Request, Response } from 'express';
 
 // local dependencies
-import Controller, { METHOD, WithAuth, WithPermission } from './base';
+import Controller, { METHOD, WithAuth, WithPermission, Validate } from './base';
 
 /**
  * Implement user CRUD and may be extended by user specific actions
@@ -47,6 +47,9 @@ export default class Users extends Controller {
     /**
      * endpoint to create item
      */
+    @Validate({
+        'body.test': (val: any) => 'error message'
+    })
     @WithPermission({/* to know how to handle permissions */})
     @Users.Endpoint({action: 'create', path: '/new', method: METHOD.POST})
     public async create (request: Request, response: Response) {
