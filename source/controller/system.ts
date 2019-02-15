@@ -15,7 +15,7 @@ export default class System extends Controller {
     /**
      * implement user self
      */
-    @WithSelf()
+    @WithSelf
     @System.Endpoint({action: 'getSelf', path: '/self', method: METHOD.GET})
     public async getSelf (request: Request, response: Response) {
         // TODO must prepare user self data to send only public information

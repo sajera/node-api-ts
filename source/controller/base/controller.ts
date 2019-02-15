@@ -114,7 +114,7 @@ export class WithAuthorization extends Controller {
      *
      */
     public async _checkSelfPermissions (request: Request, response: Response) {
-        console.info('checkSelfPermissions => allow to all', this.self);
+        console.info('checkSelfPermissions => allowed to all', this.self);
     }
 
     /**

@@ -1,10 +1,9 @@
 
 // outsource dependencies
-import * as path from 'path';
 import { Request, Response } from 'express';
 
 // local dependencies
-import Controller, { METHOD, WithAuth } from './base';
+import Controller, { METHOD, WithAuth, WithPermission } from './base';
 
 /**
  * Implement user CRUD and may be extended by user specific actions
@@ -48,7 +47,7 @@ export default class Users extends Controller {
     /**
      * endpoint to create item
      */
-    @WithAuth
+    @WithPermission({/* to know how to handle permissions */})
     @Users.Endpoint({action: 'create', path: '/new', method: METHOD.POST})
     public async create (request: Request, response: Response) {
         const data = await (new Promise((resolve, reject) => {
@@ -62,7 +61,7 @@ export default class Users extends Controller {
      * endpoint to update item
      */
     @WithAuth
-    @Users.Endpoint({action: 'update', path: '/:id', method: METHOD.PUT})
+    @Users.Endpoint({action: 'update', path: '/id/:id', method: METHOD.PUT})
     public async update (request: Request, response: Response) {
         const data = await (new Promise((resolve, reject) => {
             // reject({error: true});

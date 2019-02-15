@@ -8,7 +8,7 @@ import { RoutOptions, PermissionOptions, endpointFn, middlewareFn, errorMiddlewa
 
 // specific common implementation parts
 import { Validate } from './validate';
-import { WithAuth, WithSelf } from './auth';
+import { WithAuth, WithSelf, WithPermission } from './auth';
 
 // NOTE make aliases to comfortable usage
 export {
@@ -26,6 +26,7 @@ export {
     // specific for project
     WithAuth,
     WithSelf,
+    WithPermission,
     Validate,
     
 };
