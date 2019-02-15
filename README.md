@@ -33,9 +33,9 @@ In order to provide expandable and scalable application. Each build process star
     * [x] Provide ability to get configuration data on **any stage of project life cycle**
     * > Priority rules for `.env` files from lowest:
         * min: `${root}/.env`
-        * `${root}/${environment}.env`
+        * `${root}/${NODE_ENV}.env`
         * `${root}/${configStore}/.env`
-        * max: `${root}/${configStore}/${environment}.env`
+        * max: `${root}/${configStore}/${NODE_ENV}.env`
 
 * [ ] `Server` Project server life cycle
     * [x] **[express server](https://expressjs.com/ "express")** and provide to use original express with options from project config 
