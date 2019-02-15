@@ -42,7 +42,7 @@ export function WithAuth (target: Controller, property: string, descriptor: any)
             // NOTE care about status of response
             if ( response.headersSent ) { return; }
             // NOTE continue executing endpoint
-            return await descriptor.value.call(target, request, response);
+            return descriptor.value.call(target, request, response);
         }
     };
 }
@@ -81,7 +81,7 @@ export function WithSelf (options: SelfOptions = {user: true}) {
                 // NOTE care about status of response
                 if ( response.headersSent ) { return; }
                 // NOTE continue executing endpoint
-                return await descriptor.value.call(target, request, response);
+                return descriptor.value.call(target, request, response);
             }
         };
     };
