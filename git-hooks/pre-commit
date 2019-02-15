@@ -1,4 +1,5 @@
 #!/bin/sh
+SUCCESS=true
 echo "Running Linters:"
 
 # Run tslint and get the output and return code
@@ -9,8 +10,14 @@ ret_code=$?
 if [ $ret_code != 0 ]; then
 	printf "TSlint FAILED: Commit contains files with TSlint errors !!!"
 	echo "$tslint\n"
-	exit 1
+	SUCCESS=false
 else
 	printf "TSlint SUCCESS: Commit allowed."
+	echo "$tslint\n"
+fi
+
+if $SUCCESS; then
 	exit 0
 fi
+
+exit 1
