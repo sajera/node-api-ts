@@ -9,11 +9,11 @@ ret_code=$?
 # If it didn't pass, announce it failed and print the output
 if [ $ret_code != 0 ]; then
 	printf "TSlint FAILED: Commit contains files with TSlint errors !!!"
-	echo "$tslint\n"
+	echo "TSlint FAILED: Commit contains files with TSlint errors !!!"
 	SUCCESS=false
 else
 	printf "TSlint SUCCESS: Commit allowed."
-	echo "$tslint\n"
+	echo "TSlint SUCCESS: Commit allowed."
 fi
 
 if $SUCCESS; then
