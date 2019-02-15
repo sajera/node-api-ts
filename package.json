@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm-run-all start-api start-cron",
     "start-api": "ts-node source/api.ts",
-    "start-cron": "ts-node cron.ts",
+    "start-cron": "ts-node source/cron.ts",
     "api-local": "nodemon --exec ts-node source/api.ts",
     "cron-local": "nodemon --exec ts-node source/cron.ts"
   },
@@ -38,6 +38,7 @@
     "lodash": "^4.17.11",
     "lowdb": "^1.0.0",
     "multer": "^1.4.1",
+    "s-is": "^1.4.15",
     "session-file-store": "^1.2.0"
   },
   "nodemonConfig": {

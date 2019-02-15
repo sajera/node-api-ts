@@ -68,7 +68,7 @@ In order to provide expandable and scalable application. Each build process star
     * [ ] Provide MongoDB initialization
     * [ ] Provide examples of usage
 
-* [ ] `DB` Project model life cycle
+* [ ] `Model` Project model life cycle
     * [ ] Abstract helpers for model creation such as (Base)Controller
     * [ ] Provide huge customizable Models
     * [ ] Implement ability to connect models in the same way for different DB
