@@ -1,5 +1,6 @@
 
 // outsource dependencies
+import { get } from 'lodash';
 import { Router, Request, Response, NextFunction } from 'express';
 
 // local dependencies
@@ -45,6 +46,7 @@ export class Controller {
     public static lifeCycle (action: string) {
         const Controller = this;
         return async (request: Request, response: Response, next: NextFunction) => {
+            // NOTE provide access to original error
             let _error: Error;
             const instance = new Controller(request, response);
             // NOTE try to execute endpoint
@@ -56,7 +58,7 @@ export class Controller {
             }
             // NOTE care about error handling
             try {
-                return await instance.handleError(_error, request, response, next);
+                return await instance._handleError(_error, request, response, next);
             } catch ( error ) {
                 // NOTE care =) about stacked request
                 next({error, _error});
@@ -83,14 +85,13 @@ export class Controller {
         return (t: Controller, p: string, d: any) => ({ value: d.value });
     }
 
-
     // ---------- LIFE CYCLE -----------------------
     public constructor (public readonly request: Request, public readonly response: Response, next?: NextFunction) {}
 
     /**
      * simple customization middleware to handle error
      */
-    public async handleError (error: Error, request: Request, response: Response, next?: NextFunction) {
+    public async _handleError (error: Error, request: Request, response: Response, next?: NextFunction) {
         // NOTE break original error object using spread operator to provide ability of Object.toJSON method
         const { message, stack } = error;
         response.status(500).type('json').send({message, stack});
@@ -108,7 +109,7 @@ export class WithAuthorization extends Controller {
     public self?: object; // TODO must be a User
     public authorized?: boolean;
 
-    // ------------------------ [TODO] ------------------------------------------------
+    // ----- [TODO should be implemented ] -------
 
     /**
      *
@@ -150,20 +151,25 @@ export class WithAuthorization extends Controller {
  *
  * @abstract
  */
-export default class WithValidation extends WithAuthorization {
-    public invalid?: any;
+export class WithValidation extends WithAuthorization {
+    public invalid?: string[];
     
     /**
      *
      */
     public async _validate (request: Request, response: Response, options: ValidateOptions) {
-        
-        // NOTE to test life cycle
-        this.invalid = true;
-
+        this.invalid = [];
+        // NOTE run all validations
+        for (const key of Object.keys(options)) {
+            // NOTE execute validation of property
+            const error = options[key](get(request, key), key);
+            if (error) { this.invalid.push(error); }
+        }
         // NOTE if we have some validation errors send it back
-        if ( this.invalid ) {
-            await response.status(400).send(this.invalid);
+        if ( this.invalid && this.invalid.length ) {
+            await response.status(400).send(this.invalid.join('\n'));
         }
     }
 }
+
+export default WithValidation;

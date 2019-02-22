@@ -7,8 +7,7 @@ import { METHOD } from './const';
 import { RoutOptions, PermissionOptions, endpointFn, middlewareFn, errorMiddlewareFn  } from './interface';
 
 // specific common implementation parts
-import is from './is';
-import Validate from './validate';
+import is, { Validate } from './validate';
 import { WithAuth, WithSelf, WithPermission } from './auth';
 
 // NOTE make aliases to comfortable usage
