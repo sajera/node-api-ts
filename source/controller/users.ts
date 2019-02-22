@@ -47,12 +47,12 @@ export default class Users extends Controller {
     /**
      * endpoint to create item
      */
-    @Validate({
-        // 'body.test': is.string.required,
-        'body.test1': isCountable.defaults(1),
-        'body.test2': countable.defaults(0),
-        'body.test3': (val: any) => 'error message 3',
-    })
+    // @Validate({
+    //     // 'body.test': is.string.required,
+    //     'body.test1': isCountable.defaults(1),
+    //     'body.test2': countable.defaults(0),
+    //     'body.test3': (val: any) => 'error message 3',
+    // })
     @WithPermission({/* to know how to handle permissions */})
     @Users.Endpoint({action: 'create', path: '/new', method: METHOD.POST})
     public async create (request: Request, response: Response) {

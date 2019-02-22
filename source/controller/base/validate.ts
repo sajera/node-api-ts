@@ -55,9 +55,9 @@ class Is {
     public static create (name: string, check: checkFn) { return new Is(name, check); }
     private constructor (private name: string, private check: checkFn) {}
 
-    public required (path: string) {
+    // public required (path: string) {
 
-    }
+    // }
 
     protected __required (value: any, path: string = unknownMsg): string | null {
         console.log('required', this);
