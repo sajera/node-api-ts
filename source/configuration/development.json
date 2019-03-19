@@ -9,6 +9,11 @@
         "lastModified": false,
         "resources":  ["/public"]
     },
+    "swagger": {
+        "log": false,
+        "redirect": false,
+        "lastModified": false
+    },
     "urlencodedParse": {
         "log": false,
         "extended":  false

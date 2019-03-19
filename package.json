@@ -17,6 +17,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^10.12.19",
+    "@types/swagger-ui-express": "^3.0.0",
     "nodemon": "^1.18.9",
     "npm-run-all": "^4.1.5",
     "ts-node": "^8.0.2",
@@ -39,10 +40,12 @@
     "lowdb": "^1.0.0",
     "multer": "^1.4.1",
     "s-is": "^1.4.15",
-    "session-file-store": "^1.2.0"
+    "session-file-store": "^1.2.0",
+    "swagger-ui-express": "^4.0.2"
   },
   "nodemonConfig": {
     "ignore": [
+      "swagger/**/*",
       "public/**/*",
       "es5/**"
     ],

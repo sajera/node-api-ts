@@ -44,21 +44,23 @@ export class Controller {
      * ability to customize life cycle of middleware for specific controller
      */
     public static lifeCycle (action: string) {
-        const Controller = this;
         return async (request: Request, response: Response, next: NextFunction) => {
             // NOTE provide access to original error
             let _error: Error;
-            const instance = new Controller(request, response);
             // NOTE try to execute endpoint
             try {
-                return await instance[action](request, response);
+                const instance = this.create(request, response);
+                const endpoint = get(instance, action, () => '');
+                return await endpoint.call(instance, request, response);
             } catch ( error ) {
                 _error = error;
-                console.error(`[Controller: ${Controller.name} => ${action}] Execution error detected \n`, error);
+                console.error(`[Controller: ${this.name} => ${action}] Execution error detected \n`, error);
             }
             // NOTE care about error handling
             try {
-                return await instance._handleError(_error, request, response, next);
+                const instance = this.create(request, response);
+                const errorHandler = get(instance, '_handleError', () => '');
+                return await errorHandler.call(instance, _error, request, response, next);
             } catch ( error ) {
                 // NOTE care =) about stacked request
                 next({error, _error});
@@ -83,6 +85,11 @@ export class Controller {
         this.routes.push(rout);
         // console.info(`[CONTROLLER: ${this.name}: ${this.prefix}] add endpoint =>`, rout);
         return (t: Controller, p: string, d: any) => ({ value: d.value });
+    }
+
+    public static create (request: Request, response: Response, next?: NextFunction) {
+        const Controller = this;
+        return new Controller(request, response, next);
     }
 
     // ---------- LIFE CYCLE -----------------------
@@ -162,11 +169,11 @@ export class WithValidation extends WithAuthorization {
         // NOTE run all validations
         for (const key of Object.keys(options)) {
             // NOTE execute validation of property
-            const error = options[key](get(request, key), key);
+            const error = await options[key](get(request, key), key);
             if (error) { this.invalid.push(error); }
         }
         // NOTE if we have some validation errors send it back
-        if ( this.invalid && this.invalid.length ) {
+        if ( this.invalid.length ) {
             await response.status(400).send(this.invalid.join('\n'));
         }
     }

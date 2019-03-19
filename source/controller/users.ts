@@ -10,8 +10,8 @@ import { isCountable, countable } from './base/is';
  */
 export default class Users extends Controller {
     public static readonly prefix: string = '/users';
-    public transit: any;
-    
+    private transit: any;
+
     /**
      * endpoint to provide functionality to build lists
      */
@@ -82,6 +82,7 @@ export default class Users extends Controller {
     @WithAuth
     @Users.Endpoint({action: 'remove', path: '/id/:id', method: METHOD.DELETE})
     public async remove (request: Request, response: Response) {
+        console.log('@Users.Endpoint remove', this.transit);
         // NOTE provide ability to transit data from one action to another such as from remove list to remove item
         const id = this.transit ? this.transit : request.params.id;
         // TODO entity remove
@@ -107,6 +108,9 @@ export default class Users extends Controller {
             // NOTE delegate execution for each item to another action within controller
             await this.remove(request, response);
         }
+
+        // TODO to know why the "transit" stored on next call ....
+        this.transit = null;
         await response.status(200).type('json').send(list);
     }
 
