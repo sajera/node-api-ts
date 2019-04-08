@@ -4,11 +4,11 @@ import Controller from './controller';
 
 // common implementation parts
 import { METHOD } from './const';
-import { RoutOptions, SelfOptions, endpointFn, middlewareFn, errorMiddlewareFn  } from './interface';
+import { RoutOptions, PermissionOptions, endpointFn, middlewareFn, errorMiddlewareFn  } from './interface';
 
 // specific common implementation parts
-import { WithAuth, WithSelf } from './auth';
-
+import is, { Validate } from './validate';
+import { WithAuth, WithSelf, WithPermission } from './auth';
 
 // NOTE make aliases to comfortable usage
 export {
@@ -18,7 +18,7 @@ export {
 
     // interfaces
     RoutOptions,
-    SelfOptions,
+    PermissionOptions,
     endpointFn,
     middlewareFn,
     errorMiddlewareFn,
@@ -26,8 +26,11 @@ export {
     // specific for project
     WithAuth,
     WithSelf,
+    WithPermission,
+    Validate,
 
-    
+    // validation helper
+    is,
 };
 
 export default Controller;

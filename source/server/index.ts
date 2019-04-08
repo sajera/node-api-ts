@@ -9,6 +9,7 @@ import * as fileStore from 'session-file-store';
 
 // local dependencies
 import Cors from './cors';
+import Swagger from './swagger';
 import ParseJSON from './parse-json';
 import Configuration from '../configuration';
 import ParseUrlencoded from './parse-urlencoded';
@@ -24,6 +25,7 @@ export class Server {
     protected static _nodeServer: http.Server;
     public readonly cors: boolean = Boolean(Configuration.get('cors', false));
     public readonly static: boolean = Boolean(Configuration.get('static', false));
+    public readonly swagger: boolean = Boolean(Configuration.get('swagger', false));
     public readonly showLog: boolean = Boolean(Configuration.get('server.log', false));
     public readonly jsonParse: boolean = Boolean(Configuration.get('jsonParse', false));
     public readonly urlencodedParse: boolean = Boolean(Configuration.get('urlencodedParse', false));
@@ -66,6 +68,8 @@ export class Server {
 
     public static async initialize () {
         this.instance.log();
+        // NOTE swagger should be initialized after the swagger file will generated
+        if ( this.instance.swagger ) { Swagger.initialize(this.instance); }
         // NOTE last common debug middleware
         this.instance.app.use(this.instance.handleError);
         await this.start();

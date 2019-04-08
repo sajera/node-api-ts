@@ -1,0 +1,55 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Base definition for API url format. Presentation example. \n Path generating rules \n {VERSION} / {CONTROLLER} [/ {QUANTITY}] [/ {ADDITION}] \n 1. VERSION -  means API version and using as base path for all urls \n 2. CONTROLLER - logic entity - handler/worker which will determine actions for specific entity or api module \n 3. [QUANTITY] - mark used to determine response type as list or single item \n\t single - GET: api/user/{id} \n\t list - GET: api/user/list \n 4. [ADDITION] - provide logic to define complicate actions \n\t POST: api/user/list/status/DISABLED \n\t GET: api/user/{id}/status/DISABLED \n\t POST: api/user/list/filter",
+    "version": "1.0.0",
+    "title": "API url definition",
+    "contact": {
+      "email": "allsajera@gmail.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "host": "define.your.host",
+  "basePath": "/api-v1",
+  "tags": [
+    {
+      "name": "oauth",
+      "description": "Authentication flow",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "https://ru.wikipedia.org/wiki/OAuth"
+      }
+    },
+    {
+      "name": "User",
+      "description": "Entity base CRUD operation"
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "securityDefinitions": {
+    "petstore_auth": {
+      "type": "oauth2",
+      "authorizationUrl": "http://petstore.swagger.io/oauth/dialog",
+      "flow": "implicit",
+      "scopes": {
+        "write:pets": "modify pets in your account",
+        "read:pets": "read your pets"
+      }
+    },
+    "api_key": {
+      "type": "apiKey",
+      "name": "api_key",
+      "in": "header"
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  }
+}

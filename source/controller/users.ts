@@ -1,18 +1,17 @@
 
 // outsource dependencies
-import * as path from 'path';
 import { Request, Response } from 'express';
 
 // local dependencies
-import Controller, { METHOD, WithAuth } from './base';
-
+import Controller, { METHOD, WithAuth, WithPermission, Validate, is } from './base';
+import { isCountable, countable } from './base/is';
 /**
  * Implement user CRUD and may be extended by user specific actions
  */
 export default class Users extends Controller {
     public static readonly prefix: string = '/users';
-    public transit: any;
-    
+    private transit: any;
+
     /**
      * endpoint to provide functionality to build lists
      */
@@ -48,7 +47,13 @@ export default class Users extends Controller {
     /**
      * endpoint to create item
      */
-    @WithAuth
+    // @Validate({
+    //     // 'body.test': is.string.required,
+    //     'body.test1': isCountable.defaults(1),
+    //     'body.test2': countable.defaults(0),
+    //     'body.test3': (val: any) => 'error message 3',
+    // })
+    @WithPermission({/* to know how to handle permissions */})
     @Users.Endpoint({action: 'create', path: '/new', method: METHOD.POST})
     public async create (request: Request, response: Response) {
         const data = await (new Promise((resolve, reject) => {
@@ -62,7 +67,7 @@ export default class Users extends Controller {
      * endpoint to update item
      */
     @WithAuth
-    @Users.Endpoint({action: 'update', path: '/:id', method: METHOD.PUT})
+    @Users.Endpoint({action: 'update', path: '/id/:id', method: METHOD.PUT})
     public async update (request: Request, response: Response) {
         const data = await (new Promise((resolve, reject) => {
             // reject({error: true});
@@ -77,6 +82,7 @@ export default class Users extends Controller {
     @WithAuth
     @Users.Endpoint({action: 'remove', path: '/id/:id', method: METHOD.DELETE})
     public async remove (request: Request, response: Response) {
+        console.log('@Users.Endpoint remove', this.transit);
         // NOTE provide ability to transit data from one action to another such as from remove list to remove item
         const id = this.transit ? this.transit : request.params.id;
         // TODO entity remove
@@ -102,6 +108,9 @@ export default class Users extends Controller {
             // NOTE delegate execution for each item to another action within controller
             await this.remove(request, response);
         }
+
+        // TODO to know why the "transit" stored on next call ....
+        this.transit = null;
         await response.status(200).type('json').send(list);
     }
 

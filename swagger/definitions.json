@@ -1,0 +1,73 @@
+{
+  "Filter": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "example": "",
+        "description": "Can be applied part of name (not required)"
+      },
+      "email": {
+        "type": "string",
+        "example": "",
+        "description": "Can be applied part of email (not required)"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "DISABLED",
+          "AND",
+          "OTHER",
+          "ALLOWED",
+          "STATUSES"
+        ],
+        "example": "",
+        "description": "(not required)"
+      }
+    }
+  },
+  "Authentication": {
+    "type": "string",
+    "example": " JWT eyJ0eXAiOiJKV",
+    "description": "Authorization token in the standard form. Possible values: 'Authorization: JWT <ACCESS_TOKEN>' or 'Authorization: Bearer <ACCESS_TOKEN>'"
+  },
+  "UserDto": {
+    "type": "object",
+    "properties": {
+      "username": {
+        "type": "string"
+      },
+      "firstName": {
+        "type": "string"
+      },
+      "lastName": {
+        "type": "string"
+      },
+      "email": {
+        "type": "string"
+      },
+      "password": {
+        "type": "string"
+      },
+      "phone": {
+        "type": "string"
+      },
+      "userStatus": {
+        "type": "integer",
+        "format": "int32",
+        "description": "User Status"
+      }
+    }
+  },
+  "UserShortDto": {
+    "type": "object",
+    "properties": {
+      "username": {
+        "type": "string"
+      },
+      "email": {
+        "type": "string"
+      }
+    }
+  }
+}

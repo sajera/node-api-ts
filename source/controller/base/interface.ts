@@ -6,6 +6,11 @@ import { Request, Response, NextFunction } from 'express';
 import { METHOD } from './const';
 
 // cycle: string[] | Array<(request: Request, response: Response) => void>
+export type checkFn = (value: any) => boolean;
+export type ValidateOptions = checkFormatterFn[];
+export type checkFormatterFn = (value: any, path: string) => string | null;
+export type validateFn = (request: Request, response: Response) => Promise<any>;
+
 export type endpointFn = ((request: Request, response: Response) => Promise<any>);
 export type middlewareFn = ((request: Request, response: Response, next: NextFunction) => void);
 export type errorMiddlewareFn = ((error: Error, request: Request, response: Response, next: NextFunction) => void);
@@ -16,7 +21,7 @@ export interface RoutOptions {
     action: string;
 }
 
-export interface SelfOptions {
-    user: boolean;
+export interface PermissionOptions {
+    any?: any;
     // TODO add more options
 }
