@@ -32,7 +32,7 @@ export class IndexController {
         console.info(`---------------- [API: ${this.apiPath}] ----------------`);
         this.router = Router();
         // NOTE initialize API Controllers
-        await this.setupController(SystemController);
+        // await this.setupController(SystemController);
         await this.setupController(UsersController);
         
         // NOTE initialize API router

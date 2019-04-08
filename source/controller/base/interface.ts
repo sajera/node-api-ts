@@ -19,6 +19,7 @@ export interface RoutOptions {
     path: string;
     method: METHOD;
     action: string;
+    allowOptions?: boolean;
 }
 
 export interface PermissionOptions {
