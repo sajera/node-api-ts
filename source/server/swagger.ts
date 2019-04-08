@@ -1,4 +1,5 @@
 // outsource dependencies
+import * as fs from 'fs';
 import * as path from 'path';
 import * as swagger from 'swagger-ui-express';
 
@@ -34,6 +35,17 @@ export default class SwaggerOptions {
         );
     }
 
+    private static writeLastResults (content: object) {
+        if (Configuration.get('swagger', false) && (
+            Configuration.get('swagger.log', false)
+            || Configuration.get('debug', false)
+            || Configuration.getENV('DEBUG', false)
+        )) {
+            const stringContent = JSON.stringify(content, null, 4);
+            fs.writeFile('swagger/last-results.local.json', stringContent, () => '');
+        }
+    }
+
     public static initialize (server: Server) {
         const swaggerOptions = new SwaggerOptions();
         // NOTE base information may contain any swagger data
@@ -44,6 +56,8 @@ export default class SwaggerOptions {
         // NOTE setup definition it should present in configuration
         content.definitions = !swaggerOptions.definitions ? {}
             : require(path.join(process.cwd(), swaggerOptions.definitions));
+        // NOTE write swagger result to the file to simplify development
+        this.writeLastResults(content);
         // NOTE setup swagger
         server.app.use('/swagger', swagger.serve, swagger.setup(content, swaggerOptions));
     }
