@@ -8,6 +8,7 @@ import { RoutOptions, PermissionOptions, endpointFn, middlewareFn, errorMiddlewa
 
 // specific common implementation parts
 import is, { Validate } from './validate';
+import AllowOptions from './allow-options';
 import { WithAuth, WithSelf, WithPermission } from './auth';
 
 // NOTE make aliases to comfortable usage
@@ -28,7 +29,7 @@ export {
     WithSelf,
     WithPermission,
     Validate,
-
+    AllowOptions,
     // validation helper
     is,
 };

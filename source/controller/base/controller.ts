@@ -20,24 +20,32 @@ export class Controller {
      * common initialization method
      */
     public static initialize (router: Router) {
-        this.setupRoutes(this.router);
+        console.info(
+            `\n[CONTROLLER: ${this.name}] endpoints:`
+            , this.routes
+                .map(rout => `\n\t${rout.method.toUpperCase()}: ${this.prefix}${rout.path} => (${rout.action})`)
+                .join('')
+        );
+        for ( const route of this.routes ) {
+            this.setupRoute(route);
+        }
         router.use(this.prefix, this.router);
     }
 
     /**
      * complicate customization to setup routes
      */
-    public static setupRoutes (router: Router) {
+    public static setupRoute (route: RoutOptions) {
         const Controller = this;
-        console.info(
-            `\n[CONTROLLER: ${Controller.name}] endpoints:`
-            , Controller.routes
-                .map(rout => `\n\t${rout.method.toUpperCase()}: ${Controller.prefix}${rout.path} => (${rout.action})`)
-                .join('')
-        );
-        for ( const { method, path, action } of Controller.routes ) {
-            router[method](path, Controller.lifeCycle(action));
+        const path = route.path;
+        const action = route.action;
+        const method = route.method;
+        const allowOption = route.allowOptions;
+        // NOTE very simple implementation of "allow options" flow
+        if ( allowOption ) {
+            this.router.options(path, Controller.lifeCycle(action) );
         }
+        this.router[method](path, Controller.lifeCycle(action) );
     }
 
     /**

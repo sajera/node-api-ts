@@ -3,8 +3,9 @@
 import { Request, Response } from 'express';
 
 // local dependencies
-import Controller, { METHOD, WithAuth, WithPermission, Validate, is } from './base';
+import Controller, { METHOD, WithAuth, WithPermission, Validate, is, AllowOptions } from './base';
 import { isCountable, countable } from './base/is';
+
 /**
  * Implement user CRUD and may be extended by user specific actions
  */
@@ -35,11 +36,11 @@ export default class Users extends Controller {
      * endpoint to get item by id
      */
     @WithAuth
-    @Users.Endpoint({action: 'byId', path: '/id/:id', method: METHOD.GET})
+    @Users.Endpoint({action: 'byId', path: '/:id', method: METHOD.GET})
     public async byId (request: Request, response: Response) {
         const data = await (new Promise((resolve, reject) => {
             // reject({error: true});
-            resolve({data: true});
+            resolve({get: true});
         }));
         await response.status(200).type('json').send(data);
     }
@@ -58,7 +59,7 @@ export default class Users extends Controller {
     public async create (request: Request, response: Response) {
         const data = await (new Promise((resolve, reject) => {
             // reject({error: true});
-            resolve({data: true});
+            resolve({create: true});
         }));
         await response.status(200).type('json').send(data);
     }
@@ -67,11 +68,12 @@ export default class Users extends Controller {
      * endpoint to update item
      */
     @WithAuth
-    @Users.Endpoint({action: 'update', path: '/id/:id', method: METHOD.PUT})
+    @AllowOptions
+    @Users.Endpoint({action: 'update', path: '/:id', method: METHOD.PUT})
     public async update (request: Request, response: Response) {
         const data = await (new Promise((resolve, reject) => {
             // reject({error: true});
-            resolve({data: true});
+            resolve({update: true});
         }));
         await response.status(200).type('json').send(data);
     }
@@ -82,13 +84,13 @@ export default class Users extends Controller {
     @WithAuth
     @Users.Endpoint({action: 'remove', path: '/id/:id', method: METHOD.DELETE})
     public async remove (request: Request, response: Response) {
-        console.log('@Users.Endpoint remove', this.transit);
+        console.log('@Users.Endpoint remove', this.transit, request.params);
         // NOTE provide ability to transit data from one action to another such as from remove list to remove item
         const id = this.transit ? this.transit : request.params.id;
         // TODO entity remove
         const data = await (new Promise((resolve, reject) => {
             // reject({error: true});
-            resolve({data: true});
+            resolve({remove: true});
         }));
         // NOTE provide ability to transit closing request to caller
         if ( this.transit ) { return; }
@@ -99,7 +101,11 @@ export default class Users extends Controller {
      * endpoint to remove list item
      */
     @WithAuth
-    @Users.Endpoint({action: 'removeList', path: '/list', method: METHOD.DELETE})
+    @Users.Endpoint({
+        action: 'removeList',
+        path: '/list',
+        method: METHOD.DELETE
+    })
     public async removeList (request: Request, response: Response) {
         // TODO get user list from body
         const list = [{id: '100'}, {id: '200'}];
