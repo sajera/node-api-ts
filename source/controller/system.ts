@@ -1,81 +1,78 @@
 
-// // outsource dependencies
-// import { Request, Response } from 'express';
+// outsource dependencies
 
-// // local dependencies
-// import Configuration from '../configuration';
-// import Controller, { METHOD, WithSelf } from './base';
+// local dependencies
+import Configuration from '../configuration';
+import { APIController, APIEndpoint, API_METHOD, BaseController } from './base';
 
-// /**
-//  * system endpoints which not belong to any controllers and mostly unique
-//  */
-// export default class System extends Controller {
-//     public static readonly prefix: string = '/system';
+/**
+ * system endpoints which not belong to any controllers and mostly unique
+ */
+@APIController({ path: '/system' })
+export default class System extends BaseController {
 
-//     /**
-//      * implement user self
-//      */
-//     @WithSelf
-//     @System.Endpoint({action: 'getSelf', path: '/self', method: METHOD.GET})
-//     public async getSelf (request: Request, response: Response) {
-//         // TODO must prepare user self data to send only public information
-//         const user = this.self;
-//         // NOTE very simple solution to take logged user using decorator "WithSelf"
-//         await response.status(200).type('json').send(user);
-//     }
+    /**
+     * implement user self
+     */
+    @APIEndpoint({path: '/self', method: API_METHOD.GET})
+    public async getSelf () {
+        // TODO must prepare user self data to send only public information
+        const user = {}; // this.self;
+        // NOTE very simple solution to take logged user using decorator "WithSelf"
+        await this.response.status(200).type('json').send(user);
+    }
 
-//     /**
-//      * implement user sign up
-//      */
-//     @System.Endpoint({action: 'signUp', path: '/sign-up', method: METHOD.POST})
-//     public async signUp (request: Request, response: Response) {
-//         // TODO implement user creation
-//         const user = request.body;
-//         // NOTE very simple solution without email verification to delegate authorization to authorization action
-//         await this.signIn(request, response);
-//     }
+    /**
+     * implement user sign up
+     */
+    @APIEndpoint({path: '/sign-up', method: API_METHOD.POST})
+    public async signUp () {
+        // TODO implement user creation
+        const user = this.request.body;
+        await this.response.status(200).type('json').send(user);
+    }
 
-//     /**
-//      * implement user sign in
-//      */
-//     @System.Endpoint({action: 'signIn', path: '/sign-in', method: METHOD.POST})
-//     public async signIn (request: Request, response: Response) {
-//         // TODO implement authorization flow
-//         // NOTE currently fake authorization token
-//         await response.status(200).type('json').send({
-//             access_token: 'my_fake_authorization_token',
-//             refresh_token: '',
-//         });
-//     }
+    /**
+     * implement user sign in
+     */
+    @APIEndpoint({path: '/sign-in', method: API_METHOD.POST})
+    public async signIn () {
+        // TODO implement authorization flow
+        // NOTE currently fake authorization token
+        await this.response.status(200).type('json').send({
+            access_token: 'my_fake_authorization_token',
+            refresh_token: '',
+        });
+    }
 
-//     /**
-//      * implement user sign out
-//      */
-//     @System.Endpoint({action: 'signOut', path: '/sign-out', method: METHOD.GET})
-//     public async signOut (request: Request, response: Response) {
-//         // TODO kill session and authorization tokens
-//         await (new Promise((resolve, reject) => {
+    /**
+     * implement user sign out
+     */
+    @APIEndpoint({path: '/sign-out', method: API_METHOD.GET})
+    public async signOut () {
+        // TODO kill session and authorization tokens
+        await (new Promise((resolve, reject) => {
 
-//             // emulation ... some code
+            // emulation ... some code
 
-//             // NOTE all done
-//             resolve({});
-//         }));
-//         // NOTE in any case 200: "ok"
-//         await response.status(200).type('json').send({});
-//     }
+            // NOTE all done
+            resolve({});
+        }));
+        // NOTE in any case 200: "ok"
+        await this.response.status(200).type('json').send({});
+    }
     
-//     /**
-//      * provide public system info
-//      */
-//     @System.Endpoint({action: 'information', path: '/info', method: METHOD.GET})
-//     public async information (request: Request, response: Response) {
-//         await response.status(200).type('json').send({
-//             base: false,
-//             health: 'UP',
-//             auth: 'Authorization',
-//             version: Configuration.get('version', 1),
-//         });
-//     }
+    /**
+     * provide public system info
+     */
+    @APIEndpoint({path: '/info', method: API_METHOD.GET})
+    public async information () {
+        await this.response.status(200).type('json').send({
+            base: false,
+            health: 'UP',
+            auth: 'Authorization',
+            version: Configuration.get('version', 1),
+        });
+    }
 
-// }
+}

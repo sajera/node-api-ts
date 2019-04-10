@@ -8,7 +8,7 @@ import Server from '../server';
 import Configuration from '../configuration';
 // controllers
 import UsersController from './users';
-// import SystemController from './system';
+import SystemController from './system';
 
 export class IndexController {
     protected static _instance: IndexController;
@@ -32,7 +32,7 @@ export class IndexController {
         console.info(`---------------- [API: ${this.apiPath}] ----------------`);
         this.router = Router();
         // NOTE initialize API Controllers
-        // await this.setupController(SystemController);
+        SystemController.initialize(this.router);
         UsersController.initialize(this.router);
         
         // NOTE initialize API router

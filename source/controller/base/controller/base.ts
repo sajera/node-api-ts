@@ -19,6 +19,10 @@ export default class Controller {
     public static initialize (router: Router) {
         // NOTE create controller router
         this.router = Router();
+        // console.info(
+        //     `\n[CONTROLLER: ${this.name}]`
+        //     , this.annotation
+        // );
         // NOTE setup all endpoints of controller
         for ( const endpoint of this.annotation.endpoints ) {
             this.setupEndpoint(endpoint);
@@ -30,11 +34,11 @@ export default class Controller {
     /**
      * common simple setup endpoint
      */
-    private static setupEndpoint ({ path, method, action }: Endpoint) {
+    public static setupEndpoint ({ path, method, action }: Endpoint) {
         const Ctrl = this;
         this.router[method](path, (request: Request, response: Response, next: NextFunction) => {
             const instance = new Ctrl(request, response);
-            (new Promise((resolve, reject) => instance[action]().then(resolve).catch(reject)))
+            instance[action]()
             .then(() => !response.headersSent && next())
             .catch((error: Error) => {
                 console.error(`\n[CONTROLLER: ${Ctrl.name}.${action}] Error:\n`, error);
