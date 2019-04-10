@@ -1,6 +1,5 @@
 
 // outsource dependencies
-import { Request, Response } from 'express';
 
 // local dependencies
 import { APIController, APIEndpoint, API_METHOD, BaseController } from './base';
@@ -56,6 +55,7 @@ export default class Users extends BaseController {
     /**
      * endpoint to update item
      */
+    @APIEndpoint({ path: '/:id', method: API_METHOD.PUT })
     public async update () {
         const data = await (new Promise((resolve, reject) => {
             // reject({error: true});
@@ -67,6 +67,7 @@ export default class Users extends BaseController {
     /**
      * endpoint to remove item
      */
+    @APIEndpoint({ path: '/:id', method: API_METHOD.DELETE })
     public async remove () {
         const data = await (new Promise((resolve, reject) => {
             // reject({error: true});
@@ -79,6 +80,7 @@ export default class Users extends BaseController {
     /**
      * endpoint to remove list item
      */
+    @APIEndpoint({ path: '/list', method: API_METHOD.DELETE })
     public async removeList () {
         // TODO get user list from body
         const list = [{id: '100'}, {id: '200'}];

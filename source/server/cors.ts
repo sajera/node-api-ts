@@ -11,7 +11,7 @@ export default class CorsOptions {
     public readonly origin: boolean | string | string[] = Configuration.get('cors.origin', false);
     public readonly preflightContinue: boolean = Configuration.get('cors.preflightContinue', true);
     public readonly methods: string[] = Configuration.get('cors.methods', [
-        'GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'
+        'GET', 'PUT', 'POST', 'DELETE', 'HEAD', 'OPTIONS'
     ]);
     public readonly exposedHeaders: string[] = Configuration.get('cors.exposedHeaders', [
         'Content-Range', 'X-Content-Range'

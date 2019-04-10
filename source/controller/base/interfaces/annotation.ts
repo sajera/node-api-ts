@@ -15,8 +15,6 @@ export interface SwaggerAnnotation {
 export interface EndpointAnnotation {
     path: string;
     method: API_METHOD;
-    allowHead?: boolean;
-    allowOption?: boolean;
 }
 /**
  * Endpoint annotation restriction
