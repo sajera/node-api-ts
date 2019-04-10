@@ -1,37 +1,6 @@
 
-// base controller to extend
-import Controller from './controller';
+export { API_METHOD, METHOD } from './constant';
+export { default as BaseController } from './controller';
+export { APIController, APIEndpoint } from './annotations';
 
-// common implementation parts
-import { METHOD } from './const';
-import { RoutOptions, PermissionOptions, endpointFn, middlewareFn, errorMiddlewareFn  } from './interface';
-
-// specific common implementation parts
-import is, { Validate } from './validate';
-import AllowOptions from './allow-options';
-import { WithAuth, WithSelf, WithPermission } from './auth';
-
-// NOTE make aliases to comfortable usage
-export {
-    Controller, // abstract base controller
-    // constants
-    METHOD,
-
-    // interfaces
-    RoutOptions,
-    PermissionOptions,
-    endpointFn,
-    middlewareFn,
-    errorMiddlewareFn,
-
-    // specific for project
-    WithAuth,
-    WithSelf,
-    WithPermission,
-    Validate,
-    AllowOptions,
-    // validation helper
-    is,
-};
-
-export default Controller;
+export * from './interfaces';
