@@ -13,6 +13,7 @@
         "source/**/*",
     ],
     "exclude": [
+        "swagger",
         "node_modules",
         "**/*.spec.ts"
     ]

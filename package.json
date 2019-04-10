@@ -2,19 +2,22 @@
   "name": "node-api-ts",
   "version": "0.0.1",
   "author": "Sajera: Serhii P <allsajera@gmail.com>",
-  "description": "Project created as dummy to fast setup base structure for scalings projects",
+  "description": "Project created as dummy to fast setup base structure for expandable and scalable applications",
   "main": "index.js",
   "scripts": {
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "lint-auto-fix": "tslint -c tslint.json -p tsconfig.json --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm-run-all start-api start-cron",
     "start-api": "ts-node source/api.ts",
-    "start-cron": "ts-node cron.ts",
+    "start-cron": "ts-node source/cron.ts",
     "api-local": "nodemon --exec ts-node source/api.ts",
     "cron-local": "nodemon --exec ts-node source/cron.ts"
   },
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^10.12.19",
+    "@types/swagger-ui-express": "^3.0.0",
     "nodemon": "^1.18.9",
     "npm-run-all": "^4.1.5",
     "ts-node": "^8.0.2",
@@ -36,13 +39,20 @@
     "lodash": "^4.17.11",
     "lowdb": "^1.0.0",
     "multer": "^1.4.1",
-    "session-file-store": "^1.2.0"
+    "s-is": "^1.4.15",
+    "session-file-store": "^1.2.0",
+    "swagger-ui-express": "^4.0.2"
   },
   "nodemonConfig": {
     "ignore": [
+      "swagger/**/*",
       "public/**/*",
       "es5/**"
     ],
     "delay": "2500"
+  },
+  "engines": {
+    "node": ">=9.7.0",
+    "npm": ">=5.6.0"
   }
 }
