@@ -3,16 +3,8 @@
         "log": true,
         "port": 4000
     },
-    "static": {
-        "log": false,
-        "redirect": false,
-        "lastModified": false,
-        "resources":  ["/public"]
-    },
     "swagger": {
-        "log": false,
-        "redirect": false,
-        "lastModified": false
+        "log": false
     },
     "urlencodedParse": {
         "log": false,
