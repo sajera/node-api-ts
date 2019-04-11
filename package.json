@@ -1,6 +1,6 @@
 {
   "name": "node-api-ts",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "author": "Sajera: Serhii P <allsajera@gmail.com>",
   "description": "Project created as dummy to fast setup base structure for expandable and scalable applications",
   "main": "index.js",
