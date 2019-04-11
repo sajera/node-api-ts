@@ -12,14 +12,12 @@ import { ControllerAnnotation, Annotation } from '../interfaces';
  *
  * @example
  * /@APIController({path: '/ctrl-prefix'})
- * export default class My extends Controller {
- *     ...
- * }
+ * export default class My extends Controller { ... }
  * @decorator
  */
 export default function (options: ControllerAnnotation) {
     return (Ctrl: any) => {
-        const annotation: Annotation = formatAnnotation();
+        const annotation: Annotation = formatAnnotation(Ctrl, options);
         // NOTE store data which was grabbed from annotations
         Ctrl.annotation = annotation;
         return Ctrl;
