@@ -35,7 +35,7 @@ export default class AuthController extends BaseController {
 
     public async getLoggedUser () {
         // TODO implement
-        console.log('checkAuthorization NOT IMPLEMENTED');
+        console.log('getLoggedUser NOT IMPLEMENTED');
         return {name: 'Logged user =)'};
         // throw new Error('getLoggedUser NOT IMPLEMENTED');
     }

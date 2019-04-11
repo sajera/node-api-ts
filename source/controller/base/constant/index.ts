@@ -5,7 +5,7 @@
 /**
  * list of allowed to use express methods
  */
-export enum METHOD {
+export enum HTTP_METHOD {
     GET = 'get',
     PUT = 'put',
     POST = 'post',
