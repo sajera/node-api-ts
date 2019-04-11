@@ -21,7 +21,7 @@ export function APIEndpoint (value: EndpointAnnotation) {
 /**
  * Define addition data for swagger endpoints
  */
-export function Swagger (value: SwaggerAnnotation) {
+export function APISwagger (value: SwaggerAnnotation) {
     return Reflect.metadata(ANNOTATION_TYPE.SWAGGER, value);
 }
 
@@ -38,11 +38,8 @@ export function APIController (options: ControllerAnnotation) {
             if ( !Reflect.hasMetadata(ANNOTATION_TYPE.ENDPOINT, target, name) ) { continue; }
             const endpointAnnotation: EndpointAnnotation = Reflect.getMetadata(ANNOTATION_TYPE.ENDPOINT, target, name);
             const swaggerAnnotation: SwaggerAnnotation = Reflect.getMetadata(ANNOTATION_TYPE.SWAGGER, target, name);
-            const endpoint: Endpoint = {
-                action: name,
-                ...swaggerAnnotation,
-                ...endpointAnnotation,
-            };
+            const endpoint: Endpoint = { action: name, ...endpointAnnotation };
+            if ( swaggerAnnotation ) { endpoint.swagger = swaggerAnnotation; }
             annotation.endpoints.push(endpoint);
             // console.log('Ctrl.prototype', name
             //     , '\nswagger: ', endpointAnnotation

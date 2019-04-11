@@ -21,6 +21,7 @@ export interface EndpointAnnotation {
  */
 export interface Endpoint extends EndpointAnnotation {
     action: string;
+    swagger?: any; // NOTE without final implementation - define only idea
     any?: any;
 }
 /**
