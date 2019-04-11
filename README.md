@@ -10,7 +10,7 @@ Provided expandable and scalable application. Each build process start from setu
 
 ### Application server
 
-Provide flow to expand application server by any existing and features express modules in common way. All connected, to base server, modules has default his own configuration. It wil use default configuration only if it wosnt provided from `Application configuration`.
+Provide flow to expand application server by any existing and features express modules in common way. All connected, to base server, modules has default his own configuration. It will use default configuration only if it wasn't provided from `Application configuration`.
 
 - - - -
 # Root TODO`s
@@ -48,7 +48,7 @@ Provide flow to expand application server by any existing and features express m
     * [ ] cookie with options from project config 
     * [ ] session (Not authorization) with options from project config 
 
-* [ ] `Controller` Project controllers life cycle
+* [ ] `API Controller` Project controllers
     * [x] Provide controllers entry point
     * [x] Provide functionality from express
     * [x] Implement Controller life cycle - each call to API will be handled of its own controller instance
