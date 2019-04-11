@@ -1,9 +1,8 @@
 
 // outsource dependencies
-import { Router, Request, Response, NextFunction, RequestHandler } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 
 // local dependencies
-import Configuration from '../../../configuration';
 import { Annotation, Endpoint } from '../interfaces';
 
 /**
@@ -13,15 +12,6 @@ import { Annotation, Endpoint } from '../interfaces';
 export default class Controller {
     public static router: Router;
     public static annotation: Annotation;
-
-    public static log () {
-        console.info(`\n[CONTROLLER: ${this.name}(${this.annotation.name})]: ${this.annotation.path}`);
-        for (const endpoint of this.annotation.endpoints) {
-            const auth = endpoint.auth ? 'private' : 'public';
-            const swagger = endpoint.swagger ? '(+Swagger)' : '';
-            console.info(`  [ENDPOINT: ${auth} ${swagger}] ${endpoint.action}(${endpoint.method}, ${endpoint.path})`);
-        }
-    }
 
     /**
      * common initialization method
@@ -35,9 +25,6 @@ export default class Controller {
         }
         // NOTE add controller router to application router
         router.use(this.annotation.path, this.router);
-        // NOTE debug log
-        // if ( Configuration.getENV('DEBUG', false) ) { this.log(); }
-        this.log();
     }
 
     /**
@@ -50,7 +37,7 @@ export default class Controller {
             instance[action]()
             .then(() => !response.headersSent && next())
             .catch((error: Error) => {
-                console.error(`\n[CONTROLLER: ${Ctrl.name}.${action}] Error:\n`, error);
+                console.error(`\n[CONTROLLER: ${Ctrl.name}.${action}] Execution Error:\n`, error);
                 next(error);
             });
         });

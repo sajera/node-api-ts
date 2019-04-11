@@ -1,4 +1,8 @@
-{
+{   
+    "api": {
+        "log": true,
+        "path": "/api"
+    },
     "server": {
         "log": true,
         "port": 4000
