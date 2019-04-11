@@ -15,6 +15,7 @@
         "space-within-parens": false,
         "no-shadowed-variable": false,
         "no-conditional-assignment": true,
+        "object-literal-shorthand": false,
         "object-literal-sort-keys": false,
         "no-consecutive-blank-lines": false,
         "one-variable-per-declaration": false,
