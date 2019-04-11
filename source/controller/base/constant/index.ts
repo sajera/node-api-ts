@@ -25,7 +25,7 @@ export enum API_METHOD {
 |                Annotation TYPES                 |
 -------------------------------------------------*/
 /**
- * create types using symbol
+ * create types using symbol or switch to another creation type using common method
  * @private
  */
 function createType (name: string): symbol {
@@ -37,5 +37,6 @@ function createType (name: string): symbol {
 export const ANNOTATION_TYPE = {
     ENDPOINT: createType('endpoint'),
     SWAGGER: createType('swagger'),
+    AUTH: createType('authorization'),
 };
 

@@ -2,7 +2,7 @@
 // outsource dependencies
 
 // local dependencies
-import { APIController, APIEndpoint, APISwagger, API_METHOD, BaseController } from './base';
+import { APIController, APIEndpoint, Swagger, API_METHOD, BaseController, Auth } from './base';
 
 /**
  * Implement user CRUD and may be extended by user specific actions
@@ -13,13 +13,15 @@ export default class Users extends BaseController {
     /**
      * endpoint to provide functionality to build lists
      */
-    @APISwagger({any: 'test'})
+    @Auth({self: true})
+    @Swagger({any: 'test'})
     @APIEndpoint({ path: '/filter', method: API_METHOD.POST })
     public async filter () {
         // TODO get filtered page with users
         const data = await (new Promise((resolve, reject) => {
             // reject({error: true});
             resolve({
+                test: this.self,
                 page: 0,
                 size: 10,
                 content: [],

@@ -2,13 +2,9 @@
 
 // local dependencies
 import { API_METHOD } from '../constant';
+import { SwaggerEndpoint } from './swagger';
+import { AuthEndpoint } from './auth';
 
-/**
- * Swagger addition data annotation restriction
- */
-export interface SwaggerAnnotation {
-    any?: any;
-}
 /**
  * Endpoint annotation restriction
  */
@@ -22,7 +18,8 @@ export interface EndpointAnnotation {
 export interface Endpoint extends EndpointAnnotation {
     action: string;
     // NOTE without final implementation - define only idea
-    swagger?: any;
+    swagger?: SwaggerEndpoint;
+    auth?: AuthEndpoint;
     any?: any;
 }
 /**

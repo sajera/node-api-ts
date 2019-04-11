@@ -53,11 +53,11 @@ Provide flow to expand application server by any existing and features express m
     * [x] Provide functionality from express
     * [x] Implement Controller life cycle - each call to API will be handled of its own controller instance
     * [x] Provide `endpoint` as controller `public async` method with access to controller instance for current call
-    * [x] Provide Decorators `API` (Annotation)
+    * [x] Provide Decorators `API`
         * [x] @APIController({...options...}) - define `class` as API controller - read annotations of controller
         * [x] @APIEndpoint({...options...}) - define `public async` method of `{APIController}` as endpoint - setup annotation endpoint
-        * [ ] @APISwagger({...options...}) - expand `{@APIEndpoint}` annotation - provide ability to auto generate documentation of endpoint using **[Swagger](https://www.npmjs.com/package/swagger-ui-express/ "swagger-ui-express")**
     * [ ] Provide Decorators `@APIEndpoint` (Proxy)  
+        * [ ] @Swagger({...options...}) - expand `{@APIEndpoint}` annotation - provide ability to auto generate documentation of endpoint using **[Swagger](https://www.npmjs.com/package/swagger-ui-express/ "swagger-ui-express")**
         * [ ] @Auth({…options…}) - check/restore `Authorization` and handle 401 Unathorized
         * [ ] @Validate - ??? or it can be as @APIEndpointSchema
         * [ ] @??? - ???
