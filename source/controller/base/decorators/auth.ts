@@ -3,6 +3,7 @@
 import 'reflect-metadata';
 
 // local dependencies
+import Controller from '../controller';
 import { ANNOTATION_TYPE } from '../constant';
 import { SwaggerAnnotation, AuthAnnotation } from '../interfaces';
 
@@ -50,28 +51,8 @@ export default function (options: AuthAnnotation) {
             value: async function () {
                 // NOTE care about status of response
                 if ( this.response.headersSent ) { return; }
-                console.log('this.request.originalUrl', this.request.originalUrl);
-                // console.log('target', target);
-                // console.log('descriptor', descriptor);
-                // // NOTE care about status of response
-                // if ( response.headersSent ) { return; }
-                // // NOTE care about previous check
-                // if ( !target.authorized ) {
-                //     // TODO common check authorization method from Controller
-                //     await target._checkAuth.call(target, request, response);
-                // }
-                // // NOTE care about status of response
-                // if ( response.headersSent ) { return; }
-                // // NOTE care about previous check
-                // if ( !target.self ) {
-                //     // TODO common check authorization method from Controller
-                //     await target._getSelf.call(target, request, response);
-                // }
-                // // NOTE care about status of response
-                // if ( response.headersSent ) { return; }
-                // // NOTE check permission
-                // await target._checkSelfPermissions.call(target, request, response);
-
+                // NOTE delegate authorization flow to the controller
+                await Controller.checkAuthorizationFlow(this, options);
                 // NOTE care about status of response
                 if ( this.response.headersSent ) { return; }
                 // NOTE continue executing endpoint

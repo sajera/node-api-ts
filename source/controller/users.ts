@@ -13,7 +13,7 @@ export default class Users extends BaseController {
     /**
      * endpoint to provide functionality to build lists
      */
-    @Auth({any: 'test'})
+    @Auth({self: true})
     @Swagger({any: 'test'})
     @APIEndpoint({ path: '/filter', method: API_METHOD.POST })
     public async filter () {
@@ -21,6 +21,7 @@ export default class Users extends BaseController {
         const data = await (new Promise((resolve, reject) => {
             // reject({error: true});
             resolve({
+                test: this.self,
                 page: 0,
                 size: 10,
                 content: [],
