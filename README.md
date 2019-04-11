@@ -57,8 +57,8 @@ Provide flow to expand application server by any existing and features express m
         * [x] @APIController({...options...}) - define `class` as API controller - read annotations of controller
         * [x] @APIEndpoint({...options...}) - define `public async` method of `{APIController}` as endpoint - setup annotation endpoint
     * [ ] Provide Decorators `@APIEndpoint` (Proxy)  
-        * [ ] @Swagger({...options...}) - expand `{@APIEndpoint}` annotation - provide ability to auto generate documentation of endpoint using **[Swagger](https://www.npmjs.com/package/swagger-ui-express/ "swagger-ui-express")**
-        * [ ] @Auth({…options…}) - check/restore `Authorization` and handle 401 Unathorized
+        * [x] @Swagger({...options...}) - expand `{@APIEndpoint}` annotation - provide ability to auto generate documentation of endpoint using **[Swagger](https://www.npmjs.com/package/swagger-ui-express/ "swagger-ui-express")**
+        * [x] @Auth({…options…}) - check/restore `Authorization` and handle 401 Unathorized
         * [ ] @Validate - ??? or it can be as @APIEndpointSchema
         * [ ] @??? - ???
     * [x] Provide examples of usage
@@ -75,3 +75,5 @@ Provide flow to expand application server by any existing and features express m
     * [ ] Provide huge customizable Models
     * [ ] Implement ability to connect models in the same way for different DB
     * [ ] Provide examples of usage
+
+* [ ] `Documentation` generate project swagger
