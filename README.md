@@ -3,13 +3,14 @@
 In order to speed up starting of development process - was implemented dummy application with base functionality which may present within node application on typescript. Such as configure Typescript, start up Express server, setup and configure server router, cors, static content, file upload and body parse. Applied code linters which support company code style agreement.
 
 
-### Configuration
+### Application configuration
 
-Provided expandable and scalable application. Each build process start from setup `configuration`. Application config may be split by environment and configuration. Implemented behavior for `*.env` (environment configuration) and `*.json` (application configuration). Within application present `.env` file in root directory with example of supported flags and `./source/configuration/development.json` as default application configuration with supported parameters.
+Provided expandable and scalable application. Each build process start from setup `configuration`. Application config may be split by environment and configuration. Implemented behavior for `*.env` (environment configuration) and `*.json` (application configuration). Within application present `.env` file in root directory with example of supported flags and `./source/configuration/development.json` as default application configuration with supported parameters. Example of all awalable configuration parameters present in `./source/configuration/example.json`.
 
 
-### Server
+### Application server
 
+Provide flow to expand application server by any existing and features express modules in common way. All connected, to base server, modules has default his own configuration. It wil use default configuration only if it wosnt provided from `Application configuration`.
 
 - - - -
 # Root TODO`s
@@ -19,7 +20,7 @@ Provided expandable and scalable application. Each build process start from setu
     * [x] Provide ability to easy setup configuration for different environment and project requirement
     * [x] Provide API initialization flow which may apply a lot of changes with same initialization rules
     * [x] Include Server(s) life cycle
-    * [ ] Include Controllers life cycle
+    * [x] Include Controllers life cycle
     * [ ] Include Database(s) life cycle
     * [ ] Include models life cycle
     * [ ] Generate documentation (Swagger or ...)
@@ -52,14 +53,15 @@ Provided expandable and scalable application. Each build process start from setu
     * [x] Provide functionality from express
     * [x] Implement Controller life cycle - each call to API will be handled of its own controller instance
     * [x] Provide `endpoint` as controller `public async` method with access to controller instance for current call
+    * [x] Provide Decorators `API` (Annotation)
+        * [x] @APIController({...options...}) - define `class` as API controller - read annotations of controller
+        * [x] @APIEndpoint({...options...}) - define `public async` method of `{APIController}` as endpoint - setup annotation endpoint
+        * [ ] @APISwagger({...options...}) - expand `{@APIEndpoint}` annotation - provide ability to auto generate documentation of endpoint using **[Swagger](https://www.npmjs.com/package/swagger-ui-express/ "swagger-ui-express")**
+    * [ ] Provide Decorators `@APIEndpoint` (Proxy)  
+        * [ ] @Auth({…options…}) - check/restore `Authorization` and handle 401 Unathorized
+        * [ ] @Validate - ??? or it can be as @APIEndpointSchema
+        * [ ] @??? - ???
     * [x] Provide examples of usage
-    * [x] Provide **Decorators** which will provide to different endpoints similar(common) actions within project
-        * [x] @`${Controller}`.Endpoint({...options...}) - define `public async` method as endpoint of controller
-        * [x] @WithAuth - check authorization to allow endpoint only for logged users (handle 401)
-        * [x] @WithSelf - add to controller instance data of logged user (handle 401)
-        * [x] @WithPermission({...options...}) - before allow endpoint check permissions logged user (handle 403)
-        * [ ] @AllowOption - define how many checks (other decorators) may run for `OPTIONS` request for current endpoint
-        * [x] @Validate({...options...}) - check data within request to make sure the data is correct for endpoint (handle 400/406)
 
 * [ ] `DB` Project database life cycle
     * [ ] Provide customization from configuration file
@@ -73,6 +75,3 @@ Provided expandable and scalable application. Each build process start from setu
     * [ ] Provide huge customizable Models
     * [ ] Implement ability to connect models in the same way for different DB
     * [ ] Provide examples of usage
-
-* [ ] `Documentation` provide project documentation
-    * [ ] Find best way....
