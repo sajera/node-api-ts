@@ -45,7 +45,7 @@
     "session-file-store": "^1.2.0",
     "swagger-ui-express": "^4.0.2"
   },
-  "_husky": {
+  "husky": {
     "hooks": {
       "pre-commit": "npm run lint"
     }
