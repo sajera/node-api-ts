@@ -18,7 +18,10 @@ export enum HTTP_METHOD {
  * list of allowed to use express methods for API endpoints
  */
 export enum API_METHOD {
-    GET = 'get', PUT = 'put', POST = 'post', DELETE = 'delete'
+    GET = 'get',
+    PUT = 'put',
+    POST = 'post',
+    DELETE = 'delete'
 }
 
 /*-------------------------------------------------

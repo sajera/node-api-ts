@@ -18,12 +18,12 @@ import {
  */
 export default function (Ctrl: any, rootOptions: ControllerAnnotation): Annotation {
     const target = Ctrl.prototype;
-    const annotation: Annotation = {...rootOptions, name: Ctrl.name, endpoints: []};
+    const annotation: Annotation = { ...rootOptions, name: Ctrl.name, endpoints: [] };
     const allNames: string[] = Object.keys(target);
     const endpointNames: string[] = [];
     // NOTE take only annotated as endpoint
     for (const name of allNames) {
-        if ( Reflect.hasMetadata(ANNOTATION_TYPE.ENDPOINT, target, name) ) {
+        if (Reflect.hasMetadata(ANNOTATION_TYPE.ENDPOINT, target, name)) {
             endpointNames.push(name);
         }
     }

@@ -45,7 +45,7 @@
     "session-file-store": "^1.2.0",
     "swagger-ui-express": "^4.0.2"
   },
-  "husky": {
+  "_husky": {
     "hooks": {
       "pre-commit": "npm run lint"
     }
@@ -56,7 +56,7 @@
       "public/**/*",
       "es5/**"
     ],
-    "delay": "2500"
+    "delay": 2500
   },
   "engines": {
     "node": ">=9.7.0",

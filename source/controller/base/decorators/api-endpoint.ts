@@ -10,9 +10,9 @@ import { EndpointAnnotation } from '../interfaces';
  * Define correct meta data for API endpoints
  *
  * @example
- * /@APIController({path: '/ctrl-prefix'})
+ * /@APIController({ path: '/ctrl-prefix' })
  * export default class My extends Controller {
- *     @APIEndpoint({method: API_METHOD.GET, path: '/express/:path'})
+ *     @APIEndpoint({ method: API_METHOD.GET, path: '/express/:path' })
  *     public async endpoint () { ... }
  * }
  * @decorator

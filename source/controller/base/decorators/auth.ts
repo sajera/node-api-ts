@@ -33,11 +33,11 @@ export default function (options: AuthAnnotation) {
              */
             value: async function () {
                 // NOTE care about status of response
-                if ( this.response.headersSent ) { return; }
+                if (this.response.headersSent) { return; }
                 // NOTE delegate authorization flow to the controller
                 await Controller.checkAuthorizationFlow(this, options);
                 // NOTE care about status of response
-                if ( this.response.headersSent ) { return; }
+                if (this.response.headersSent) { return; }
                 // NOTE continue executing endpoint
                 await descriptor.value.call(this);
             }
