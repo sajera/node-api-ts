@@ -63,5 +63,5 @@ data
 es5
 
 # local environment config
-local.*
-*.local.*
+*.local*
+*local.*

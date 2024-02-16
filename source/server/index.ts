@@ -92,7 +92,7 @@ export class Server {
     await (new Promise(resolve => {
       this._nodeServer = this.instance.app.listen(this.instance.port, () => {
         console.info(`\n[SERVER] is running on ${this.instance.port} port`);
-        resolve();
+        resolve(this.instance.port);
       });
     }));
   }
