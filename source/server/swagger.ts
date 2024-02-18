@@ -1,39 +1,28 @@
 // outsource dependencies
 import * as fs from 'fs';
 import { set } from 'lodash';
-import * as path from 'path';
+import * as express from 'express';
 import * as swagger from 'swagger-ui-express';
-
 // local dependencies
-import { Server } from './server';
-import * as logger from './logger';
-import { Annotation } from './controller/base';
-import { PORT, HOST, API_PATH, APP_VERSION, APP_NAME, NODE_ENV, DEBUG } from './constant';
+import Logger from '../logger';
+import { Annotation } from '../controller/base';
+import { PORT, HOST, API_PATH, APP_VERSION, APP_NAME, NODE_ENV, DEBUG, SWAGGER_PATH } from '../constant';
 
-export default class SwaggerOptions {
-
-  private constructor () {
-    logger.log('SWAGGER', this);
-  }
-
-  /**
-   * almost static swagger information
-   */
-  private static getContent () {
-    return {
-      tags: [],
-      paths: {},
-      swagger: '2.0',
-      basePath: API_PATH,
-      version: APP_VERSION,
-      host: `${HOST}:${PORT}`,
-      schemes: ['http', 'https'],
-      externalDocs: { url: 'http://swagger.io', description: 'Find out more about Swagger' },
-      info: {
-        title: `${APP_NAME}:${NODE_ENV} API url definition`,
-        contact: { email: 'allsajera@gmail.com' },
-        license: { name: 'MIT', url: 'https://opensource.org/licenses/MIT' },
-        description: `Base definition for API url format. Presentation example. Path generating rules {VERSION} / {CONTROLLER} [/ {QUANTITY}] [/ {ADDITION}]
+// configure
+const BASE = {
+  tags: [],
+  paths: {},
+  swagger: '2.0',
+  basePath: API_PATH,
+  version: APP_VERSION,
+  host: `${HOST}:${PORT}`,
+  schemes: ['http', 'https'],
+  externalDocs: { url: 'http://swagger.io', description: 'Find out more about Swagger' },
+  info: {
+    title: `${APP_NAME}:${NODE_ENV} API url definition`,
+    contact: { email: 'allsajera@gmail.com' },
+    license: { name: 'MIT', url: 'https://opensource.org/licenses/MIT' },
+    description: `Base definition for API url format. Presentation example. Path generating rules {VERSION} / {CONTROLLER} [/ {QUANTITY}] [/ {ADDITION}]
             1. VERSION -  means API version and using as base path for all urls "${API_PATH}"
             2. CONTROLLER - logic entity - handler/worker which will determine actions for specific entity or api module
             3. [QUANTITY] - mark used to determine response type as list or single item
@@ -44,28 +33,55 @@ export default class SwaggerOptions {
                 POST: api/user/{id}/status/DISABLED
                 PUT: api/user/{id}/status/{status}
                 POST: api/user/filter`,
-      },
-      securityDefinitions: {
-        Authorization: { type: 'apiKey', name: 'Authorization', in: 'header', description: 'Authorization: Bearer <ACCESS_TOKEN>' }
-      },
-      // TODO
-      definitions: {
-        Authorization: {
-          type: 'string',
-          example: 'JWT eyJ0eXAiOiJKV',
-          description: 'Authorization token in the standard form. Possible values: \'Authorization: JWT <ACCESS_TOKEN>\' or \'Authorization: Bearer <ACCESS_TOKEN>\''
-        },
-      },
-    };
+  },
+  securityDefinitions: {
+    Authorization: { type: 'apiKey', name: 'Authorization', in: 'header', description: 'Authorization: Bearer <ACCESS_TOKEN>' }
+  },
+  // TODO
+  definitions: {
+    Authorization: {
+      type: 'string',
+      example: 'JWT eyJ0eXAiOiJKV',
+      description: 'Authorization token in the standard form. Possible values: \'Authorization: JWT <ACCESS_TOKEN>\' or \'Authorization: Bearer <ACCESS_TOKEN>\''
+    },
+  },
+};
+
+export default class Swagger {
+  private content = BASE
+  private static _instance: Swagger;
+  public static get content () { return this._instance.content; }
+  public static create (controllers) { this._instance = new Swagger(controllers); }
+
+  private constructor (private controllers: Annotation[]) {
+    Logger.log('SWAGGER', `specification: ${this.content.swagger}`);
+
+    this.createPaths()
+    this.createDefinitions()
+
+    // NOTE write swagger result to the file to simplify development
+    DEBUG && fs.writeFile(
+      'public/last-results.local.json',
+      JSON.stringify(this.content, null, 2),
+      () => Logger.important('SWAGGER', 'last generated results available under swagger/last-results.local.json')
+    );
+  }
+
+  /**
+   * generate "swagger.definitions" based on annotations from controllers
+   */
+  private createDefinitions () {
+    // TODO setup definition it should present in configuration
+    // this.content.definitions = require(path.join(process.cwd(), 'public/definitions.json'));
   }
 
   /**
    * generate "swagger.paths" based on annotations from controllers
    */
-  private static definePaths (content, controllers: Annotation[]) {
-    for (const controller of controllers) {
+  private createPaths () {
+    for (const controller of this.controllers) {
       // NOTE define global tags to split endpoints by controllers
-      content.tags.push(controller.name);
+      this.content.tags.push(controller.name);
       for (const endpoint of controller.endpoints) {
         // NOTE skip in case definition absent
         if (!endpoint.swagger) { continue; }
@@ -100,7 +116,7 @@ export default class SwaggerOptions {
           // NOTE record parameter definition
           ep.parameters.push({ name: name.substring(1), in: 'path', type: 'string', required: true });
         }
-        set(content.paths, `${path}.${endpoint.method}`, ep);
+        set(this.content.paths, `${path}.${endpoint.method}`, ep);
         // console.log(`Controller ${path} => \n`
         //   , '\n endpoint:', endpoint
         //   , '\n ep:', ep
@@ -108,6 +124,7 @@ export default class SwaggerOptions {
       }
     }
   }
+
   // TODO define parameters https://swagger.io/docs/specification/2-0/describing-parameters/
   // parameters: [
   //   {
@@ -129,30 +146,13 @@ export default class SwaggerOptions {
   //   }
   // ],
 
-  public static initialize (server: Server, controllers: Annotation[]) {
-    // NOTE base information may contain any swagger data
-    const content = SwaggerOptions.getContent();
-    // NOTE controller annotation into sagger declaration
-    SwaggerOptions.definePaths(content, controllers);
-    // TODO setup definitions
 
-    logger.important('SWAGGER', `available on ${content.host}/swagger`, `swagger:${content.swagger}`);
-
-    // TODO setup definition it should present in configuration
-    content.definitions = require(path.join(process.cwd(), 'swagger/definitions.json'));
-    // NOTE write swagger result to the file to simplify development
-    DEBUG && fs.writeFile(
-      'swagger/last-results.local.json',
-      JSON.stringify(content, null, 2),
-      () => logger.important('SWAGGER', 'last generated results available under swagger/last-results.local.json')
-    );
-    // TODO setup swagger
-    server.app.use('/swagger', swagger.serve, swagger.setup(content, {
+  public static start (server: express.Application) {
+    Logger.important('SWAGGER', `available on http://${this.content.host}/swagger`);
+    server.use(SWAGGER_PATH, swagger.serve, swagger.setup(this.content, {
+      customCss: '.swagger-ui .topbar { display: none }',
       customSiteTitle: NODE_ENV,
       customJs: null,
-      customCss: '.swagger-ui .topbar { display: none }',
-      // NOTE generate at runtime
-      // filePath: "swagger/swagger-api-doc.json",
     }));
   }
 }

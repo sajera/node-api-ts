@@ -14,9 +14,9 @@ import { AuthAnnotation } from '../interfaces';
  * @example
  * /@APIController({path: '/ctrl-prefix'})
  * export default class My extends Controller {
- *     @Auth({ ... })
- *     @APIEndpoint({method: API_METHOD.GET, path: '/express/:path'})
- *     public async endpoint () { ... }
+ *    @Auth({ ... })
+ *    @APIEndpoint({method: API_METHOD.GET, path: '/express/:path'})
+ *    public async endpoint () { ... }
  * }
  * @decorator
  */
@@ -27,10 +27,10 @@ export default function (options: AuthAnnotation) {
     Reflect.defineMetadata(ANNOTATION_TYPE.AUTH, options, target, property);
     return {
       /**
-             * important !!! DO NOT USE ARROW FUNCTION !!!
-             * in case we use `reflect-metadata` as target we got not the instance of Controller but `Controller` itself
-             * only one way to get current request instance use `this` which will setup from compiler using `apply`
-             */
+        * important !!! DO NOT USE ARROW FUNCTION !!!
+        * in case we use `reflect-metadata` as target we got not the instance of Controller but `Controller` itself
+        * only one way to get current request instance use `this` which will setup from compiler using `apply`
+        */
       value: async function () {
         // NOTE care about status of response
         if (this.response.headersSent) { return; }

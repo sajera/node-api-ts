@@ -1,25 +1,32 @@
 
 import Server from './server';
-import Swagger from './swagger';
+import Logger from './logger';
 import Controller from './controller';
-// import Configuration from './configuration';
-import * as logger from './logger';
+
+// TODO remove
 import * as config from './constant';
+import { API_PATH, SWAGGER_PATH } from './constant';
+import Swagger from './server/swagger';
+Logger.info('CONFIG', config);
 
 class API {
 
   public static async start () {
-    // NOTE
-    logger.info('CONFIG', config);
-
+    // NOTE create server instance
+    Server.create();
     // TODO initialize database connection
     // DB.initialize();
     // TODO initialize models
     // Model.initialize(DB);
-    // TODO initialize controller
-    await Controller.initialize(Server.instance);
-    // NOTE
-    await Swagger.initialize(Server.instance, Controller.annotations);
+    // NOTE initialize controller
+    await Controller.initialize(Server.expressApp);
+
+    // Server.expressApp.use(API_PATH, Controller)
+    // NOTE initialize swagger
+    if (SWAGGER_PATH) {
+      Swagger.create(Controller.annotations)
+      Swagger.start(Server.expressApp)
+    }
     // NOTE initialize express server
     await Server.initialize();
     // TODO remove
@@ -36,8 +43,8 @@ class API {
 }
 
 API.start()
-  .then(() => logger.important('API', 'Successfully started'))
+  .then(() => Logger.important('API', 'Successfully started'))
   .catch(async (error: unknown) => {
     await API.stop();
-    logger.error('API', error);
+    Logger.error('API', error);
   });

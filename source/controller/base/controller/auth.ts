@@ -16,7 +16,7 @@ export default class AuthController extends BaseController {
   public get self (): any { return { ...this._self }; }
 
   public set self (value) {
-    // NOTE may by it should throw an error ???
+    // FIXME may be it should throw an error ???
     if (typeof this._self !== 'undefined') { return; }
     this._self = value;
   }
@@ -26,7 +26,7 @@ export default class AuthController extends BaseController {
   public get isAuthorized (): boolean { return Boolean(this._isAuthorized); }
 
   public set isAuthorized (value) {
-    // NOTE may by it should throw an error ???
+    // NOTE may be it should throw an error ???
     if (typeof this._isAuthorized !== 'undefined') { return; }
     this._isAuthorized = Boolean(value);
   }
