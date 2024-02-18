@@ -1,9 +1,9 @@
 // outsource dependencies
 
 // local dependencies
+import { AuthEndpoint } from './auth';
 import { API_METHOD } from '../constant';
 import { SwaggerEndpoint } from './swagger';
-import { AuthEndpoint } from './auth';
 
 /**
  * Endpoint annotation restriction

@@ -1,11 +1,36 @@
-# Dummy of Node API based on TypeScript and Express
+# Application on TypeScript and Express
 
 In order to speed up starting of development process - was implemented dummy application with base functionality which may present within node application on typescript. Such as configure Typescript, start up Express server, setup and configure server router, cors, static content, file upload and body parse. Applied code linters which support company code style agreement.
 
 
 ### Application configuration
 
-Provided expandable and scalable application. Each build process start from setup `configuration`. Application config may be split by environment and configuration. Implemented behavior for `*.env` (environment configuration) and `*.json` (application configuration). Within application present `.env` file in root directory with example of supported flags and `./source/configuration/development.json` as default application configuration with supported parameters. Example of all awalable configuration parameters present in `./source/configuration/example.json`.
+"In our project, environment variables, such as database URLs or API keys, are managed using a `.env` file. This file, formatted as `KEY=VALUE` pairs, stores configuration data. During local development, developers create and modify this file to suit their testing needs, optionally overriding specific variables in a `.env.local` file. However, in production deployments, we avoid using `.env` files to protect sensitive information. Instead, environment variables are securely passed to the application server or container during deployment, a process handled by deployment scripts or configuration management tools. Within the Node.js application, environment variables are accessed using `process.env.VARIABLE_NAME`, simplifying configuration management without requiring direct modification of the application's code."
+
+1. **Understanding the `.env` File:**
+  - Explain that the `.env` file is a plain text file where environment variables are stored.
+  - Each line in the file contains a single environment variable in the format `KEY=VALUE`.
+  - Emphasize the importance of not sharing sensitive information in the `.env` file.
+2. **Local Development:**
+  - Describe the `.env` file's role in local development.
+  - Mention that developers create this file to store environment variables needed for testing the application locally.
+  - Highlight the optional `.env.local` file, which developers can use to override specific variables for their local environment without affecting others.
+3. **Deployment:**
+  - Explain that in production deployments, environment variables are managed differently.
+  - Mention that the `.env` file is not used in production to avoid exposing sensitive information.
+  - Instead, environment variables are passed directly to the application server or container during deployment.
+  - This process is typically handled by deployment scripts or configuration management tools.
+4. **Usage:**
+  - Mention that within the Node.js application code, developers access environment variables using `process.env.VARIABLE_NAME`.
+  - Explain that developers load environment variables from the `.env` file into the application using the `dotenv` package, which is installed as a dependency.
+  - Assure them that once environment variables are set up correctly, they do not need to modify any JavaScript code.
+5. **Security:**
+  - Remind them about the importance of securing environment variables, especially in production environments.
+  - Encourage them to follow best practices for managing secrets and sensitive information, such as using secure storage solutions and access controls.
+6. **Support and Resources:**
+  - Offer assistance and provide resources for setting up environment variables if needed.
+  - Direct them to documentation or tutorials specific to their deployment environment (e.g., cloud platforms, container orchestration tools) for further guidance.
+
 
 
 ### Application server
