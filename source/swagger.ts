@@ -6,55 +6,35 @@ import * as swagger from 'swagger-ui-express';
 
 // local dependencies
 import { Server } from './server';
-import Configuration from './configuration';
+import * as logger from './logger';
 import { Annotation } from './controller/base';
+import { PORT, HOST, API_PATH, APP_VERSION, APP_NAME, NODE_ENV, DEBUG } from './constant';
 
 export default class SwaggerOptions {
-  public readonly customJs: string = Configuration.get('swagger.customJs', null);
-  public readonly customCss: string = Configuration.get('swagger.customCss', null);
-  public readonly explorer: boolean = Configuration.get('swagger.explorer', false);
-  public readonly swaggerUrl: string = Configuration.get('swagger.swaggerUrl', null);
-  public readonly customSiteTitle: string = Configuration.get('swagger.customSiteTitle', 'Sajera API');
-
-  // TODO remove
-  public readonly paths: string = Configuration.get('swagger.paths', null);
-  public readonly definitions: string = Configuration.get('swagger.definitions', null);
-  public readonly info: string = Configuration.get('swagger.info', 'swagger/info.json');
 
   private constructor () {
-    if (Configuration.get('swagger', false) && (
-      Configuration.get('swagger.log', false)
-      || Configuration.get('debug', false)
-      || Configuration.getENV('DEBUG', false)
-    )) { this.log(); }
-  }
-
-  public log () {
-    const fields = [];
-    const hidden = [];
-    Object.keys(this).map(key => hidden.indexOf(key) === -1 && fields.push(key));
-    console.info('\n---------------- [SWAGGER] ----------------'
-      , JSON.stringify(this, fields, 4)
-    );
+    logger.log('SWAGGER', this);
   }
 
   /**
    * almost static swagger information
    */
-  private static getContent (server: Server) {
+  private static getContent () {
     return {
       tags: [],
       paths: {},
       swagger: '2.0',
-      basePath: server.apiPath,
+      basePath: API_PATH,
+      version: APP_VERSION,
+      host: `${HOST}:${PORT}`,
       schemes: ['http', 'https'],
       externalDocs: { url: 'http://swagger.io', description: 'Find out more about Swagger' },
       info: {
-        title: 'API url definition',
+        title: `${APP_NAME}:${NODE_ENV} API url definition`,
         contact: { email: 'allsajera@gmail.com' },
         license: { name: 'MIT', url: 'https://opensource.org/licenses/MIT' },
         description: `Base definition for API url format. Presentation example. Path generating rules {VERSION} / {CONTROLLER} [/ {QUANTITY}] [/ {ADDITION}]
-            1. VERSION -  means API version and using as base path for all urls "${server.apiPath}"
+            1. VERSION -  means API version and using as base path for all urls "${API_PATH}"
             2. CONTROLLER - logic entity - handler/worker which will determine actions for specific entity or api module
             3. [QUANTITY] - mark used to determine response type as list or single item
                 single - GET: api/user/{id}
@@ -69,16 +49,14 @@ export default class SwaggerOptions {
         Authorization: { type: 'apiKey', name: 'Authorization', in: 'header', description: 'Authorization: Bearer <ACCESS_TOKEN>' }
       },
       // TODO
-      host: `0.0.0.0:${server.port}`,
-      version: Configuration.get('VERSION', '1.0.0'),
       definitions: {
         Authorization: {
           type: 'string',
           example: 'JWT eyJ0eXAiOiJKV',
-          description: "Authorization token in the standard form. Possible values: 'Authorization: JWT <ACCESS_TOKEN>' or 'Authorization: Bearer <ACCESS_TOKEN>'"
+          description: 'Authorization token in the standard form. Possible values: \'Authorization: JWT <ACCESS_TOKEN>\' or \'Authorization: Bearer <ACCESS_TOKEN>\''
         },
       },
-    }
+    };
   }
 
   /**
@@ -87,10 +65,10 @@ export default class SwaggerOptions {
   private static definePaths (content, controllers: Annotation[]) {
     for (const controller of controllers) {
       // NOTE define global tags to split endpoints by controllers
-      content.tags.push(controller.name)
+      content.tags.push(controller.name);
       for (const endpoint of controller.endpoints) {
         // NOTE skip in case definition absent
-        if (!endpoint.swagger) continue
+        if (!endpoint.swagger) { continue; }
         const ep = { // NOTE definition of endpoint
           tags: [controller.name],
           summary: controller.name,
@@ -109,24 +87,24 @@ export default class SwaggerOptions {
           produces: ['application/json'],
           // NOTE Authentication https://swagger.io/docs/specification/2-0/authentication/
           security: []
-        }
+        };
         if (endpoint.auth) { // NOTE Authorization declaration
-          ep.security.push({ Authorization: [] })
-          set(ep.responses, 401, { description: 'Unauthorized' })
+          ep.security.push({ Authorization: [] });
+          set(ep.responses, 401, { description: 'Unauthorized' });
         }
         // NOTE path definition https://swagger.io/docs/specification/2-0/paths-and-operations/
-        let path = `${controller.path}/${endpoint.path}`.replace(/\/+/g, '/')
-        for (let name of path.match(/:[^/]+/g) || []) {
+        let path = `${controller.path}/${endpoint.path}`.replace(/\/+/g, '/');
+        for (const name of path.match(/:[^/]+/g) || []) {
           // NOTE update path to swagger definition
-          path = path.replace(name, `{${name.substring(1)}}`)
+          path = path.replace(name, `{${name.substring(1)}}`);
           // NOTE record parameter definition
-          ep.parameters.push({ name: name.substring(1), in: 'path', type: 'string', required: true })
+          ep.parameters.push({ name: name.substring(1), in: 'path', type: 'string', required: true });
         }
-        set(content.paths, `${path}.${endpoint.method}`, ep)
-        console.log(`Controller ${path} => \n`
-          , '\n endpoint:', endpoint
-          , '\n ep:', ep
-        );
+        set(content.paths, `${path}.${endpoint.method}`, ep);
+        // console.log(`Controller ${path} => \n`
+        //   , '\n endpoint:', endpoint
+        //   , '\n ep:', ep
+        // );
       }
     }
   }
@@ -152,25 +130,29 @@ export default class SwaggerOptions {
   // ],
 
   public static initialize (server: Server, controllers: Annotation[]) {
-    const swaggerOptions = new SwaggerOptions();
     // NOTE base information may contain any swagger data
-    const content = SwaggerOptions.getContent(server);
+    const content = SwaggerOptions.getContent();
     // NOTE controller annotation into sagger declaration
     SwaggerOptions.definePaths(content, controllers);
     // TODO setup definitions
 
-    console.log('\n---------------- [SWAGGER] ----------------'
-      // , '\n swagger:', server
-      // , '\n content:', content
-      // , '\n controllers:', controllers
-    );
+    logger.important('SWAGGER', `available on ${content.host}/swagger`, `swagger:${content.swagger}`);
 
     // TODO setup definition it should present in configuration
-    content.definitions = !swaggerOptions.definitions ? {}
-      : require(path.join(process.cwd(), swaggerOptions.definitions));
+    content.definitions = require(path.join(process.cwd(), 'swagger/definitions.json'));
     // NOTE write swagger result to the file to simplify development
-    // fs.writeFile('swagger/last-results.local.json', JSON.stringify(content, null, 4), () => '');
-    // NOTE setup swagger
-    server.app.use('/swagger', swagger.serve, swagger.setup(content, swaggerOptions));
+    DEBUG && fs.writeFile(
+      'swagger/last-results.local.json',
+      JSON.stringify(content, null, 2),
+      () => logger.important('SWAGGER', 'last generated results available under swagger/last-results.local.json')
+    );
+    // TODO setup swagger
+    server.app.use('/swagger', swagger.serve, swagger.setup(content, {
+      customSiteTitle: NODE_ENV,
+      customJs: null,
+      customCss: '.swagger-ui .topbar { display: none }',
+      // NOTE generate at runtime
+      // filePath: "swagger/swagger-api-doc.json",
+    }));
   }
 }

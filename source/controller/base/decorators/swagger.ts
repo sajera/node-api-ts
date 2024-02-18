@@ -19,5 +19,5 @@ import { SwaggerAnnotation } from '../interfaces';
  * @decorator
  */
 export default function (value: SwaggerAnnotation) {
-    return Reflect.metadata(ANNOTATION_TYPE.SWAGGER, value);
+  return Reflect.metadata(ANNOTATION_TYPE.SWAGGER, value);
 }

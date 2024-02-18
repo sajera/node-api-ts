@@ -8,6 +8,7 @@ import { Router } from 'express';
 import Server from '../server';
 import { Annotation } from './base';
 import Configuration from '../configuration';
+import { API_PATH } from '../constant';
 // controllers
 import UsersController from './users';
 import SystemController from './system';
@@ -15,9 +16,13 @@ import SystemController from './system';
 export default class IndexController {
   // NOTE is singleton
   private router: Router;
+
   private annotations: Annotation[] = [];
+
   protected static _instance: IndexController;
+
   public static get annotations () { return this._instance.annotations; }
+
   private apiPath: string = Configuration.get('api.path', '/api');
 
   /**
@@ -54,7 +59,7 @@ export default class IndexController {
     await this.setupController(SystemController);
 
     // NOTE initialize API router
-    server.app.use(server.apiPath, this.router);
+    server.app.use(API_PATH, this.router);
   }
 
   /**

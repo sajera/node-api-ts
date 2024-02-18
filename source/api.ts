@@ -1,15 +1,16 @@
 
-import pkg = require('../package.json');
-
 import Server from './server';
 import Swagger from './swagger';
 import Controller from './controller';
-import Configuration from './configuration';
-
+// import Configuration from './configuration';
+import * as logger from './logger';
+import * as config from './constant';
 
 class API {
 
   public static async start () {
+    // NOTE
+    logger.info('CONFIG', config);
 
     // TODO initialize database connection
     // DB.initialize();
@@ -18,7 +19,7 @@ class API {
     // TODO initialize controller
     await Controller.initialize(Server.instance);
     // NOTE
-    await Swagger.initialize(Server.instance, Controller.annotations)
+    await Swagger.initialize(Server.instance, Controller.annotations);
     // NOTE initialize express server
     await Server.initialize();
     // TODO remove
@@ -35,8 +36,8 @@ class API {
 }
 
 API.start()
-  .then(() => console.info(`\n[API: ${pkg.name} -v ${pkg.version}] Successfully running\n`))
-  .catch(async (error: any) => {
+  .then(() => logger.important('API', 'Successfully started'))
+  .catch(async (error: unknown) => {
     await API.stop();
-    console.error(`\n[API: ${pkg.name} -v ${pkg.version}] was stopped with error:` , error);
+    logger.error('API', error);
   });

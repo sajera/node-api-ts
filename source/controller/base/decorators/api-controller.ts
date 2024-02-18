@@ -16,10 +16,10 @@ import { ControllerAnnotation, Annotation } from '../interfaces';
  * @decorator
  */
 export default function (options: ControllerAnnotation) {
-    return (Ctrl: any) => {
-        const annotation: Annotation = formatAnnotation(Ctrl, options);
-        // NOTE store data which was grabbed from annotations
-        Ctrl.annotation = annotation;
-        return Ctrl;
-    };
+  return (Ctrl: any) => {
+    const annotation: Annotation = formatAnnotation(Ctrl, options);
+    // NOTE store data which was grabbed from annotations
+    Ctrl.annotation = annotation;
+    return Ctrl;
+  };
 }

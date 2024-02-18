@@ -18,5 +18,5 @@ import { EndpointAnnotation } from '../interfaces';
  * @decorator
  */
 export default function (value: EndpointAnnotation) {
-    return Reflect.metadata(ANNOTATION_TYPE.ENDPOINT, value);
+  return Reflect.metadata(ANNOTATION_TYPE.ENDPOINT, value);
 }

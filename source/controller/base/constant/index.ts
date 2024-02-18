@@ -32,14 +32,14 @@ export enum API_METHOD {
  * @private
  */
 function createType (name: string): symbol {
-    return Symbol(name);
+  return Symbol(name);
 }
 /**
  * Available types for annotation
  */
 export const ANNOTATION_TYPE = {
-    ENDPOINT: createType('endpoint'),
-    SWAGGER: createType('swagger'),
-    AUTH: createType('authorization'),
+  ENDPOINT: createType('endpoint'),
+  SWAGGER: createType('swagger'),
+  AUTH: createType('authorization'),
 };
 

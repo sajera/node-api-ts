@@ -17,21 +17,21 @@ export default class System extends BaseController {
     @Auth({ self: true })
     @Swagger({ summary: 'Get self information' })
     @APIEndpoint({ path: '/self', method: API_METHOD.GET })
-    public async getSelf () {
-        // NOTE very simple solution to take logged user using decorator "WithSelf"
-        await this.response.status(200).type('json').send({
-          test: this.self
-        });
-    }
+  public async getSelf () {
+    // NOTE very simple solution to take logged user using decorator "WithSelf"
+    await this.response.status(200).type('json').send({
+      test: this.self
+    });
+  }
 
     /**
      * implement user sign up
      */
     @APIEndpoint({ path: '/sign-up', method: API_METHOD.POST })
     public async signUp () {
-        // TODO implement user creation
-        const user = this.request.body;
-        await this.response.status(200).type('json').send(user);
+      // TODO implement user creation
+      const user = this.request.body;
+      await this.response.status(200).type('json').send(user);
     }
 
     /**
@@ -39,12 +39,12 @@ export default class System extends BaseController {
      */
     @APIEndpoint({ path: '/sign-in', method: API_METHOD.POST })
     public async signIn () {
-        // TODO implement authorization flow
-        // NOTE currently fake authorization token
-        await this.response.status(200).type('json').send({
-            access_token: 'my_fake_authorization_token',
-            refresh_token: '',
-        });
+      // TODO implement authorization flow
+      // NOTE currently fake authorization token
+      await this.response.status(200).type('json').send({
+        access_token: 'my_fake_authorization_token',
+        refresh_token: '',
+      });
     }
 
     /**
@@ -52,16 +52,16 @@ export default class System extends BaseController {
      */
     @APIEndpoint({ path: '/sign-out', method: API_METHOD.GET })
     public async signOut () {
-        // TODO kill session and authorization tokens
-        await (new Promise((resolve, reject) => {
+      // TODO kill session and authorization tokens
+      await (new Promise((resolve, reject) => {
 
-            // emulation ... some code
+        // emulation ... some code
 
-            // NOTE all done
-            resolve({});
-        }));
-        // NOTE in any case 200: "ok"
-        await this.response.status(200).type('json').send({});
+        // NOTE all done
+        resolve({});
+      }));
+      // NOTE in any case 200: "ok"
+      await this.response.status(200).type('json').send({});
     }
 
     /**
@@ -69,12 +69,12 @@ export default class System extends BaseController {
      */
     @APIEndpoint({ path: '/info', method: API_METHOD.GET })
     public async information () {
-        await this.response.status(200).type('json').send({
-            base: false,
-            health: 'UP',
-            auth: 'Authorization',
-            version: Configuration.get('version', 1),
-        });
+      await this.response.status(200).type('json').send({
+        base: false,
+        health: 'UP',
+        auth: 'Authorization',
+        version: Configuration.get('version', 1),
+      });
     }
 
 }

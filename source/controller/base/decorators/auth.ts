@@ -21,26 +21,26 @@ import { AuthAnnotation } from '../interfaces';
  * @decorator
  */
 export default function (options: AuthAnnotation) {
-    // NOTE store options within encapsulation
-    return (target: any, property: string, descriptor: PropertyDescriptor) => {
-        // NOTE annotate method as with auth
-        Reflect.defineMetadata(ANNOTATION_TYPE.AUTH, options, target, property);
-        return {
-            /**
+  // NOTE store options within encapsulation
+  return (target: any, property: string, descriptor: PropertyDescriptor) => {
+    // NOTE annotate method as with auth
+    Reflect.defineMetadata(ANNOTATION_TYPE.AUTH, options, target, property);
+    return {
+      /**
              * important !!! DO NOT USE ARROW FUNCTION !!!
              * in case we use `reflect-metadata` as target we got not the instance of Controller but `Controller` itself
              * only one way to get current request instance use `this` which will setup from compiler using `apply`
              */
-            value: async function () {
-                // NOTE care about status of response
-                if (this.response.headersSent) { return; }
-                // NOTE delegate authorization flow to the controller
-                await Controller.checkAuthorizationFlow(this, options);
-                // NOTE care about status of response
-                if (this.response.headersSent) { return; }
-                // NOTE continue executing endpoint
-                await descriptor.value.call(this);
-            }
-        };
+      value: async function () {
+        // NOTE care about status of response
+        if (this.response.headersSent) { return; }
+        // NOTE delegate authorization flow to the controller
+        await Controller.checkAuthorizationFlow(this, options);
+        // NOTE care about status of response
+        if (this.response.headersSent) { return; }
+        // NOTE continue executing endpoint
+        await descriptor.value.call(this);
+      }
     };
+  };
 }
