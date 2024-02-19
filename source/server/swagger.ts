@@ -5,10 +5,46 @@ import * as express from 'express';
 import * as swagger from 'swagger-ui-express';
 // local dependencies
 import Logger from '../logger';
-import { Annotation } from '../controller/base';
+import { Annotation, ANNOTATION_TYPE } from '../controller/base';
 import { PORT, HOST, API_PATH, APP_VERSION, APP_NAME, NODE_ENV, DEBUG, SWAGGER_PATH } from '../constant';
 
 // configure
+export const ANNOTATION_SWAGGER = Symbol('SWAGGER')
+/**
+ * Swagger addition data annotation restriction
+ */
+interface SwaggerAnnotation {
+  description?: string;
+  operationId?: string;
+  summary?: string;
+  tags?: string[]
+  consumes?: string[]
+  produces?: string[]
+  parameters?: Array<any> // TODO define schema
+  responses?: Partial<any> // TODO define schema
+}
+/**
+ * Swagger addition data annotation restriction
+ */
+export interface SwaggerEndpoint extends SwaggerAnnotation {
+  any?: any;
+}
+/**
+ * Define addition data for swagger endpoints
+ *
+ * @example
+ * /@APIController({path: '/ctrl-prefix'})
+ * export default class My extends Controller {
+ *     @Swagger({ ... })
+ *     @APIEndpoint({method: API_METHOD.GET, path: '/express/:path'})
+ *     public async endpoint () { ... }
+ * }
+ * @decorator
+ */
+export function Swagger (value: SwaggerAnnotation) {
+  return Reflect.metadata(ANNOTATION_SWAGGER, value);
+}
+
 const BASE = {
   tags: [],
   paths: {},
@@ -47,11 +83,11 @@ const BASE = {
   },
 };
 
-export default class Swagger {
+export default class SwaggerServer {
   private content = BASE
-  private static _instance: Swagger;
+  private static _instance: SwaggerServer;
   public static get content () { return this._instance.content; }
-  public static create (controllers) { this._instance = new Swagger(controllers); }
+  public static create (controllers) { this._instance = new SwaggerServer(controllers); }
 
   private constructor (private controllers: Annotation[]) {
     Logger.log('SWAGGER', `specification: ${this.content.swagger}`);
