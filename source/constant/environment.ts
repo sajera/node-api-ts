@@ -28,4 +28,6 @@ export const PORT = varNumber(process.env.PORT || '80');
 export const HOST = varString(process.env.HOST || '0.0.0.0');
 export const API_PATH = varString(process.env.API_PATH);
 
+export const STATIC_PATH = varString(process.env.STATIC_PATH)
+
 export const SWAGGER_PATH = varString(process.env.SWAGGER_PATH)

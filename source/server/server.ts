@@ -2,76 +2,40 @@
 import * as cors from 'cors';
 import * as http from 'http';
 import * as path from 'path';
-import * as https from 'https';
-import * as multer from 'multer'; // need to be setup in place
 import * as express from 'express';
 // local dependencies
-import Logger from '../logger';
 import Swagger from './swagger';
-import { HOST, PORT, API_PATH, LOG_LEVEL, SWAGGER_PATH } from '../constant';
-import { Controller } from './controller';
+import { Logger } from '../service';
+import * as middleware from './middleware';
+import { Controller, Annotation } from './controller';
+import { HOST, PORT, API_PATH, LOG_LEVEL, SWAGGER_PATH, STATIC_PATH } from '../constant';
 
 export class Server {
   // NOTE is singleton
   private static _instance: Server;
   private router = express.Router()
+  private annotation: Annotation[] = []
   private static _nodeServer: http.Server;
   private static get instance () { return this._instance; }
 
   public static create () { this._instance = new Server(express()); }
   public static get expressApp () { return this._instance.expressApp; }
 
-
   private get STATIC () {
-    const options = { // @see https://expressjs.com/en/4x/api.html#express.static
-      fallthrough: true,
-    };
-    Logger.debug('SERVER:STATIC', options);
-    return express.static(path.join(process.cwd(), 'public'), options);
+    Logger.important('SERVER', `Serve the static content from the ./public folder on the .${STATIC_PATH} path`);
+    // @see https://expressjs.com/en/4x/api.html#express.static
+    return express.static(path.join(process.cwd(), 'public'), { fallthrough: true });
   }
 
   private get CORS () {
-    const options: cors.CorsOptions = { // @see https://www.npmjs.com/package/cors#configuration-options
+    Logger.important('SERVER', 'CORS enabled from root ./ ');
+    return cors({ // @see https://www.npmjs.com/package/cors#configuration-options
       credentials: true,
       exposedHeaders: ['Content-Range', 'X-Content-Range'],
       methods: ['GET', 'PUT', 'POST', 'DELETE', 'HEAD', 'OPTIONS'],
       allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Authorization', 'Token'],
       origin: [/\/\/localhost/, /\/\/127.0.0.1/, /\/\/0.0.0.0/, 'http://some-ui', 'http://some-api'],
-    };
-    Logger.debug('SERVER:CORS', options);
-    return cors(options);
-  }
-
-  private get JSON () {
-    const options = { // @see https://www.npmjs.com/package/body-parser#options
-      // @see https://www.npmjs.com/package/body-parser#verify
-      // verify: (req: express.Request, res: express.Response, buf: Buffer, encoding: string = 'UTF-8') => throw new Error('At som reason'),
-      // @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#syntax
-      // reviver: (key: string, value: any): any => ''
-      inflate: true, // false => reject compressed body
-      type: '*/json',
-      limit: '5mb',
-      strict: true,
-    };
-    Logger.debug('SERVER:JSON', options);
-    return express.json(options);
-  }
-
-  private get URLENCODED () {
-    // NOTE form data
-    const options = { // @see https://www.npmjs.com/package/body-parser#options-3
-      type: '*/x-www-form-urlencoded',
-      extended: true,
-      inflate: true, // false => reject compressed body
-      limit: '2mb',
-    };
-    Logger.debug('SERVER:URLENCODED', options);
-    return express.urlencoded(options);
-  }
-
-  private get FORM () {
-    Logger.debug('SERVER:FORM', 'No files');
-    return multer().none();
+    });
   }
 
   /**
@@ -80,18 +44,13 @@ export class Server {
   private constructor (public expressApp: express.Application) {
     // NOTE debug request middleware
     if (LOG_LEVEL > 0) { expressApp.use(this.logRequest); }
-    // NOTE common allow cors to make sure the error available ¯\_(ツ)_/¯
+    // NOTE common allow cors to make sure the errors also available ¯\_(ツ)_/¯
     expressApp.use(this.CORS);
-    expressApp.use([new RegExp(`^${API_PATH}`), '/'], this.STATIC);
-    // expressApp.use([/^\/api/, '/'], this.STATIC);
-    // TODO is it only common or should be specified per endpoint ?
-    expressApp.use(API_PATH, this.URLENCODED);
-    expressApp.use(API_PATH, this.FORM);
-    expressApp.use(API_PATH, this.JSON);
+    STATIC_PATH && expressApp.use([new RegExp(`^${API_PATH}`), STATIC_PATH], this.STATIC);
   }
 
   private logRequest (request: express.Request, response: express.Response, next: express.NextFunction) {
-    Logger.info('SERVER:CONNECT', `${request.method}: ${request.originalUrl}`);
+    Logger.important('SERVER:CONNECT', `${request.method}: ${request.originalUrl}`);
     return next();
   }
 
@@ -101,15 +60,18 @@ export class Server {
     return response.status(404).send('Not Found');
   }
 
-  public static async subscribe (Ctrl: typeof Controller) {
+  public static subscribe (Ctrl: typeof Controller) {
+    // NOTE grab all annotation
+    this.instance.annotation.push(Ctrl.annotation)
     // NOTE create controller router
     const router = express.Router();
     // NOTE setup all endpoints of controller
-    for (const { path, method, action } of Ctrl.annotation.endpoints) {
-      Logger.log('SERVER:SUBSCRIBE', `${Ctrl.annotation.name} => ${method.toUpperCase()} ${API_PATH}${Ctrl.annotation.path}${path}`);
+    for (const { path, method, action, urlencoded, json } of Ctrl.annotation.endpoints) {
+      Logger.info('SUBSCRIBE', `${Ctrl.annotation.name} => ${method.toUpperCase()}(${action}) ${API_PATH}${Ctrl.annotation.path}${path}`);
       const middlewares = []
-      // TODO middlewares
-
+      // NOTE middlewares of endpoint
+      json && middlewares.push(middleware.jsonMiddleware(json))
+      urlencoded && middlewares.push(middleware.urlEncodedMiddleware(urlencoded))
       // NOTE set up the controller handler
       middlewares.push(Ctrl.handle(action))
       router[method].apply(router, [path, ...middlewares])
@@ -119,8 +81,15 @@ export class Server {
   }
 
   public static async initialize () {
-    Logger.info('SERVER:INIT', { HOST, PORT });
+    Logger.debug('SERVER', 'protocol HTTP');
+    // NOTE it's should be impossible
     await this.stop();
+
+    // NOTE initialize swagger
+    if (SWAGGER_PATH) {
+      Swagger.create(this.instance.annotation)
+      Swagger.start(this.expressApp)
+    }
     // NOTE last common debug middleware
     this.expressApp.use(API_PATH, this.instance.router);
     // NOTE last common debug middleware
@@ -133,7 +102,7 @@ export class Server {
     if (this._nodeServer) {
       this._nodeServer.close();
       this._nodeServer = null;
-      Logger.error('SERVER:STOP');
+      Logger.error('SERVER', 'was stopped');
     }
   }
 
@@ -141,7 +110,7 @@ export class Server {
     if (this._nodeServer) { await this.stop(); }
     await (new Promise(resolve => {
       this._nodeServer = this.expressApp.listen(PORT, () => {
-        Logger.important('SERVER:START', `is running on ${HOST}:${PORT}`);
+        Logger.important('SERVER', `is running on http://${HOST}:${PORT}`);
         resolve(PORT);
       });
     }));

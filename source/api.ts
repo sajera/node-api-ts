@@ -1,15 +1,12 @@
+// outsource dependencies
 
-import Logger from './logger';
+// local dependencies
 import { Server } from './server';
-// import Controller from './controller';
-
-// TODO remove
+import { Logger } from './service';
 import * as config from './constant';
-// import { API_PATH, SWAGGER_PATH } from './constant';
-// import SwaggerServer from './server/swagger';
 
-import TestSystemController from './test-system-ctrl'
-Logger.info('CONFIG', config);
+// NOTE controllers
+import TestSystemController from './controller/system'
 
 class API {
 
@@ -20,17 +17,8 @@ class API {
     // DB.initialize();
     // TODO initialize models
     // Model.initialize(DB);
-    // NOTE initialize controller
-    // await Controller.initialize(Server.expressApp);
-
-    Server.subscribe(TestSystemController)
-
-    // Server.expressApp.use(API_PATH, Controller)
-    // NOTE initialize swagger
-    // if (SWAGGER_PATH) {
-    //   SwaggerServer.create(Controller.annotations)
-    //   SwaggerServer.start(Server.expressApp)
-    // }
+    // NOTE subscribe controllers
+    await Server.subscribe(TestSystemController)
     // NOTE initialize express server
     await Server.initialize();
     // TODO remove
@@ -46,6 +34,7 @@ class API {
   }
 }
 
+Logger.debug('CONFIG', config);
 API.start()
   .then(() => Logger.important('API', 'Successfully started'))
   .catch(async (error: unknown) => {

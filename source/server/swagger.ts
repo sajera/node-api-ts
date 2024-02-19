@@ -4,8 +4,8 @@ import { set } from 'lodash';
 import * as express from 'express';
 import * as swagger from 'swagger-ui-express';
 // local dependencies
-import Logger from '../logger';
-import { Annotation, ANNOTATION_TYPE } from '../controller/base';
+import { Logger } from '../service';
+import { Annotation } from './controller';
 import { PORT, HOST, API_PATH, APP_VERSION, APP_NAME, NODE_ENV, DEBUG, SWAGGER_PATH } from '../constant';
 
 // configure
@@ -17,11 +17,11 @@ interface SwaggerAnnotation {
   description?: string;
   operationId?: string;
   summary?: string;
-  tags?: string[]
-  consumes?: string[]
-  produces?: string[]
-  parameters?: Array<any> // TODO define schema
-  responses?: Partial<any> // TODO define schema
+  tags?: string[];
+  consumes?: string[];
+  produces?: string[];
+  parameters?: Array<any>; // TODO define schema
+  responses?: Partial<any>; // TODO define schema
 }
 /**
  * Swagger addition data annotation restriction
@@ -41,8 +41,8 @@ export interface SwaggerEndpoint extends SwaggerAnnotation {
  * }
  * @decorator
  */
-export function Swagger (value: SwaggerAnnotation) {
-  return Reflect.metadata(ANNOTATION_SWAGGER, value);
+export function Swagger (pathOptions: SwaggerAnnotation) {
+  return Reflect.metadata(ANNOTATION_SWAGGER, pathOptions);
 }
 
 const BASE = {
@@ -59,16 +59,16 @@ const BASE = {
     contact: { email: 'allsajera@gmail.com' },
     license: { name: 'MIT', url: 'https://opensource.org/licenses/MIT' },
     description: `Base definition for API url format. Presentation example. Path generating rules {VERSION} / {CONTROLLER} [/ {QUANTITY}] [/ {ADDITION}]
-            1. VERSION -  means API version and using as base path for all urls "${API_PATH}"
-            2. CONTROLLER - logic entity - handler/worker which will determine actions for specific entity or api module
-            3. [QUANTITY] - mark used to determine response type as list or single item
-                single - GET: api/user/{id}
-                list - GET: api/user/list
-            4. [ADDITION] - provide logic to define complicate actions
-                DELETE: api/user/{id}/status/DISABLED
-                POST: api/user/{id}/status/DISABLED
-                PUT: api/user/{id}/status/{status}
-                POST: api/user/filter`,
+      1. VERSION -  means API version and using as base path for all urls "${API_PATH}"
+      2. CONTROLLER - logic entity - handler/worker which will determine actions for specific entity or api module
+      3. [QUANTITY] - mark used to determine response type as list or single item
+          single - GET: api/user/{id}
+          list - GET: api/user/list
+      4. [ADDITION] - provide logic to define complicate actions
+          DELETE: api/user/{id}/status/DISABLED
+          POST: api/user/{id}/status/DISABLED
+          PUT: api/user/{id}/status/{status}
+          POST: api/user/filter`,
   },
   securityDefinitions: {
     Authorization: { type: 'apiKey', name: 'Authorization', in: 'header', description: 'Authorization: Bearer <ACCESS_TOKEN>' }
@@ -77,7 +77,8 @@ const BASE = {
   definitions: {
     Authorization: {
       type: 'string',
-      example: 'JWT eyJ0eXAiOiJKV',
+      in: 'header',
+      example: 'Bearer eyJ0eXAiOiJKV',
       description: 'Authorization token in the standard form. Possible values: \'Authorization: JWT <ACCESS_TOKEN>\' or \'Authorization: Bearer <ACCESS_TOKEN>\''
     },
   },
@@ -90,7 +91,7 @@ export default class SwaggerServer {
   public static create (controllers) { this._instance = new SwaggerServer(controllers); }
 
   private constructor (private controllers: Annotation[]) {
-    Logger.log('SWAGGER', `specification: ${this.content.swagger}`);
+    Logger.debug('SWAGGER', `specification: ${this.content.swagger}`);
 
     this.createPaths()
     this.createDefinitions()
@@ -99,7 +100,7 @@ export default class SwaggerServer {
     DEBUG && fs.writeFile(
       'public/last-results.local.json',
       JSON.stringify(this.content, null, 2),
-      () => Logger.important('SWAGGER', 'last generated results available under swagger/last-results.local.json')
+      () => Logger.debug('SWAGGER', 'last generated results available under public/last-results.local.json')
     );
   }
 
@@ -115,11 +116,14 @@ export default class SwaggerServer {
    * generate "swagger.paths" based on annotations from controllers
    */
   private createPaths () {
+    // console.log(`Controller ${'createPaths'} => \n`
+    //   , '\n controllers:', this.controllers
+    // );
     for (const controller of this.controllers) {
       // NOTE define global tags to split endpoints by controllers
       this.content.tags.push(controller.name);
       for (const endpoint of controller.endpoints) {
-        // NOTE skip in case definition absent
+        // IMPORTANT skip in case definition absent
         if (!endpoint.swagger) { continue; }
         const ep = { // NOTE definition of endpoint
           tags: [controller.name],
@@ -184,7 +188,7 @@ export default class SwaggerServer {
 
 
   public static start (server: express.Application) {
-    Logger.important('SWAGGER', `available on http://${this.content.host}/swagger`);
+    Logger.important('SWAGGER', `available on http://${HOST}:${PORT}${SWAGGER_PATH}`);
     server.use(SWAGGER_PATH, swagger.serve, swagger.setup(this.content, {
       customCss: '.swagger-ui .topbar { display: none }',
       customSiteTitle: NODE_ENV,

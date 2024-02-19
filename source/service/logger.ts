@@ -1,12 +1,11 @@
 
 // local dependencies
-import { DEBUG, LOG_LEVEL, APP_NAME, APP_VERSION } from './constant';
+import { DEBUG, LOG_LEVEL } from '../constant';
 
-// TODO move to "service" ???
 // TODO better formatting
 
 const rowFormat = (rows: any): string[] => !Array.isArray(rows) ? []
-  : DEBUG ? rows.map(row => JSON.stringify(row, null, 2))
+  // : DEBUG ? rows.map(row => JSON.stringify(row, null, 2))
     : rows.map(row => JSON.stringify(row));
 /**
  * In the future, it is possible to use alternative loggers.
@@ -31,28 +30,28 @@ export class Logger {
    * the logs will be visible at any cases - always
    */
   public static important (title: string, ...args: any[]) {
-    doLog('INFO', -1, title, ...args);
+    doLog('INFO ', -1, title, ...args);
   }
 
   /**
    * will be visible at DEBUG>=2
    */
   public static warn (title: string, ...args: any[]) {
-    doLog('WARN', 2, title, ...args);
+    doLog('WARN ', 2, title, ...args);
   }
 
   /**
    * will be visible at DEBUG>=4
    */
   public static info (title: string, ...args: any[]) {
-    doLog('INFO', 4, title, ...args);
+    doLog('INFO ', 4, title, ...args);
   }
 
   /**
    * will be visible at DEBUG>=6
    */
   public static log (title: string, ...args: any[]) {
-    doLog('LOG', 6, title, ...args);
+    doLog('LOG  ', 6, title, ...args);
   }
 
   /**
@@ -62,5 +61,3 @@ export class Logger {
     doLog('DEBUG', 10, title, ...args);
   }
 }
-
-export default Logger
