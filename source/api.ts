@@ -1,12 +1,14 @@
 
-import Server from './server';
 import Logger from './logger';
-import Controller from './controller';
+import { Server } from './server';
+// import Controller from './controller';
 
 // TODO remove
 import * as config from './constant';
-import { API_PATH, SWAGGER_PATH } from './constant';
-import Swagger from './server/swagger';
+// import { API_PATH, SWAGGER_PATH } from './constant';
+// import SwaggerServer from './server/swagger';
+
+import TestSystemController from './test-system-ctrl'
 Logger.info('CONFIG', config);
 
 class API {
@@ -19,14 +21,16 @@ class API {
     // TODO initialize models
     // Model.initialize(DB);
     // NOTE initialize controller
-    await Controller.initialize(Server.expressApp);
+    // await Controller.initialize(Server.expressApp);
+
+    Server.subscribe(TestSystemController)
 
     // Server.expressApp.use(API_PATH, Controller)
     // NOTE initialize swagger
-    if (SWAGGER_PATH) {
-      Swagger.create(Controller.annotations)
-      Swagger.start(Server.expressApp)
-    }
+    // if (SWAGGER_PATH) {
+    //   SwaggerServer.create(Controller.annotations)
+    //   SwaggerServer.start(Server.expressApp)
+    // }
     // NOTE initialize express server
     await Server.initialize();
     // TODO remove
