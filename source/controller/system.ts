@@ -11,7 +11,7 @@ import { Controller, API, Endpoint, Auth, URLEncoded, JSON, Swagger } from '../s
 @API({ path: '/system' })
 export default class System extends Controller {
 
-  @Auth({ self: true })
+  @Auth({ self: false })
   @Endpoint({ path: '/self' })
   @Swagger({ summary: 'Get self information' })
   public async getSelf () {
@@ -33,6 +33,7 @@ export default class System extends Controller {
     });
   }
 
+  @Auth({ self: false })
   @JSON({ any: 2 })
   @Endpoint({ path: '/test', method: Controller.POST })
   public async test () {
@@ -53,7 +54,7 @@ export default class System extends Controller {
     });
   }
 
-  @Endpoint({ path: '/sign-out', method: Controller.GET })
+  @Endpoint({ path: '/sign-out' })
   public async signOut () {
     // TODO kill session and authorization tokens
     await (new Promise((resolve, reject) => {
