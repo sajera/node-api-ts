@@ -33,3 +33,5 @@ export const STATIC_PATH = varString(process.env.STATIC_PATH)
 export const SWAGGER_PATH = varString(process.env.SWAGGER_PATH)
 
 export const COOKIE_SECRET = varString(process.env.COOKIE_SECRET)
+
+export const JWT_SECRET = varString(process.env.JWT_SECRET)

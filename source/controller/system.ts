@@ -1,20 +1,19 @@
-
 // outsource dependencies
 
 // local dependencies
 import { APP_VERSION } from '../constant';
-import { APIController, APIEndpoint, Controller, URLEncoded, JSON, Swagger } from '../server'
+import { Controller, API, Endpoint, Auth, URLEncoded, JSON, Swagger } from '../server'
 
 
 /**
  * system endpoints which not belong to any controllers and mostly unique
  */
-@APIController({ path: '/system' })
+@API({ path: '/system' })
 export default class System extends Controller {
 
-  // @Auth({ self: true })
+  @Auth({ self: true })
+  @Endpoint({ path: '/self' })
   @Swagger({ summary: 'Get self information' })
-  @APIEndpoint({ path: '/self' })
   public async getSelf () {
     // NOTE very simple solution to take logged user using decorator "WithSelf"
     await this.response.status(200).type('json').send({
@@ -23,7 +22,7 @@ export default class System extends Controller {
   }
 
   @URLEncoded({ any: 1 })
-  @APIEndpoint({ path: '/sign-up', method: Controller.POST })
+  @Endpoint({ path: '/sign-up', method: Controller.POST })
   public async signUp () {
     // TODO implement user creation
 
@@ -35,7 +34,7 @@ export default class System extends Controller {
   }
 
   @JSON({ any: 2 })
-  @APIEndpoint({ path: '/test', method: Controller.POST })
+  @Endpoint({ path: '/test', method: Controller.POST })
   public async test () {
     // TODO remove
     await this.response.status(200).type('json').send({
@@ -44,7 +43,7 @@ export default class System extends Controller {
     });
   }
 
-  @APIEndpoint({ path: '/sign-in', method: Controller.POST })
+  @Endpoint({ path: '/sign-in', method: Controller.POST })
   public async signIn () {
     // TODO implement authorization flow
     // NOTE currently fake authorization token
@@ -54,7 +53,7 @@ export default class System extends Controller {
     });
   }
 
-  @APIEndpoint({ path: '/sign-out', method: Controller.GET })
+  @Endpoint({ path: '/sign-out', method: Controller.GET })
   public async signOut () {
     // TODO kill session and authorization tokens
     await (new Promise((resolve, reject) => {
@@ -71,7 +70,7 @@ export default class System extends Controller {
   /**
    * provide public system info
    */
-  @APIEndpoint({ path: '/info', method: Controller.GET })
+  @Endpoint({ path: '/info', method: Controller.GET })
   public async information () {
     await this.response.status(200).type('json').send({
       base: false,

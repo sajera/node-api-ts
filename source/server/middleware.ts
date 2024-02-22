@@ -4,8 +4,7 @@ import * as http from 'http';
 import * as multer from 'multer';
 import * as express from 'express';
 // local dependencies
-import { Logger } from '../service';
-
+import { Logger, AuthService } from '../service';
 
 interface JSONAnnotation { // TODO import * as bodyParser from 'body-parser'; bodyParser.json;
   type?: string;
@@ -19,7 +18,6 @@ export interface JSONEndpoint extends JSONAnnotation {
   any?: any;
 }
 export function jsonMiddleware (options: JSONAnnotation) {
-  Logger.debug('JSON', options)
   // NOTE that is a default setting, and decorator allows to override for every specific endpoint
   return express.json({ // @see https://www.npmjs.com/package/body-parser#options
     // @see https://www.npmjs.com/package/body-parser#verify
@@ -60,7 +58,6 @@ export interface URLEncodedEndpoint extends URLEncodedAnnotation {
   any?: any;
 }
 export function urlEncodedMiddleware (options: URLEncodedAnnotation) {
-  Logger.debug('URLENCODED', options)
   // NOTE that is a default setting, and decorator allows to override for every specific endpoint
   return express.urlencoded({ // @see https://www.npmjs.com/package/body-parser#options-3
     // @see https://www.npmjs.com/package/body-parser#verify
@@ -95,7 +92,7 @@ export interface MulterEndpoint extends MulterAnnotation {
   any?: any;
 }
 export function multerMiddleware (options: MulterAnnotation) {
-  Logger.debug('MULTER', options)
+  Logger.important('MULTER', 'Middleware not implemented yet', options)
   // NOTE that is a default setting, and decorator allows to override for every specific endpoint
   // TODO need real example
   return multer().none();
@@ -118,16 +115,24 @@ export function Multer (options: MulterEndpoint) {
 
 
 interface AuthAnnotation { // TODO to know more
-  any?: any;
+  self?: boolean;
 }
 export interface AuthEndpoint extends AuthAnnotation {
   any?: any;
 }
 export function authMiddleware (options: AuthAnnotation) {
-  Logger.debug('AUTH', options)
+  Logger.important('AUTH', 'Middleware not implemented yet', options)
   // NOTE that is a default setting, and decorator allows to override for every specific endpoint
   // TODO need real example
-  return multer().none();
+  return (request: express.Request, response: express.Response, next: express.NextFunction) => {
+
+    const authorization = request.header('Authorization')
+    Logger.debug('AUTH:HANDLE', `Authorization: ${authorization}`);
+    Logger.debug('AUTH:HANDLE', `checkTokenSign: ${AuthService.checkTokenSign(authorization)}`);
+
+
+    return next();
+  }
 }
 /**
  * settings of the "auth" middleware

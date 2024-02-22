@@ -80,6 +80,7 @@ export class Controller {
         path,
         method,
         action: name,
+        auth: Reflect.getMetadata(middleware.ANNOTATION_AUTH, target, name),
         json: Reflect.getMetadata(middleware.ANNOTATION_JSON, target, name),
         swagger: Reflect.getMetadata(swagger.ANNOTATION_SWAGGER, target, name),
         multer: Reflect.getMetadata(middleware.ANNOTATION_MULTER, target, name),
@@ -120,7 +121,7 @@ export const ANNOTATION_ENDPOINT = Symbol('ENDPOINT')
  * }
  * @decorator
  */
-export function APIEndpoint (endpoint: EndpointAnnotation) {
+export function Endpoint (endpoint: EndpointAnnotation) {
   return Reflect.metadata(ANNOTATION_ENDPOINT, endpoint);
 }
 
@@ -133,7 +134,7 @@ export function APIEndpoint (endpoint: EndpointAnnotation) {
  * export default class My extends Controller { ... }
  * @decorator
  */
-export function APIController<T> (options: ControllerAnnotation) {
+export function API<T> (options: ControllerAnnotation) {
   return (Ctrl: typeof Controller) => {
     Ctrl.formatAnnotation(options)
     // NOTE store data which was grabbed from annotations

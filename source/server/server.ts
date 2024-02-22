@@ -10,6 +10,7 @@ import { Logger } from '../service';
 import * as middleware from './middleware';
 import { Controller, Annotation } from './controller';
 import { HOST, PORT, API_PATH, LOG_LEVEL, DEBUG, SWAGGER_PATH, STATIC_PATH, COOKIE_SECRET } from '../constant';
+import { authMiddleware } from './middleware';
 
 class Server {
   private router = express.Router()
@@ -44,7 +45,7 @@ class Server {
       credentials: true,
       exposedHeaders: ['Content-Range', 'X-Content-Range'],
       methods: ['GET', 'PUT', 'POST', 'DELETE', 'HEAD', 'OPTIONS'],
-      allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Authorization', 'Token'],
+      allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Authorization'],
       origin: [/\/\/localhost/, /\/\/127.0.0.1/, /\/\/0.0.0.0/, 'http://some-ui', 'http://some-api'],
     });
   }
@@ -66,13 +67,15 @@ class Server {
     // NOTE create controller router
     const router = express.Router();
     // NOTE setup all endpoints of controller
-    for (const { path, method, action, urlencoded, json } of Ctrl.annotation.endpoints) {
+    for (const { path, method, action, urlencoded, json, auth, multer } of Ctrl.annotation.endpoints) {
       Logger.info('SUBSCRIBE', `${Ctrl.annotation.name} => ${method.toUpperCase()}(${action}) ${API_PATH}${Ctrl.annotation.path}${path}`);
       const middlewares = []
-      // NOTE middlewares of endpoint
+      // NOTE middlewares of endpoint based on annotation(decorators)
+      auth && middlewares.push(middleware.authMiddleware(auth))
       json && middlewares.push(middleware.jsonMiddleware(json))
+      multer && middlewares.push(middleware.multerMiddleware(multer))
       urlencoded && middlewares.push(middleware.urlEncodedMiddleware(urlencoded))
-      // NOTE set up the controller handler
+      // NOTE set up the controller action handler
       middlewares.push(Ctrl.handle(action))
       router[method].apply(router, [path, ...middlewares])
     }
