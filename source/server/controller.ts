@@ -5,7 +5,6 @@ import * as express from 'express';
 // local dependencies
 import * as swagger from './swagger';
 import * as middleware from './middleware';
-import { ANNOTATION_URLENCODED, JSONEndpoint } from './middleware';
 
 /**
  * list of allowed to use express methods for API endpoints

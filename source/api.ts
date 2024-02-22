@@ -6,21 +6,21 @@ import { Logger } from './service';
 import * as config from './constant';
 
 // NOTE controllers
-import TestSystemController from './controller/system'
+import SystemCtrl from './controller/system'
 
 class API {
 
   public static async start () {
-    // NOTE create server instance
-    Server.create();
     // TODO initialize database connection
     // DB.initialize();
     // TODO initialize models
     // Model.initialize(DB);
     // NOTE subscribe controllers
-    await Server.subscribe(TestSystemController)
+    await Server.subscribe(SystemCtrl)
     // NOTE initialize express server
     await Server.initialize();
+    // NOTE start express server
+    await Server.start();
     // TODO remove
     // NOTE test if error
     // await (new Promise((resolve, reject) => reject('test on error')));

@@ -37,12 +37,10 @@ export default class System extends Controller {
   @JSON({ any: 2 })
   @APIEndpoint({ path: '/test', method: Controller.POST })
   public async test () {
-    // TODO implement user creation
-
-
+    // TODO remove
     await this.response.status(200).type('json').send({
       body: this.request.body,
-
+      session: this.request.session,
     });
   }
 

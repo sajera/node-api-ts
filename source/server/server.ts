@@ -3,32 +3,43 @@ import * as cors from 'cors';
 import * as http from 'http';
 import * as path from 'path';
 import * as express from 'express';
+import * as cookie from 'express-session';
 // local dependencies
 import Swagger from './swagger';
 import { Logger } from '../service';
 import * as middleware from './middleware';
 import { Controller, Annotation } from './controller';
-import { HOST, PORT, API_PATH, LOG_LEVEL, SWAGGER_PATH, STATIC_PATH } from '../constant';
+import { HOST, PORT, API_PATH, LOG_LEVEL, DEBUG, SWAGGER_PATH, STATIC_PATH, COOKIE_SECRET } from '../constant';
 
-export class Server {
-  // NOTE is singleton
-  private static _instance: Server;
+class Server {
   private router = express.Router()
   private annotation: Annotation[] = []
+  private constructor (public expressApp: express.Application) { Logger.debug('SERVER', 'create Express App'); }
+  // NOTE is singleton
+  private static instance: Server;
   private static _nodeServer: http.Server;
-  private static get instance () { return this._instance; }
+  public static create () { this.instance = new Server(express()); }
+  public static get expressApp () { return this.instance.expressApp; }
 
-  public static create () { this._instance = new Server(express()); }
-  public static get expressApp () { return this._instance.expressApp; }
-
-  private get STATIC () {
-    Logger.important('SERVER', `Serve the static content from the ./public folder on the .${STATIC_PATH} path`);
+  private static get STATIC () {
+    Logger.important('SERVER', `serve the static content from the ./public folder on the '${STATIC_PATH}' path`);
     // @see https://expressjs.com/en/4x/api.html#express.static
     return express.static(path.join(process.cwd(), 'public'), { fallthrough: true });
   }
 
-  private get CORS () {
-    Logger.important('SERVER', 'CORS enabled from root ./ ');
+  private static get COOKIE () {
+    Logger.important('SERVER', `COOKIE is enabled and ${!DEBUG ? '' : 'not ' }secure`);
+    !DEBUG && this.expressApp.set('trust proxy', 1)
+    return cookie({ // @see https://expressjs.com/en/resources/middleware/session.html
+      resave: false,
+      secret: COOKIE_SECRET,
+      saveUninitialized: true,
+      cookie: { maxAge: 60000, secure: !DEBUG },
+    });
+  }
+
+  private static get CORS () {
+    Logger.important('SERVER', `CORS enabled from '/' path`);
     return cors({ // @see https://www.npmjs.com/package/cors#configuration-options
       credentials: true,
       exposedHeaders: ['Content-Range', 'X-Content-Range'],
@@ -38,18 +49,7 @@ export class Server {
     });
   }
 
-  /**
-   * let's make sure that is a common middlewares and first in a queue
-   */
-  private constructor (public expressApp: express.Application) {
-    // NOTE debug request middleware
-    if (LOG_LEVEL > 0) { expressApp.use(this.logRequest); }
-    // NOTE common allow cors to make sure the errors also available ¯\_(ツ)_/¯
-    expressApp.use(this.CORS);
-    STATIC_PATH && expressApp.use([new RegExp(`^${API_PATH}`), STATIC_PATH], this.STATIC);
-  }
-
-  private logRequest (request: express.Request, response: express.Response, next: express.NextFunction) {
+  private static logRequest (request: express.Request, response: express.Response, next: express.NextFunction) {
     Logger.important('SERVER:CONNECT', `${request.method}: ${request.originalUrl}`);
     return next();
   }
@@ -81,10 +81,15 @@ export class Server {
   }
 
   public static async initialize () {
-    Logger.debug('SERVER', 'protocol HTTP');
-    // NOTE it's should be impossible
-    await this.stop();
-
+    Logger.debug('SERVER', 'initialize routes');
+    // NOTE log all connections
+    if (LOG_LEVEL > 2 || DEBUG) { this.expressApp.use(this.logRequest); }
+    // NOTE common allow cors to make sure the errors also available ¯\_(ツ)_/¯
+    this.expressApp.use(this.CORS);
+    // NOTE enable cookie session
+    COOKIE_SECRET && this.expressApp.use(this.COOKIE);
+    // NOTE serve static from root path "/" exclude "/api/*" paths
+    STATIC_PATH && this.expressApp.use([new RegExp(`^${API_PATH}`), STATIC_PATH], this.STATIC);
     // NOTE initialize swagger
     if (SWAGGER_PATH) {
       Swagger.create(this.instance.annotation)
@@ -94,8 +99,6 @@ export class Server {
     this.expressApp.use(API_PATH, this.instance.router);
     // NOTE last common debug middleware
     this.expressApp.use(this.notFound);
-    // NOTE assumed all middleware already subscribed
-    await this.start();
   }
 
   public static async stop () {
@@ -107,7 +110,7 @@ export class Server {
   }
 
   public static async start () {
-    if (this._nodeServer) { await this.stop(); }
+    await this.stop();
     await (new Promise(resolve => {
       this._nodeServer = this.expressApp.listen(PORT, () => {
         Logger.important('SERVER', `is running on http://${HOST}:${PORT}`);
@@ -116,3 +119,7 @@ export class Server {
     }));
   }
 }
+// NOTE create server instance
+Server.create();
+export { Server };
+export default Server;
