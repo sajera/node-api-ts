@@ -5,7 +5,7 @@ import { Logger } from './logger';
 import { JWT_SECRET } from '../constant';
 
 
-class Token {
+class Token<T> {
   private readonly secret = JWT_SECRET // same secret for all tokens
   private readonly signOptions: jwt.SignOptions
   private readonly verifyOptions: jwt.VerifyOptions = {
@@ -24,17 +24,18 @@ class Token {
   }
 
   /**
-   * secret algorithm only 'HS256'|'HS384'|'HS512'
+   * secret algorithms only 'HS256'|'HS384'|'HS512'
+   * expiresIn @see https://www.npmjs.com/package/jsonwebtoken#token-expiration-exp-claim
    */
-  public static create ({ expiresIn = '1h', algorithm = 'HS256', algorithms }: { expiresIn?: string, algorithm?: 'HS256'|'HS384'|'HS512', algorithms?: jwt.Algorithm[] }) {
-    return new Token(
+  public static create<T> ({ expiresIn = '1h', algorithm = 'HS256', algorithms }: { expiresIn?: string, algorithm?: 'HS256'|'HS384'|'HS512', algorithms?: jwt.Algorithm[] }) {
+    return new Token<T>(
       { expiresIn, algorithm },
       { algorithms: algorithms || [algorithm], maxAge: expiresIn },
     )
   }
 
   /**
-   * verify the sign algorithm and expiration time
+   * verify the sign and expiration time
    */
   public isValid (token: string): boolean {
     try {
@@ -46,12 +47,18 @@ class Token {
     }
   }
 
-  public parse (token: string) {
-    return jwt.verify(token, this.secret, this.verifyOptions)
+  /**
+   * verify the sign and expiration time get data from token
+   */
+  public parse (token: string): T {
+    return <T>jwt.verify(token, this.secret, this.verifyOptions)
   }
 
-  public sign<T> (data: Partial<T>): string {
-    return jwt.sign(data, this.secret, this.signOptions);
+  /**
+   * create signed token
+   */
+  public create (data: T): string {
+    return jwt.sign(data as jwt.JwtPayload, this.secret, this.signOptions);
   }
 }
 

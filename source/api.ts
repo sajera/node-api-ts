@@ -8,6 +8,12 @@ import * as config from './constant';
 // NOTE controllers
 import SystemCtrl from './controller/system'
 
+declare namespace Express {
+  export interface Request {
+    auth?: string
+  }
+}
+
 class API {
 
   public static async start () {

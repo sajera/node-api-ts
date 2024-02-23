@@ -58,7 +58,7 @@ class Server {
   private static notFound (request: express.Request, response: express.Response) {
     // NOTE actually it should not be used
     Logger.error('SERVER:404', `${request.method}: ${request.originalUrl}`);
-    return response.status(404).send('Not Found');
+    return response.status(404).type('json').send('Not Found');
   }
 
   public static subscribe (Ctrl: typeof Controller) {

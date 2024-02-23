@@ -76,10 +76,10 @@ const BASE = {
   // TODO
   definitions: {
     Authorization: {
-      type: 'string',
       in: 'header',
-      example: 'Bearer eyJ0eXAiOiJKV',
-      description: 'Authorization token in the standard form. Possible values: \'Authorization: JWT <ACCESS_TOKEN>\' or \'Authorization: Bearer <ACCESS_TOKEN>\''
+      type: 'string',
+      example: 'Bearer <ACCESS_TOKEN>',
+      description: 'Authorization token in the standard form. Possible values: "Authorization: Bearer <ACCESS_TOKEN>"'
     },
   },
 };
@@ -144,6 +144,7 @@ export default class SwaggerServer {
           // NOTE Authentication https://swagger.io/docs/specification/2-0/authentication/
           security: []
         };
+        // TODO reuse definitions
         if (endpoint.auth) { // NOTE Authorization declaration
           ep.security.push({ Authorization: [] });
           set(ep.responses, 401, { description: 'Unauthorized' });

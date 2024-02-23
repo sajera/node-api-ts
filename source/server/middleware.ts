@@ -124,14 +124,20 @@ export function authMiddleware (options: AuthAnnotation) {
   Logger.important('AUTH', 'Middleware not implemented yet', options)
   // NOTE that is a default setting, and decorator allows to override for every specific endpoint
   // TODO need real example
-  return (request: express.Request, response: express.Response, next: express.NextFunction) => {
+  return async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+    try {
+      const authorization = request.header('Authorization')
+      Logger.debug('AUTH:HANDLE', `Authorization: ${authorization}`);
 
-    const authorization = request.header('Authorization')
-    Logger.debug('AUTH:HANDLE', `Authorization: ${authorization}`);
-    Logger.debug('AUTH:HANDLE', `checkTokenSign: ${AuthService.checkTokenSign(authorization)}`);
-
-
-    return next();
+      const auth = AuthService.getAuthAccess(request.header('Authorization'))
+      // TODO extend express.Request
+      // request.auth = auth
+      Logger.debug('AUTH:HANDLE', `getAuthAccess: ${auth}`);
+      return next();
+    } catch (error) {
+      Logger.debug('AUTH:401', error.message);
+      return response.status(401).type('json').send('Unauthorized');
+    }
   }
 }
 /**
