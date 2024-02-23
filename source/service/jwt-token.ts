@@ -5,9 +5,11 @@ import { Logger } from './logger';
 import { JWT_SECRET } from '../constant';
 
 
-class Token<T> {
+class JwtToken<T> {
   private readonly secret = JWT_SECRET // same secret for all tokens
-  private readonly signOptions: jwt.SignOptions
+  private readonly signOptions: jwt.SignOptions = {
+    algorithm: 'HS256'
+  }
   private readonly verifyOptions: jwt.VerifyOptions = {
     // algorithms: ['HS256', 'HS384', 'HS512'],
     ignoreExpiration: false,
@@ -28,40 +30,37 @@ class Token<T> {
    * expiresIn @see https://www.npmjs.com/package/jsonwebtoken#token-expiration-exp-claim
    */
   public static create<T> ({ expiresIn = '1h', algorithm = 'HS256', algorithms }: { expiresIn?: string, algorithm?: 'HS256'|'HS384'|'HS512', algorithms?: jwt.Algorithm[] }) {
-    return new Token<T>(
+    return new JwtToken<T>(
       { expiresIn, algorithm },
       { algorithms: algorithms || [algorithm], maxAge: expiresIn },
     )
   }
 
   /**
-   * verify the sign and expiration time
+   * verify the sign and expiration time get data from token
    */
-  public isValid (token: string): boolean {
-    try {
-      const decoded = this.parse(token)
-      // TODO expiration checked ??
-      return Boolean(decoded);
-    } catch (error) {
-      return false
-    }
+  public verify (token: string): T {
+    // TODO is expiration correctly checked
+    console.log('JwtToken.verify', token)
+    console.log('JwtToken.decode', this.decode(token))
+    return <T>jwt.verify(token, this.secret, this.verifyOptions)
   }
 
   /**
-   * verify the sign and expiration time get data from token
+   * get data from token
    */
-  public parse (token: string): T {
-    return <T>jwt.verify(token, this.secret, this.verifyOptions)
+  public decode (token: string): T {
+    return <T>jwt.decode(token, this.verifyOptions)
   }
 
   /**
    * create signed token
    */
-  public create (data: T): string {
+  public sign (data: T): string {
     return jwt.sign(data as jwt.JwtPayload, this.secret, this.signOptions);
   }
 }
 
 // NOTE create server instance
-export { Token };
-export default Token;
+export { JwtToken };
+export default JwtToken;

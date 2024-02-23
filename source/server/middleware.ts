@@ -33,10 +33,10 @@ export function jsonMiddleware (options: JSONAnnotation) {
 /**
  * settings of the "body-parse".json middleware
  * @example
- * /@APIController({path: '/ctrl-prefix'})
+ * /@API({path: '/ctrl-prefix'})
  * export default class My extends Controller {
  *     @JSON({ ... })
- *     @APIEndpoint({method: API_METHOD.GET, path: '/express/:path'})
+ *     @Endpoint({method: API_METHOD.GET, path: '/express/:path'})
  *     public async endpoint () { ... }
  * }
  * @decorator
@@ -71,10 +71,10 @@ export function urlEncodedMiddleware (options: URLEncodedAnnotation) {
 /**
  * settings of the "body-parse".urlencoded middleware
  * @example
- * /@APIController({path: '/ctrl-prefix'})
+ * /@API({path: '/ctrl-prefix'})
  * export default class My extends Controller {
  *     @URLEncoded({ ... })
- *     @APIEndpoint({method: API_METHOD.GET, path: '/express/:path'})
+ *     @Endpoint({method: API_METHOD.GET, path: '/express/:path'})
  *     public async endpoint () { ... }
  * }
  * @decorator
@@ -100,10 +100,10 @@ export function multerMiddleware (options: MulterAnnotation) {
 /**
  * settings of the "multer" middleware
  * @example
- * /@APIController({path: '/ctrl-prefix'})
+ * /@API({path: '/ctrl-prefix'})
  * export default class My extends Controller {
  *     @Multer({ ... })
- *     @APIEndpoint({method: API_METHOD.GET, path: '/express/:path'})
+ *     @Endpoint({method: API_METHOD.GET, path: '/express/:path'})
  *     public async endpoint () { ... }
  * }
  * @decorator
@@ -113,26 +113,28 @@ export function Multer (options: MulterEndpoint) {
   return Reflect.metadata(ANNOTATION_MULTER, options);
 }
 
-
+declare module "express" {
+  export interface Request {
+    self?: AuthService.Self;
+    auth?: AuthService.AccessTokenPayload;
+  }
+}
 interface AuthAnnotation { // TODO to know more
+  lightweight?: boolean;
   self?: boolean;
 }
-export interface AuthEndpoint extends AuthAnnotation {
-  any?: any;
-}
-export function authMiddleware (options: AuthAnnotation) {
-  Logger.important('AUTH', 'Middleware not implemented yet', options)
+export interface AuthEndpoint extends AuthAnnotation {}
+export function authMiddleware ({ lightweight, self }: AuthAnnotation) {
   // NOTE that is a default setting, and decorator allows to override for every specific endpoint
-  // TODO need real example
   return async (request: express.Request, response: express.Response, next: express.NextFunction) => {
     try {
-      const authorization = request.header('Authorization')
-      Logger.debug('AUTH:HANDLE', `Authorization: ${authorization}`);
-
-      const auth = AuthService.getAuthAccess(request.header('Authorization'))
-      // TODO extend express.Request
-      // request.auth = auth
-      Logger.debug('AUTH:HANDLE', `getAuthAccess: ${auth}`);
+      if (lightweight) { // NOTE verify token sign and expiration only
+        request.auth = AuthService.getAuthAccessSync(request.header('Authorization'))
+      } else { // NOTE verify token sign and expiration + check DB record
+        request.auth = await AuthService.getAuthAccess(request.header('Authorization'))
+      }
+      // NOTE extract user data from DB
+      request.self = !self ? null : await AuthService.getSelf(request.auth)
       return next();
     } catch (error) {
       Logger.debug('AUTH:401', error.message);
@@ -143,10 +145,10 @@ export function authMiddleware (options: AuthAnnotation) {
 /**
  * settings of the "auth" middleware
  * @example
- * /@APIController({path: '/ctrl-prefix'})
+ * /@API({path: '/ctrl-prefix'})
  * export default class My extends Controller {
- *     @Multer({ ... })
- *     @APIEndpoint({method: API_METHOD.GET, path: '/express/:path'})
+ *     @Auth({ ... })
+ *     @Endpoint({ path: '/express/:path' })
  *     public async endpoint () { ... }
  * }
  * @decorator
