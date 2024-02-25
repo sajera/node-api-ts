@@ -40,9 +40,6 @@ class JwtToken<T> {
    * verify the sign and expiration time get data from token
    */
   public verify (token: string): T {
-    // TODO is expiration correctly checked
-    console.log('JwtToken.verify', token)
-    console.log('JwtToken.decode', this.decode(token))
     return <T>jwt.verify(token, this.secret, this.verifyOptions)
   }
 

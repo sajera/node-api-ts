@@ -11,23 +11,20 @@ interface JSONAnnotation { // TODO import * as bodyParser from 'body-parser'; bo
   limit?: string;
   inflate?: boolean;
   strict?: boolean;
+  // @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#syntax
   reviver?(key: string, value: any): any;
+  // @see https://www.npmjs.com/package/body-parser#verify
   verify?(req: http.IncomingMessage, res: http.ServerResponse, buf: Buffer, encoding: string): void;
 }
-export interface JSONEndpoint extends JSONAnnotation {
-  any?: any;
-}
+export interface JSONEndpoint extends JSONAnnotation {}
 export function jsonMiddleware (options: JSONAnnotation) {
   // NOTE that is a default setting, and decorator allows to override for every specific endpoint
   return express.json({ // @see https://www.npmjs.com/package/body-parser#options
-    // @see https://www.npmjs.com/package/body-parser#verify
-    // verify: (req: express.Request, res: express.Response, buf: Buffer, encoding: string = 'UTF-8') => throw new Error('At som reason'),
-    // @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#syntax
-    // reviver: (key: string, value: any): any => ''
-    limit: options.limit || '5mb',
-    type: options.type || '*/json',
-    strict: options.strict || true,
-    inflate: options.inflate || true, // false => reject compressed body
+    type: '*/json',
+    inflate: true, // false => reject compressed body
+    strict: true,
+    limit: '5mb',
+    ...options,
   });
 }
 /**
@@ -52,20 +49,18 @@ interface URLEncodedAnnotation { // TODO import * as bodyParser from 'body-parse
   limit?: string;
   inflate?: boolean;
   extended?: boolean;
+  // @see https://www.npmjs.com/package/body-parser#verify
   verify?(req: http.IncomingMessage, res: http.ServerResponse, buf: Buffer, encoding: string): void;
 }
-export interface URLEncodedEndpoint extends URLEncodedAnnotation {
-  any?: any;
-}
+export interface URLEncodedEndpoint extends URLEncodedAnnotation {}
 export function urlEncodedMiddleware (options: URLEncodedAnnotation) {
   // NOTE that is a default setting, and decorator allows to override for every specific endpoint
   return express.urlencoded({ // @see https://www.npmjs.com/package/body-parser#options-3
-    // @see https://www.npmjs.com/package/body-parser#verify
-    // verify: (req: express.Request, res: express.Response, buf: Buffer, encoding: string = 'UTF-8') => throw new Error('At som reason'),
-    type: options.type || '*/x-www-form-urlencoded',
-    extended: options.extended || true,
-    inflate: options.inflate || true, // false => reject compressed body
-    limit: options.limit || '2mb',
+    type: '*/x-www-form-urlencoded',
+    extended: true,
+    inflate: true, // false => reject compressed body
+    limit: '2mb',
+    ...options
   });
 }
 /**
@@ -115,28 +110,27 @@ export function Multer (options: MulterEndpoint) {
 
 declare module "express" {
   export interface Request {
-    self?: AuthService.Self;
-    auth?: AuthService.AccessTokenPayload;
+    auth?: AuthService.Auth;
   }
 }
-interface AuthAnnotation { // TODO to know more
-  lightweight?: boolean;
-  self?: boolean;
+interface AuthAnnotation {
+  lightweight?: boolean; // not sure it useful
+  optional?: boolean;
 }
 export interface AuthEndpoint extends AuthAnnotation {}
-export function authMiddleware ({ lightweight, self }: AuthAnnotation) {
+export function authMiddleware ({ optional, lightweight }: AuthAnnotation) {
   // NOTE that is a default setting, and decorator allows to override for every specific endpoint
   return async (request: express.Request, response: express.Response, next: express.NextFunction) => {
     try {
-      if (lightweight) { // NOTE verify token sign and expiration only
-        request.auth = AuthService.getAuthAccessSync(request.header('Authorization'))
-      } else { // NOTE verify token sign and expiration + check DB record
-        request.auth = await AuthService.getAuthAccess(request.header('Authorization'))
-      }
-      // NOTE extract user data from DB
-      request.self = !self ? null : await AuthService.getSelf(request.auth)
+      // NOTE verify token sign and expiration only
+      const auth = AuthService.verifyAuthAccess(request.header('Authorization'))
+      // NOTE get DB record of session
+      // TODO throw in case "Session Interrupted/Invalidated"
+      !lightweight && (request.auth = await AuthService.getAuth(auth))
       return next();
     } catch (error) {
+      // NOTE allow to "try" to get auth and pass in case it missing
+      if (optional) { return next(); }
       Logger.debug('AUTH:401', error.message);
       return response.status(401).type('json').send('Unauthorized');
     }

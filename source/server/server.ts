@@ -1,7 +1,7 @@
 // outsource dependencies
 import * as cors from 'cors';
-import * as http from 'http';
-import * as path from 'path';
+import * as http from 'node:http';
+import * as path from 'node:path';
 import * as express from 'express';
 import * as cookie from 'express-session';
 // local dependencies

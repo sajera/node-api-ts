@@ -35,3 +35,7 @@ export const SWAGGER_PATH = varString(process.env.SWAGGER_PATH)
 export const COOKIE_SECRET = varString(process.env.COOKIE_SECRET)
 
 export const JWT_SECRET = varString(process.env.JWT_SECRET)
+export const SID_SECRET = varString(process.env.SID_SECRET)
+
+export const PWD_HASH = varNumber(process.env.PWD_HASH)
+export const PWD_SALT = varString(process.env.PWD_SALT)

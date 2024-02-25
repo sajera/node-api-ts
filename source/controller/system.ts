@@ -1,6 +1,7 @@
 // outsource dependencies
 
 // local dependencies
+import { AuthService } from '../service';
 import { APP_VERSION } from '../constant';
 import { Controller, API, Endpoint, Auth, URLEncoded, JSON, Swagger } from '../server'
 
@@ -11,7 +12,7 @@ import { Controller, API, Endpoint, Auth, URLEncoded, JSON, Swagger } from '../s
 @API({ path: '/system' })
 export default class System extends Controller {
 
-  @Auth({ self: false })
+  @Auth({})
   @Endpoint({ path: '/self' })
   @Swagger({ summary: 'Get self information' })
   public async getSelf () {
@@ -21,7 +22,7 @@ export default class System extends Controller {
     });
   }
 
-  @URLEncoded({ any: 1 })
+  @URLEncoded({})
   @Endpoint({ path: '/sign-up', method: Controller.POST })
   public async signUp () {
     // TODO implement user creation
@@ -33,8 +34,8 @@ export default class System extends Controller {
     });
   }
 
-  @Auth({ self: false })
-  @JSON({ any: 2 })
+  @JSON({})
+  @Auth({ optional: true })
   @Endpoint({ path: '/test', method: Controller.POST })
   public async test () {
     // TODO remove
@@ -46,14 +47,15 @@ export default class System extends Controller {
 
   @Endpoint({ path: '/sign-in', method: Controller.POST })
   public async signIn () {
-    // TODO implement authorization flow
-    // NOTE currently fake authorization token
-    await this.response.status(200).type('json').send({
-      access_token: 'my_fake_authorization_token',
-      refresh_token: '',
-    });
+    // TODO check user credentials
+    // TODO find the user session
+    // TODO continue use previous session if its possible
+    // TODO response schema
+    const auth = await AuthService.createAuth(1, { to: 'think about' } )
+    await this.response.status(200).type('json').send(auth);
   }
 
+  @Auth({})
   @Endpoint({ path: '/sign-out' })
   public async signOut () {
     // TODO kill session and authorization tokens
