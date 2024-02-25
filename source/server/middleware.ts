@@ -38,7 +38,7 @@ export function jsonMiddleware (options: JSONAnnotation) {
  * }
  * @decorator
  */
-export const ANNOTATION_JSON = Symbol('JSON')
+export const ANNOTATION_JSON = Symbol('JSON');
 export function JSON (options: JSONEndpoint) {
   return Reflect.metadata(ANNOTATION_JSON, options);
 }
@@ -74,7 +74,7 @@ export function urlEncodedMiddleware (options: URLEncodedAnnotation) {
  * }
  * @decorator
  */
-export const ANNOTATION_URLENCODED = Symbol('URLENCODED')
+export const ANNOTATION_URLENCODED = Symbol('URLENCODED');
 export function URLEncoded (options: URLEncodedEndpoint) {
   return Reflect.metadata(ANNOTATION_URLENCODED, options);
 }
@@ -87,7 +87,7 @@ export interface MulterEndpoint extends MulterAnnotation {
   any?: any;
 }
 export function multerMiddleware (options: MulterAnnotation) {
-  Logger.important('MULTER', 'Middleware not implemented yet', options)
+  Logger.important('MULTER', 'Middleware not implemented yet', options);
   // NOTE that is a default setting, and decorator allows to override for every specific endpoint
   // TODO need real example
   return multer().none();
@@ -103,12 +103,12 @@ export function multerMiddleware (options: MulterAnnotation) {
  * }
  * @decorator
  */
-export const ANNOTATION_MULTER = Symbol('MULTER')
+export const ANNOTATION_MULTER = Symbol('MULTER');
 export function Multer (options: MulterEndpoint) {
   return Reflect.metadata(ANNOTATION_MULTER, options);
 }
 
-declare module "express" {
+declare module 'express' {
   export interface Request {
     auth?: AuthService.Auth;
   }
@@ -123,10 +123,10 @@ export function authMiddleware ({ optional, lightweight }: AuthAnnotation) {
   return async (request: express.Request, response: express.Response, next: express.NextFunction) => {
     try {
       // NOTE verify token sign and expiration only
-      const auth = AuthService.verifyAuthAccess(request.header('Authorization'))
+      const auth = AuthService.verifyAuthAccess(request.header('Authorization'));
       // NOTE get DB record of session
       // TODO throw in case "Session Interrupted/Invalidated"
-      !lightweight && (request.auth = await AuthService.getAuth(auth))
+      !lightweight && (request.auth = await AuthService.getAuth(auth));
       return next();
     } catch (error) {
       // NOTE allow to "try" to get auth and pass in case it missing
@@ -134,7 +134,7 @@ export function authMiddleware ({ optional, lightweight }: AuthAnnotation) {
       Logger.debug('AUTH:401', error.message);
       return response.status(401).type('json').send('Unauthorized');
     }
-  }
+  };
 }
 /**
  * settings of the "auth" middleware
@@ -147,7 +147,7 @@ export function authMiddleware ({ optional, lightweight }: AuthAnnotation) {
  * }
  * @decorator
  */
-export const ANNOTATION_AUTH = Symbol('AUTH')
+export const ANNOTATION_AUTH = Symbol('AUTH');
 export function Auth (options: AuthEndpoint) {
   return Reflect.metadata(ANNOTATION_AUTH, options);
 }

@@ -3,7 +3,7 @@
 // local dependencies
 import { AuthService } from '../service';
 import { APP_VERSION } from '../constant';
-import { Controller, API, Endpoint, Auth, URLEncoded, JSON, Swagger } from '../server'
+import { Controller, API, Endpoint, Auth, URLEncoded, JSON, Swagger } from '../server';
 
 
 /**
@@ -51,7 +51,7 @@ export default class System extends Controller {
     // TODO find the user session
     // TODO continue use previous session if its possible
     // TODO response schema
-    const auth = await AuthService.createAuth(1, { to: 'think about' } )
+    const auth = await AuthService.createAuth(1, { to: 'think about' });
     await this.response.status(200).type('json').send(auth);
   }
 

@@ -57,8 +57,11 @@ export interface Annotation extends ControllerAnnotation {
  */
 export class Controller {
   public static GET = METHOD.GET;
+
   public static PUT = METHOD.PUT;
+
   public static POST = METHOD.POST;
+
   public static DELETE = METHOD.DELETE;
 
   public static annotation: Annotation;
@@ -105,11 +108,11 @@ export class Controller {
           console.error(`\n[CONTROLLER: ${Ctrl.name}.${action}] Execution Error:\n`, error);
           next(error);
         });
-    }
+    };
   }
 }
 
-export const ANNOTATION_ENDPOINT = Symbol('ENDPOINT')
+export const ANNOTATION_ENDPOINT = Symbol('ENDPOINT');
 /**
  * Define correct metadata for API endpoints
  *
@@ -136,7 +139,7 @@ export function Endpoint (endpoint: EndpointAnnotation) {
  */
 export function API<T> (options: ControllerAnnotation) {
   return (Ctrl: typeof Controller) => {
-    Ctrl.formatAnnotation(options)
+    Ctrl.formatAnnotation(options);
     // NOTE store data which was grabbed from annotations
     // Ctrl.annotation = formatAnnotation(Ctrl, options);
     return Ctrl as T;

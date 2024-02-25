@@ -6,7 +6,7 @@ import { DEBUG, LOG_LEVEL } from '../constant';
 
 const rowFormat = (rows: any): string[] => !Array.isArray(rows) ? []
   // : DEBUG ? rows.map(row => JSON.stringify(row, null, 2))
-    : rows.map(row => JSON.stringify(row));
+  : rows.map(row => JSON.stringify(row));
 /**
  * In the future, it is possible to use alternative loggers.
  */

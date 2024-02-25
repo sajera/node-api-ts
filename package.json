@@ -6,13 +6,13 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "lint-auto-fix": "eslint . --ext .ts --fix",
+    "lint:fix": "eslint . --ext .ts --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm-run-all start-api start-cron",
-    "start-api": "ts-node source/api.ts",
-    "start-cron": "ts-node source/cron.ts",
-    "api-local": "nodemon --exec ts-node source/api.ts",
-    "cron-local": "nodemon --exec ts-node source/cron.ts"
+    "start-api": "ts-node --transpile-only source/api.ts",
+    "start-cron": "ts-node --transpile-only source/cron.ts",
+    "start-api:dev": "nodemon --exec ts-node source/api.ts",
+    "start-cron:dev": "nodemon --exec ts-node source/cron.ts"
   },
   "license": "MIT",
   "devDependencies": {

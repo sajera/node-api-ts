@@ -13,13 +13,19 @@ import { HOST, PORT, API_PATH, LOG_LEVEL, DEBUG, SWAGGER_PATH, STATIC_PATH, COOK
 import { authMiddleware } from './middleware';
 
 class Server {
-  private router = express.Router()
-  private annotation: Annotation[] = []
+  private router = express.Router();
+
+  private annotation: Annotation[] = [];
+
   private constructor (public expressApp: express.Application) { Logger.debug('SERVER', 'create Express App'); }
+
   // NOTE is singleton
   private static instance: Server;
+
   private static _nodeServer: http.Server;
+
   public static create () { this.instance = new Server(express()); }
+
   public static get expressApp () { return this.instance.expressApp; }
 
   private static get STATIC () {
@@ -30,7 +36,7 @@ class Server {
 
   private static get COOKIE () {
     Logger.important('SERVER', `COOKIE is enabled and ${!DEBUG ? '' : 'not ' }secure`);
-    !DEBUG && this.expressApp.set('trust proxy', 1)
+    !DEBUG && this.expressApp.set('trust proxy', 1);
     return cookie({ // @see https://expressjs.com/en/resources/middleware/session.html
       resave: false,
       secret: COOKIE_SECRET,
@@ -40,7 +46,7 @@ class Server {
   }
 
   private static get CORS () {
-    Logger.important('SERVER', `CORS enabled from '/' path`);
+    Logger.important('SERVER', 'CORS enabled from \'/\' path');
     return cors({ // @see https://www.npmjs.com/package/cors#configuration-options
       credentials: true,
       exposedHeaders: ['Content-Range', 'X-Content-Range'],
@@ -63,24 +69,24 @@ class Server {
 
   public static subscribe (Ctrl: typeof Controller) {
     // NOTE grab all annotation
-    this.instance.annotation.push(Ctrl.annotation)
+    this.instance.annotation.push(Ctrl.annotation);
     // NOTE create controller router
     const router = express.Router();
     // NOTE setup all endpoints of controller
     for (const { path, method, action, urlencoded, json, auth, multer } of Ctrl.annotation.endpoints) {
       Logger.info('SUBSCRIBE', `${Ctrl.annotation.name} => ${method.toUpperCase()}(${action}) ${API_PATH}${Ctrl.annotation.path}${path}`);
-      const middlewares = []
+      const middlewares = [];
       // NOTE middlewares of endpoint based on annotation(decorators)
-      auth && middlewares.push(middleware.authMiddleware(auth))
-      json && middlewares.push(middleware.jsonMiddleware(json))
-      multer && middlewares.push(middleware.multerMiddleware(multer))
-      urlencoded && middlewares.push(middleware.urlEncodedMiddleware(urlencoded))
+      auth && middlewares.push(middleware.authMiddleware(auth));
+      json && middlewares.push(middleware.jsonMiddleware(json));
+      multer && middlewares.push(middleware.multerMiddleware(multer));
+      urlencoded && middlewares.push(middleware.urlEncodedMiddleware(urlencoded));
       // NOTE set up the controller action handler
-      middlewares.push(Ctrl.handle(action))
-      router[method].apply(router, [path, ...middlewares])
+      middlewares.push(Ctrl.handle(action));
+      router[method].apply(router, [path, ...middlewares]);
     }
     // NOTE add the controller route
-    this.instance.router.use(Ctrl.annotation.path, router)
+    this.instance.router.use(Ctrl.annotation.path, router);
   }
 
   public static async initialize () {
@@ -95,8 +101,8 @@ class Server {
     STATIC_PATH && this.expressApp.use([new RegExp(`^${API_PATH}`), STATIC_PATH], this.STATIC);
     // NOTE initialize swagger
     if (SWAGGER_PATH) {
-      Swagger.create(this.instance.annotation)
-      Swagger.start(this.expressApp)
+      Swagger.create(this.instance.annotation);
+      Swagger.start(this.expressApp);
     }
     // NOTE last common debug middleware
     this.expressApp.use(API_PATH, this.instance.router);

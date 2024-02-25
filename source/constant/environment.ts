@@ -28,14 +28,14 @@ export const PORT = varNumber(process.env.PORT || '80');
 export const HOST = varString(process.env.HOST || '0.0.0.0');
 export const API_PATH = varString(process.env.API_PATH);
 
-export const STATIC_PATH = varString(process.env.STATIC_PATH)
+export const STATIC_PATH = varString(process.env.STATIC_PATH);
 
-export const SWAGGER_PATH = varString(process.env.SWAGGER_PATH)
+export const SWAGGER_PATH = varString(process.env.SWAGGER_PATH);
 
-export const COOKIE_SECRET = varString(process.env.COOKIE_SECRET)
+export const COOKIE_SECRET = varString(process.env.COOKIE_SECRET);
 
-export const JWT_SECRET = varString(process.env.JWT_SECRET)
-export const SID_SECRET = varString(process.env.SID_SECRET)
+export const JWT_SECRET = varString(process.env.JWT_SECRET);
+export const SID_SECRET = varString(process.env.SID_SECRET);
 
-export const PWD_HASH = varNumber(process.env.PWD_HASH)
-export const PWD_SALT = varString(process.env.PWD_SALT)
+export const PWD_HASH = varNumber(process.env.PWD_HASH);
+export const PWD_SALT = varString(process.env.PWD_SALT);

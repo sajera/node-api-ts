@@ -1,6 +1,6 @@
 // outsource dependencies
-import * as bcrypt from 'bcryptjs'
-import { createHmac } from 'node:crypto'
+import * as bcrypt from 'bcryptjs';
+import { createHmac } from 'node:crypto';
 // local dependencies
 import { Logger } from './logger';
 import { JwtToken } from './jwt-token';
@@ -35,10 +35,13 @@ namespace AuthService {
 }
 
 class AuthService {
-  private readonly schema = 'bearer'
-  private readonly schemaReplacer = /^Bearer /i
-  private readonly access = JwtToken.create<AuthService.AccessTokenPayload>({ expiresIn: '1m' })
-  private readonly refresh = JwtToken.create<AuthService.RefreshTokenPayload>({ expiresIn: '7d' })
+  private readonly schema = 'bearer';
+
+  private readonly schemaReplacer = /^Bearer /i;
+
+  private readonly access = JwtToken.create<AuthService.AccessTokenPayload>({ expiresIn: '1m' });
+
+  private readonly refresh = JwtToken.create<AuthService.RefreshTokenPayload>({ expiresIn: '7d' });
 
   private constructor () {
     Logger.log('AUTH', 'service TODO');
@@ -76,22 +79,23 @@ class AuthService {
 
   // NOTE is singleton
   private static instance: AuthService;
-  public static create () { this.instance = new AuthService() }
+
+  public static create () { this.instance = new AuthService(); }
 
   /**
    * lightweight verification of token - check sign and expiration
    * @param header
    */
   public static verifyAuthAccess (header: string): AuthService.AccessTokenPayload {
-    const token = header.replace(this.instance.schemaReplacer, '')
-    return this.instance.access.verify(token)
+    const token = header.replace(this.instance.schemaReplacer, '');
+    return this.instance.access.verify(token);
   }
 
   /**
    *
    */
   public static async getAuth (auth: AuthService.AccessTokenPayload): Promise<AuthService.Auth> {
-    Logger.important('AUTH', 'get "auth" from Redis not implemented yet')
+    Logger.important('AUTH', 'get "auth" from Redis not implemented yet');
     // TODO get "auth" from Redis
     return {
       accessToken: '',
@@ -101,7 +105,7 @@ class AuthService {
       schema: '',
       sid: '',
       userId: undefined
-    }
+    };
   }
 
   /**
@@ -111,7 +115,7 @@ class AuthService {
    */
   public static async createAuth (userId: string|number, payload) {
     const sid = this.instance.sid(userId);
-    const tokenPayload = { sid, name: 'not in use', roles: ['will', 'be', 'implemented'] }
+    const tokenPayload = { sid, name: 'not in use', roles: ['will', 'be', 'implemented'] };
     const schema = this.instance.schema;
     const accessToken = this.instance.access.sign(tokenPayload);
     const refreshToken = this.instance.refresh.sign(tokenPayload);
@@ -124,10 +128,10 @@ class AuthService {
       schema: this.instance.schema,
       accessToken: this.instance.access.sign(tokenPayload),
       refreshToken: this.instance.refresh.sign(tokenPayload),
-    }
-    Logger.important('AUTH', 'store "auth" into Redis not implemented yet')
+    };
+    Logger.important('AUTH', 'store "auth" into Redis not implemented yet');
 
-    return { schema, accessToken, refreshToken }
+    return { schema, accessToken, refreshToken };
   }
 
   public static async initialize () {

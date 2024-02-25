@@ -1,28 +1,30 @@
 // outsource dependencies
-import * as jwt from 'jsonwebtoken'
+import * as jwt from 'jsonwebtoken';
 // local dependencies
 import { Logger } from './logger';
 import { JWT_SECRET } from '../constant';
 
 
 class JwtToken<T> {
-  private readonly secret = JWT_SECRET // same secret for all tokens
+  private readonly secret = JWT_SECRET; // same secret for all tokens
+
   private readonly signOptions: jwt.SignOptions = {
     algorithm: 'HS256'
-  }
+  };
+
   private readonly verifyOptions: jwt.VerifyOptions = {
     // algorithms: ['HS256', 'HS384', 'HS512'],
     ignoreExpiration: false,
     clockTolerance: 3 * 60, // 3min
-  }
+  };
 
   private constructor (signOptions: jwt.SignOptions, verifyOptions: jwt.VerifyOptions) {
     if (!this.secret) {
-      this.secret = '¯\_(ツ)_/¯'
+      this.secret = '¯\_(ツ)_/¯';
       Logger.error('TOKEN', 'Secret is missing. Switching to default secret');
     }
-    this.signOptions = { ...this.signOptions, ...signOptions }
-    this.verifyOptions = { ...this.verifyOptions, ...verifyOptions }
+    this.signOptions = { ...this.signOptions, ...signOptions };
+    this.verifyOptions = { ...this.verifyOptions, ...verifyOptions };
   }
 
   /**
@@ -33,21 +35,21 @@ class JwtToken<T> {
     return new JwtToken<T>(
       { expiresIn, algorithm },
       { algorithms: algorithms || [algorithm], maxAge: expiresIn },
-    )
+    );
   }
 
   /**
    * verify the sign and expiration time get data from token
    */
   public verify (token: string): T {
-    return <T>jwt.verify(token, this.secret, this.verifyOptions)
+    return <T>jwt.verify(token, this.secret, this.verifyOptions);
   }
 
   /**
    * get data from token
    */
   public decode (token: string): T {
-    return <T>jwt.decode(token, this.verifyOptions)
+    return <T>jwt.decode(token, this.verifyOptions);
   }
 
   /**

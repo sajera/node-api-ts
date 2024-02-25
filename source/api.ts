@@ -6,7 +6,7 @@ import { Logger } from './service';
 import * as config from './constant';
 
 // NOTE controllers
-import SystemCtrl from './controller/system'
+import SystemCtrl from './controller/system';
 
 class API {
 
@@ -16,7 +16,7 @@ class API {
     // TODO initialize models
     // Model.initialize(DB);
     // NOTE subscribe controllers
-    await Server.subscribe(SystemCtrl)
+    await Server.subscribe(SystemCtrl);
     // NOTE initialize express server
     await Server.initialize();
     // NOTE start express server

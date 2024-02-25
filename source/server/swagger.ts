@@ -9,7 +9,7 @@ import { Annotation } from './controller';
 import { PORT, HOST, API_PATH, APP_VERSION, APP_NAME, NODE_ENV, DEBUG, SWAGGER_PATH } from '../constant';
 
 // configure
-export const ANNOTATION_SWAGGER = Symbol('SWAGGER')
+export const ANNOTATION_SWAGGER = Symbol('SWAGGER');
 /**
  * Swagger addition data annotation restriction
  */
@@ -85,16 +85,19 @@ const BASE = {
 };
 
 export default class SwaggerServer {
-  private content = BASE
+  private content = BASE;
+
   private static _instance: SwaggerServer;
+
   public static get content () { return this._instance.content; }
+
   public static create (controllers) { this._instance = new SwaggerServer(controllers); }
 
   private constructor (private controllers: Annotation[]) {
     Logger.debug('SWAGGER', `specification: ${this.content.swagger}`);
 
-    this.createPaths()
-    this.createDefinitions()
+    this.createPaths();
+    this.createDefinitions();
 
     // NOTE write swagger result to the file to simplify development
     DEBUG && fs.writeFile(
