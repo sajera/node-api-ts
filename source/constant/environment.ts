@@ -20,7 +20,7 @@ dotenv.config({ debug: varBoolean(process.env.DEBUG), path: [localEnv, '.env'] }
 
 // NOTE
 export const NODE_ENV = varString(process.env.NODE_ENV);
-export const LOG_LEVEL = varNumber(process.env.LOG_LEVEL);
+export const LOG_LEVEL = process.env.DEBUG ? 100 : varNumber(process.env.LOG_LEVEL);
 export const DEBUG = varBoolean(process.env.DEBUG) || LOG_LEVEL > 10;
 
 // NOTE server variables
