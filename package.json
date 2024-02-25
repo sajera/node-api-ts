@@ -47,6 +47,7 @@
     "lodash": "^4.17.11",
     "lowdb": "^1.0.0",
     "multer": "^1.4.5-lts.1",
+    "redis": "^4.6.13",
     "reflect-metadata": "^0.1.13",
     "s-is": "^1.4.15",
     "session-file-store": "^1.2.0",

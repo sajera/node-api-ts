@@ -20,7 +20,7 @@ class JwtToken<T> {
 
   private constructor (signOptions: jwt.SignOptions, verifyOptions: jwt.VerifyOptions) {
     if (!this.secret) {
-      this.secret = '¯\_(ツ)_/¯';
+      this.secret = 'Some default hardcoded secret, to make sure the security enabled';
       Logger.error('TOKEN', 'Secret is missing. Switching to default secret');
     }
     this.signOptions = { ...this.signOptions, ...signOptions };

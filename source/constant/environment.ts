@@ -6,7 +6,7 @@ import * as dotenv from 'dotenv';
 const varBoolean = (value: string = ''): boolean => /^true|1$/i.test(value);
 const varString = (value: string = ''): string => /^(null|undefined)$/i.test(value) ? '' : value;
 const varNumber = (value: string = ''): number => Number(value) || parseFloat(value) || 0;
-const toArrayStrings = (value: string = ''): string[] => value ? value.split(/\s*,\s*/) : [];
+// const toArrayStrings = (value: string = ''): string[] => value ? value.split(/\s*,\s*/) : [];
 
 // NOTE read the local configuration
 const localEnv = `.env.local${process.env.NODE_ENV || ''}`;
@@ -39,3 +39,5 @@ export const SID_SECRET = varString(process.env.SID_SECRET);
 
 export const PWD_HASH = varNumber(process.env.PWD_HASH);
 export const PWD_SALT = varString(process.env.PWD_SALT);
+
+export const REDIS_URL = varString(process.env.REDIS_URL);

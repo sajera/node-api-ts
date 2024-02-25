@@ -3,6 +3,7 @@ import * as bcrypt from 'bcryptjs';
 import { createHmac } from 'node:crypto';
 // local dependencies
 import { Logger } from './logger';
+import { Redis } from '../database';
 import { JwtToken } from './jwt-token';
 import { PWD_SALT, PWD_HASH, SID_SECRET } from '../constant';
 
@@ -22,15 +23,12 @@ namespace AuthService {
   export interface AccessTokenPayload extends TokenPayload {}
   export interface RefreshTokenPayload extends TokenPayload {}
   export interface Auth extends TokenPayload {
-    refreshToken: string;
-    accessToken: string;
+    refresh: string;
+    access: string;
     schema: string;
     userId: string|number;
     // NOTE allow to pass some-thing
     payload?: unknown
-  }
-  export interface Self {
-    // TODO define
   }
 }
 
@@ -48,26 +46,6 @@ class AuthService {
   }
 
   /**
-   * TODO
-   * generate password hash to avoid passing it into DB or to know what it is
-   */
-  private async encryptPassword (password: string): Promise<string> {
-    // FIXME should we use predefined salt ?
-    const saltOrHashRounds = PWD_SALT || PWD_HASH || 10;
-    // FIXME how much rounds we may allow to generate random hash
-    // const salt = await bcrypt.genSalt(PWD_HASH);
-    return await bcrypt.hash(password, saltOrHashRounds);
-  }
-
-  /**
-   * TODO
-   * ability to compare password with hash to know they equal
-   */
-  private async comparePassword (password: string, passwordHash: string): Promise<boolean> {
-    return await bcrypt.compare(password, passwordHash);
-  }
-
-  /**
    * create session ID by encrypt user ID to avoid compromising
    * NOTE by changing the salt we may invalidate all current session
    */
@@ -82,30 +60,36 @@ class AuthService {
 
   public static create () { this.instance = new AuthService(); }
 
+
+  /**
+   * TODO
+   * generate password hash to avoid passing it into DB or to know what it is
+   */
+  public static async encryptPassword (password: string): Promise<unknown> {
+    // FIXME should we use predefined salt ?
+    const saltOrHashRounds = PWD_SALT || PWD_HASH || 10;
+    // FIXME how much rounds we may allow to generate random hash
+    // const salt = await bcrypt.genSalt(PWD_HASH);
+    return await bcrypt.hash(password, saltOrHashRounds);
+  }
+
+  /**
+   * TODO
+   * ability to compare password with hash to know they equal
+   */
+  public static async comparePassword (password: string, passwordHash: string): Promise<boolean> {
+    return await bcrypt.compare(password, passwordHash);
+  }
+
   /**
    * lightweight verification of token - check sign and expiration
    * @param header
    */
   public static verifyAuthAccess (header: string): AuthService.AccessTokenPayload {
+    // NOTE just to explain the error is expected
+    if (!header) { throw new Error('Authentication missing'); }
     const token = header.replace(this.instance.schemaReplacer, '');
     return this.instance.access.verify(token);
-  }
-
-  /**
-   *
-   */
-  public static async getAuth (auth: AuthService.AccessTokenPayload): Promise<AuthService.Auth> {
-    Logger.important('AUTH', 'get "auth" from Redis not implemented yet');
-    // TODO get "auth" from Redis
-    return {
-      accessToken: '',
-      name: '',
-      refreshToken: '',
-      roles: [],
-      schema: '',
-      sid: '',
-      userId: undefined
-    };
   }
 
   /**
@@ -115,27 +99,34 @@ class AuthService {
    */
   public static async createAuth (userId: string|number, payload) {
     const sid = this.instance.sid(userId);
+    const cached = await this.getStoredAuth(userId, sid);
+    // NOTE return existing auth
+    if (cached) { return cached; }
+    // NOTE create new auth
     const tokenPayload = { sid, name: 'not in use', roles: ['will', 'be', 'implemented'] };
     const schema = this.instance.schema;
-    const accessToken = this.instance.access.sign(tokenPayload);
-    const refreshToken = this.instance.refresh.sign(tokenPayload);
-    // TODO store "auth" into Redis
-    const auth: AuthService.Auth = {
-      userId,
-      // TODO know more about "auth" needs
-      payload,
-      ...tokenPayload,
-      schema: this.instance.schema,
-      accessToken: this.instance.access.sign(tokenPayload),
-      refreshToken: this.instance.refresh.sign(tokenPayload),
-    };
-    Logger.important('AUTH', 'store "auth" into Redis not implemented yet');
-
-    return { schema, accessToken, refreshToken };
+    const access = this.instance.access.sign(tokenPayload);
+    const refresh = this.instance.refresh.sign(tokenPayload);
+    const auth = { userId, payload, ...tokenPayload, schema, access, refresh };
+    // NOTE store "auth" into Redis
+    return await this.storeAuth(sid, auth);
   }
 
-  public static async initialize () {
-    // TODO connect DB
+  private static async storeAuth (sid: string, auth: AuthService.Auth): Promise<AuthService.Auth> {
+    const stringAuth = JSON.stringify(auth);
+    await Redis.set(sid, stringAuth);
+    return auth;
+  }
+
+  public static async getStoredAuth (userId: string|number|null, sid: string = null): Promise<AuthService.Auth|null> {
+    !sid && (sid = this.instance.sid(userId));
+    const cached = await Redis.get(sid);
+    return !cached ? null : JSON.parse(cached);
+  }
+
+  public static async invalidateStoredAuth (userId: string|number|null, sid: string = null): Promise<number> {
+    !sid && (sid = this.instance.sid(userId));
+    return await Redis.del(sid);
   }
 
 }

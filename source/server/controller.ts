@@ -101,7 +101,7 @@ export class Controller {
     const Ctrl = this;
     return function handle (request, response, next: express.NextFunction) {
       const instance = new Ctrl(request, response);
-      instance[action]()
+      instance[action](request, response, next)
         .then(() => !response.headersSent && next())
         // TODO handle 500
         .catch((error: Error) => {

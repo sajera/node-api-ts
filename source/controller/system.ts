@@ -35,7 +35,7 @@ export default class System extends Controller {
   }
 
   @JSON({})
-  @Auth({ optional: true })
+  @Auth({ optional: false })
   @Endpoint({ path: '/test', method: Controller.POST })
   public async test () {
     // TODO remove
@@ -45,14 +45,21 @@ export default class System extends Controller {
     });
   }
 
+  // TODO validate schema
+  @JSON({})
   @Endpoint({ path: '/sign-in', method: Controller.POST })
   public async signIn () {
-    // TODO check user credentials
-    // TODO find the user session
-    // TODO continue use previous session if its possible
-    // TODO response schema
+    // TODO get user by login
+    const login = this.request.body.login
+    const password = this.request.body.password
+    const passwordHash = 'this.request.body.password'
+    // TODO compare passwords
+    const isMatch = await AuthService.comparePassword(password, passwordHash)
+    if (!isMatch) { return this.response.status(400).type('json').send('Invalid credentials'); }
+    // NOTE find existing user auth or create new one
     const auth = await AuthService.createAuth(1, { to: 'think about' });
-    await this.response.status(200).type('json').send(auth);
+    // TODO swagger response schema
+    await this.response.status(200).type('json').send({  schema: auth.schema, refresh: auth.refresh, access: auth.access });
   }
 
   @Auth({})

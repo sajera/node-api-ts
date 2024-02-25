@@ -9,8 +9,8 @@ import Swagger from './swagger';
 import { Logger } from '../service';
 import * as middleware from './middleware';
 import { Controller, Annotation } from './controller';
-import { HOST, PORT, API_PATH, LOG_LEVEL, DEBUG, SWAGGER_PATH, STATIC_PATH, COOKIE_SECRET } from '../constant';
-import { authMiddleware } from './middleware';
+import { HOST, PORT, API_PATH, DEBUG, SWAGGER_PATH, STATIC_PATH, COOKIE_SECRET } from '../constant';
+
 
 class Server {
   private router = express.Router();
@@ -22,7 +22,7 @@ class Server {
   // NOTE is singleton
   private static instance: Server;
 
-  private static _nodeServer: http.Server;
+  private static nodeServer: http.Server;
 
   public static create () { this.instance = new Server(express()); }
 
@@ -57,7 +57,7 @@ class Server {
   }
 
   private static logRequest (request: express.Request, response: express.Response, next: express.NextFunction) {
-    Logger.important('SERVER:CONNECT', `${request.method}: ${request.originalUrl}`);
+    Logger.important('REQUEST', `${request.method}: ${request.originalUrl}`);
     return next();
   }
 
@@ -92,7 +92,7 @@ class Server {
   public static async initialize () {
     Logger.debug('SERVER', 'initialize routes');
     // NOTE log all connections
-    if (LOG_LEVEL > 2 || DEBUG) { this.expressApp.use(this.logRequest); }
+    if (DEBUG) { this.expressApp.use(this.logRequest); }
     // NOTE common allow cors to make sure the errors also available ¯\_(ツ)_/¯
     this.expressApp.use(this.CORS);
     // NOTE enable cookie session
@@ -104,16 +104,16 @@ class Server {
       Swagger.create(this.instance.annotation);
       Swagger.start(this.expressApp);
     }
-    // NOTE last common debug middleware
+    // NOTE business logic middleware
     this.expressApp.use(API_PATH, this.instance.router);
     // NOTE last common debug middleware
     this.expressApp.use(this.notFound);
   }
 
   public static async stop () {
-    if (this._nodeServer) {
-      this._nodeServer.close();
-      this._nodeServer = null;
+    if (this.nodeServer) {
+      this.nodeServer.close();
+      this.nodeServer = null;
       Logger.error('SERVER', 'was stopped');
     }
   }
@@ -121,7 +121,7 @@ class Server {
   public static async start () {
     await this.stop();
     await (new Promise(resolve => {
-      this._nodeServer = this.expressApp.listen(PORT, () => {
+      this.nodeServer = this.expressApp.listen(PORT, () => {
         Logger.important('SERVER', `is running on http://${HOST}:${PORT}`);
         resolve(PORT);
       });
