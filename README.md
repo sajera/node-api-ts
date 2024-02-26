@@ -1,6 +1,11 @@
 # Application on TypeScript and Express
 
-In order to speed up starting of development process - was implemented dummy application with base functionality which may present within node application on typescript. Such as configure Typescript, start up Express server, setup and configure server router, cors, static content, file upload and body parse. Applied code linters which support company code style agreement.
+To expedite the development process, a dummy application with fundamental features was created, demonstrating typical functionalities found in a Node.js application using TypeScript. This includes setting up TypeScript configuration, initiating an Express server, configuring server routes, implementing CORS, serving static content, enabling file uploads, and parsing request bodies. Additionally, code linters adhering to the company's coding standards were applied.
+
+### Development TODO
+
+
+### Deployment TODO
 
 
 ### Application configuration
@@ -33,10 +38,6 @@ In order to speed up starting of development process - was implemented dummy app
 
 
 
-### Application server
-
-Provide flow to expand application server by any existing and features express modules in common way. All connected, to base server, modules has default his own configuration. It will use default configuration only if it wasn't provided from `Application configuration`.
-
 - - - -
 # Root TODO`s
 
@@ -52,26 +53,14 @@ Provide flow to expand application server by any existing and features express m
     * [x] Provide configurable lint rules
     * [x] Provide intuitive developer process (care about helps from IDE of developers)
 
-* [x] `Configuration` Environment ad project configuration
-    * [x] Implement getting configuration from **environment**
-    * [x] Implement expanding of **process.env** from **.env** files by priority
-    * [x] Implement getting project configuration from **${environment}.json** file
-    * [x] Provide ability to get configuration data on **any stage of project life cycle**
-    * > Priority rules for `.env` files from lowest:
-        * min: `${root}/.env`
-        * `${root}/${NODE_ENV}.env`
-        * `${root}/${configStore}/.env`
-        * max: `${root}/${configStore}/${NODE_ENV}.env`
-
 * [ ] `Server` Project server life cycle
     * [x] **[express server](https://expressjs.com/ "express")** and provide to use original express with options from project config 
     * [x] **[cors](https://www.npmjs.com/package/cors "CORS")** with options from project config
     * [x] **[static server](https://expressjs.com/en/4x/api.html#express.static "express static")** with options from project config
     * [x] **[parse json](https://www.npmjs.com/package/body-parser "body-parser => JSON")** with options from project config
     * [x] **[parse urlencoded](https://www.npmjs.com/package/body-parser "body-parser => URLENCODED")** with options from project config
+    * [x] **[cookie/session](https://www.npmjs.com/package/express-session "express-session")** with options from project config 
     * [ ] multipart with options from project config 
-    * [ ] cookie with options from project config 
-    * [ ] session (Not authorization) with options from project config 
 
 * [ ] `API Controller` Project controllers
     * [x] Provide controllers entry point

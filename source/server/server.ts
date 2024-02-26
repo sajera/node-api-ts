@@ -94,9 +94,9 @@ class Server {
     // NOTE log all connections
     if (DEBUG) { this.expressApp.use(this.logRequest); }
     // NOTE common allow cors to make sure the errors also available ¯\_(ツ)_/¯
-    this.expressApp.use(this.CORS);
+    this.expressApp.use(API_PATH, this.CORS);
     // NOTE enable cookie session
-    COOKIE_SECRET && this.expressApp.use(this.COOKIE);
+    COOKIE_SECRET && this.expressApp.use(API_PATH, this.COOKIE);
     // NOTE serve static from root path "/" exclude "/api/*" paths
     STATIC_PATH && this.expressApp.use([new RegExp(`^${API_PATH}`), STATIC_PATH], this.STATIC);
     // NOTE initialize swagger
