@@ -5,7 +5,6 @@ services:
   main:
     build:
       context: .
-    image: api-ts:dev
     tty: true
     environment:
       DEBUG: 1
