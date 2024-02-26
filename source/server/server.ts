@@ -75,12 +75,12 @@ class Server {
     // NOTE setup all endpoints of controller
     for (const { path, method, action, urlencoded, json, auth, multer } of Ctrl.annotation.endpoints) {
       Logger.info('SUBSCRIBE', `${Ctrl.annotation.name} => ${method.toUpperCase()}(${action}) ${API_PATH}${Ctrl.annotation.path}${path}`);
-      const middlewares = [];
+      let middlewares = [];
       // NOTE middlewares of endpoint based on annotation(decorators)
-      auth && middlewares.push(middleware.authMiddleware(auth));
-      json && middlewares.push(middleware.jsonMiddleware(json));
-      multer && middlewares.push(middleware.multerMiddleware(multer));
-      urlencoded && middlewares.push(middleware.urlEncodedMiddleware(urlencoded));
+      auth && (middlewares = middlewares.concat(middleware.authMiddleware(auth)));
+      json && (middlewares = middlewares.concat(middleware.jsonMiddleware(json)));
+      multer && (middlewares = middlewares.concat(middleware.multerMiddleware(multer)));
+      urlencoded && (middlewares = middlewares.concat(middleware.urlEncodedMiddleware(urlencoded)));
       // NOTE set up the controller action handler
       middlewares.push(Ctrl.handle(action));
       router[method].apply(router, [path, ...middlewares]);
@@ -106,7 +106,7 @@ class Server {
     }
     // NOTE business logic middleware
     this.expressApp.use(API_PATH, this.instance.router);
-    // NOTE last common debug middleware
+    // NOTE last common middleware
     this.expressApp.use(this.notFound);
   }
 

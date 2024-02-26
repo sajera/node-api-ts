@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import * as express from 'express';
 
 // local dependencies
+import { DEBUG } from '../constant';
 import * as swagger from './swagger';
 import { AuthService } from '../service';
 import * as middleware from './middleware';
@@ -107,10 +108,11 @@ export class Controller {
       const instance = new Ctrl(request, response);
       instance[action](request, response, next)
         .then(() => !response.headersSent && next())
-        // TODO handle 500
         .catch((error: Error) => {
           console.error(`\n[CONTROLLER: ${Ctrl.name}.${action}] Execution Error:\n`, error);
-          next(error);
+          // NOTE handle throwing endpoints
+          return response.status(500).type('json')
+            .send({code: 'TODO', error: error.message, stack: DEBUG ? error.stack : undefined });
         });
     };
   }

@@ -1,10 +1,15 @@
 // outsource dependencies
+import * as yup from 'yup';
 
 // local dependencies
-import { AuthService } from '../service';
 import { APP_VERSION } from '../constant';
+import { AuthService, Logger, Yup } from '../service';
 import { Controller, API, Endpoint, Auth, URLEncoded, JSON, Swagger } from '../server';
 
+const authSchema = Yup.create(yup.object().shape({
+  password: Yup.STRING.required('Password is mandatory'),
+  email: Yup.EMAIL.required('Email address is mandatory'),
+}));
 
 /**
  * system endpoints which not belong to any controllers and mostly unique
@@ -46,11 +51,15 @@ export default class System extends Controller {
   }
 
   // TODO validate schema
-  @JSON({})
+  @JSON({ schema: authSchema })
   @Endpoint({ path: '/sign-in', method: Controller.POST })
   public async signIn () {
+    const validation = authSchema.validate(this.request.body)
+
+    Logger.debug('SYSTEM', 'signIn validation', validation)
+    Logger.debug('SYSTEM', 'signIn body', this.request.body)
     // TODO get user by login
-    const login = this.request.body.login
+    const login = this.request.body.login.kbk.jjjj
     const password = this.request.body.password
     const passwordHash = 'this.request.body.password'
     // TODO compare passwords

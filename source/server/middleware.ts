@@ -4,7 +4,7 @@ import * as http from 'http';
 import * as multer from 'multer';
 import * as express from 'express';
 // local dependencies
-import { Logger, AuthService } from '../service';
+import { Logger, AuthService, Yup } from '../service';
 
 interface JSONAnnotation { // TODO import * as bodyParser from 'body-parser'; bodyParser.json;
   type?: string;
@@ -15,9 +15,11 @@ interface JSONAnnotation { // TODO import * as bodyParser from 'body-parser'; bo
   reviver?(key: string, value: any): any;
   // @see https://www.npmjs.com/package/body-parser#verify
   verify?(req: http.IncomingMessage, res: http.ServerResponse, buf: Buffer, encoding: string): void;
+
+  schema?: Yup<unknown>
 }
 export interface JSONEndpoint extends JSONAnnotation {}
-export function jsonMiddleware (options: JSONAnnotation) {
+export function jsonMiddleware ({ schema, ...options }: JSONAnnotation) {
   // NOTE that is a default setting, and decorator allows to override for every specific endpoint
   return express.json({ // @see https://www.npmjs.com/package/body-parser#options
     type: '*/json',
