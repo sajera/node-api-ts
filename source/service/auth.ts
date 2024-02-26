@@ -74,11 +74,10 @@ class AuthService {
   }
 
   /**
-   * TODO
    * ability to compare password with hash to know they equal
    */
-  public static async comparePassword (password: string, passwordHash: string): Promise<boolean> {
-    return await bcrypt.compare(password, passwordHash);
+  public static comparePassword (password: string, passwordHash: string): Promise<boolean> {
+    return bcrypt.compare(password, passwordHash);
   }
 
   /**
@@ -124,14 +123,14 @@ class AuthService {
     return !cached ? null : JSON.parse(cached);
   }
 
-  public static async invalidateStoredAuth (userId: string|number|null, sid: string = null): Promise<number> {
+  public static invalidateStoredAuth (userId: string|number|null, sid: string = null): Promise<number> {
     !sid && (sid = this.instance.sid(userId));
-    return await Redis.del(sid);
+    return Redis.del(sid);
   }
 
 }
 
-// NOTE create server instance
+// NOTE create servis instance
 AuthService.create();
 export { AuthService };
 export default AuthService;

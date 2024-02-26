@@ -4,9 +4,12 @@ import * as jwt from 'jsonwebtoken';
 import { Logger } from './logger';
 import { JWT_SECRET } from '../constant';
 
-
-class JwtToken<T> {
-  private readonly secret = JWT_SECRET; // same secret for all tokens
+/**
+ * Symmetric JWT Token
+ */
+export class JwtToken<T> {
+  // FIXME is it useful to specify the secret for each token builder? ?
+  private readonly secret = JWT_SECRET;
 
   private readonly signOptions: jwt.SignOptions = {
     algorithm: 'HS256'
@@ -59,7 +62,3 @@ class JwtToken<T> {
     return jwt.sign(data as jwt.JwtPayload, this.secret, this.signOptions);
   }
 }
-
-// NOTE create server instance
-export { JwtToken };
-export default JwtToken;

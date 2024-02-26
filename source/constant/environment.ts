@@ -8,10 +8,10 @@ const varString = (value: string = ''): string => /^(null|undefined)$/i.test(val
 const varNumber = (value: string = ''): number => Number(value) || parseFloat(value) || 0;
 // const toArrayStrings = (value: string = ''): string[] => value ? value.split(/\s*,\s*/) : [];
 
-// NOTE read the local configuration
+// NOTE read the local configuration @example .env.local-prod
 const localEnv = `.env.local${process.env.NODE_ENV || ''}`;
 // IMPORTANT avoid overriding the original environment variables passed through the process
-dotenv.config({ debug: varBoolean(process.env.DEBUG), path: [localEnv, '.env'] }).parsed;
+dotenv.config({ path: [localEnv, '.env'] }).parsed;
 // NOTE to log what the "dotenv" resolve from .env files
 // export const env = dotenv.config({ debug: varBoolean(process.env.DEBUG), path: [localEnv, '.env'] }).parsed;
 

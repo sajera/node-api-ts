@@ -8,10 +8,8 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc -p . && node ./es5/api.js",
-    "start:dev": "nodemon --watch source/ --exec ts-node source/api.ts",
-    "start-cron": "ts-node --transpile-only source/cron.ts",
-    "start-cron:dev": "nodemon --watch source/ --exec ts-node source/cron.ts"
+    "start": "ts-node --transpile-only source/index.ts",
+    "start:dev": "nodemon --watch source/ --exec ts-node source/index.ts"
   },
   "license": "MIT",
   "devDependencies": {

@@ -4,6 +4,7 @@ import * as express from 'express';
 
 // local dependencies
 import * as swagger from './swagger';
+import { AuthService } from '../service';
 import * as middleware from './middleware';
 
 /**
@@ -56,6 +57,8 @@ export interface Annotation extends ControllerAnnotation {
  * @abstract
  */
 export class Controller {
+  public readonly auth: AuthService.Auth
+
   public static GET = METHOD.GET;
 
   public static PUT = METHOD.PUT;
@@ -93,6 +96,7 @@ export class Controller {
   }
 
   public constructor (public readonly request: express.Request, public readonly response: express.Response) {
+    this.auth = request.auth
     // TODO grab the data prepared by previous middlewares
     // TODO made interfaces
   }
