@@ -43,4 +43,5 @@ API.start()
   .catch(async (error: unknown) => {
     await API.stop();
     Logger.error('API', error);
+    process.exit(100500);
   });

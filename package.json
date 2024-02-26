@@ -8,11 +8,10 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm-run-all start-api start-cron",
-    "start-api": "ts-node --transpile-only source/api.ts",
+    "start": "tsc -p . && node ./es5/api.js",
+    "start:dev": "nodemon --watch source/ --exec ts-node source/api.ts",
     "start-cron": "ts-node --transpile-only source/cron.ts",
-    "start-api:dev": "nodemon --exec ts-node source/api.ts",
-    "start-cron:dev": "nodemon --exec ts-node source/cron.ts"
+    "start-cron:dev": "nodemon --watch source/ --exec ts-node source/cron.ts"
   },
   "license": "MIT",
   "devDependencies": {
@@ -52,14 +51,6 @@
     "s-is": "^1.4.15",
     "session-file-store": "^1.2.0",
     "swagger-ui-express": "^4.0.2"
-  },
-  "nodemonConfig": {
-    "ignore": [
-      "swagger/**/*",
-      "public/**/*",
-      "es5/**"
-    ],
-    "delay": 2500
   },
   "TODO husky": {
     "hooks": {
