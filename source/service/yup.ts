@@ -59,7 +59,7 @@ export class Yup<Schema> {
     return result;
   }
 
-  public static create (schema) { return new Yup(schema); }
+  public static create (options) { return new Yup(yup.object().shape(options)); }
 
   /*******************************************************************
    *        Predefined reusable validators

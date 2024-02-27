@@ -18,10 +18,10 @@ declare module 'express' {
 /**
  * to avoid code repeating for validation
  */
-function createValidatorMiddleware<Schema> (schema: Yup<Schema>, contentType: RegExp, prop: string, code: string) {
+function createValidatorMiddleware<Schema> (schema: Yup<Schema>, reg: RegExp|null, prop: string, code: string) {
   return forceCast<express.Handler>((request: express.Request, response: express.Response, next: express.NextFunction) => {
     if (response.headersSent) return;
-    if (!contentType.test(request.header('Content-Type')))  return next();
+    if (reg && !reg.test(request.header('Content-Type')))  return next();
     const errors = schema.validate(request[prop])
     if (!errors) { return next(); }
     return response.status(422).type('json').send({ code, errors });
@@ -38,12 +38,19 @@ export interface JSONAnnotation { // TODO import * as bodyParser from 'body-pars
   reviver?(key: string, value: any): any;
   // @see https://www.npmjs.com/package/body-parser#verify
   verify?(req: http.IncomingMessage, res: http.ServerResponse, buf: Buffer, encoding: string): void;
+  /**
+   * case couple handlers for different content types might be made optional for one of decorator
+   * @Json({ schema, force: true })
+   * @URLEncoded({ schema, force: false })
+   */
+  force?: boolean
   // validation
   schema?: Yup<unknown>
 }
-export function jsonMiddleware ({ schema, ...options }: JSONAnnotation) {
+
+export function jsonMiddleware ({ schema, force = true, ...options }: JSONAnnotation) {
   options = { // @see https://www.npmjs.com/package/body-parser#options
-    type: '*/json',
+    type: '*/json',  // type: '*'
     inflate: true, // false => reject compressed body
     strict: true,
     limit: '5mb',
@@ -54,7 +61,7 @@ export function jsonMiddleware ({ schema, ...options }: JSONAnnotation) {
     // NOTE parse middleware
     express.json(options),
     // NOTE validation middleware right after parse
-    createValidatorMiddleware(schema, /json/i, 'body','JSON_VALIDATION')
+    createValidatorMiddleware(schema, force ? null : /json/i, 'body','JSON_VALIDATION')
   ];
 }
 /**
@@ -62,7 +69,7 @@ export function jsonMiddleware ({ schema, ...options }: JSONAnnotation) {
  * @example
  * /@API({ path: '/ctrl-prefix' })
  * export default class My extends Controller {
- *     @JSON({ ... })
+ *     @Json({ ... })
  *     @Endpoint({ method: API_METHOD.PUT, path: '/express/:path' })
  *     public async endpoint () { ... }
  * }
@@ -81,12 +88,18 @@ export interface URLEncodedAnnotation {
   extended?: boolean;
   // @see https://www.npmjs.com/package/body-parser#verify
   verify?(req: http.IncomingMessage, res: http.ServerResponse, buf: Buffer, encoding: string): void;
+  /**
+   * case couple handlers for different content types might be made optional for one of decorator
+   * @Json({ schema, force: true })
+   * @URLEncoded({ schema, force: false })
+   */
+  force?: boolean
   // validation
   schema?: Yup<unknown>
 }
-export function urlEncodedMiddleware ({ schema, ...options }: URLEncodedAnnotation) {
+export function urlEncodedMiddleware ({ schema, force = true, ...options }: URLEncodedAnnotation) {
   options = { // @see https://www.npmjs.com/package/body-parser#options-3
-    type: '*/x-www-form-urlencoded',
+    type: '*/x-www-form-urlencoded', // type: '*'
     extended: true,
     inflate: true, // false => reject compressed body
     limit: '2mb',
@@ -97,7 +110,7 @@ export function urlEncodedMiddleware ({ schema, ...options }: URLEncodedAnnotati
     // NOTE parse middleware
     express.urlencoded(options),
     // NOTE validation middleware right after parse
-    createValidatorMiddleware(schema, /form-urlencoded/i, 'body','FORM_VALIDATION')
+    createValidatorMiddleware(schema, force ? null : /form-urlencoded/i, 'body','FORM_VALIDATION')
   ];
 }
 /**
@@ -140,7 +153,7 @@ export function queryMiddleware ({ schema, ...options }: QueryAnnotation) {
   // ];
   return !schema ? [] : [
     // NOTE for sure the express already parse the query
-    createValidatorMiddleware(schema, /.*/, 'query','QUERY_VALIDATION')
+    createValidatorMiddleware(schema, null, 'query','QUERY_VALIDATION')
   ];
 }
 /**
@@ -158,6 +171,31 @@ export const ANNOTATION_QUERY = Symbol('QUERY');
 export function Query (options: QueryAnnotation) {
   return Reflect.metadata(ANNOTATION_QUERY, options);
 }
+
+
+export interface ParamsAnnotation { schema?: Yup<unknown> }
+export function paramsMiddleware ({ schema, ...options }: ParamsAnnotation) {
+  return !schema ? [] : [
+    // NOTE for sure the express already parse the query
+    createValidatorMiddleware(schema, null, 'params','PARAMS_VALIDATION')
+  ];
+}
+/**
+ * settings of the "query" middleware
+ * @example
+ * /@API({ path: '/ctrl-prefix' })
+ * export default class My extends Controller {
+ *     @Params({ ... })
+ *     @Endpoint({ path: '/express/:path' })
+ *     public async endpoint () { ... }
+ * }
+ * @decorator
+ */
+export const ANNOTATION_PARAMS = Symbol('PARAMS');
+export function Params (options: ParamsAnnotation) {
+  return Reflect.metadata(ANNOTATION_PARAMS, options);
+}
+
 
 
 export interface MulterAnnotation { // TODO to know more

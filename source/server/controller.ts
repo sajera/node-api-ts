@@ -32,6 +32,7 @@ export interface Endpoint extends EndpointAnnotation {
   action: string;
   // NOTE without final implementation - define only idea
   urlencoded?: middleware.URLEncodedAnnotation;
+  params?: middleware.ParamsAnnotation;
   multer?: middleware.MulterAnnotation;
   swagger?: swagger.SwaggerAnnotation;
   query?: middleware.QueryAnnotation;
@@ -92,6 +93,7 @@ export class Controller {
         json: Reflect.getMetadata(middleware.ANNOTATION_JSON, target, name),
         query: Reflect.getMetadata(middleware.ANNOTATION_QUERY, target, name),
         swagger: Reflect.getMetadata(swagger.ANNOTATION_SWAGGER, target, name),
+        params: Reflect.getMetadata(middleware.ANNOTATION_PARAMS, target, name),
         multer: Reflect.getMetadata(middleware.ANNOTATION_MULTER, target, name),
         urlencoded: Reflect.getMetadata(middleware.ANNOTATION_URLENCODED, target, name),
       });

@@ -11,6 +11,7 @@ import * as middleware from './middleware';
 import { Controller, Annotation } from './controller';
 import { HOST, PORT, API_PATH, DEBUG, SWAGGER_PATH, STATIC_PATH, COOKIE_SECRET } from '../constant';
 import * as url from 'node:url';
+import { paramsMiddleware } from './middleware';
 
 
 class Server {
@@ -18,7 +19,7 @@ class Server {
 
   private annotation: Annotation[] = [];
 
-  private constructor (public expressApp: express.Application) { Logger.debug('SERVER', 'create Express App'); }
+  private constructor (public expressApp: express.Application) { Logger.info('SERVER', 'create Express App'); }
 
   // NOTE is singleton
   private static instance: Server;
@@ -74,17 +75,24 @@ class Server {
     // NOTE create controller router
     const router = express.Router();
     // NOTE setup all endpoints of controller
-    for (const { path, method, action, urlencoded, json, auth, query, multer } of Ctrl.annotation.endpoints) {
-      Logger.info('SUBSCRIBE', `${Ctrl.annotation.name} => ${method.toUpperCase()}(${action}) ${API_PATH}${Ctrl.annotation.path}${path}`);
+    for (const { path, method, action, urlencoded, json, auth, query, params, multer } of Ctrl.annotation.endpoints) {
+      Logger.log('SUBSCRIBE', `${Ctrl.annotation.name} => ${method.toUpperCase()}(${action}) ${API_PATH}${Ctrl.annotation.path}${path}`);
       let middlewares = [];
-      // NOTE middlewares of endpoint based on annotation(decorators)
+      // NOTE check auth first
       auth && (middlewares = middlewares.concat(middleware.authMiddleware(auth)));
-      json && (middlewares = middlewares.concat(middleware.jsonMiddleware(json)));
+      // NOTE query is light and important
       query && (middlewares = middlewares.concat(middleware.queryMiddleware(query)));
-      multer && (middlewares = middlewares.concat(middleware.multerMiddleware(multer)));
+      // NOTE params is light and important
+      params && (middlewares = middlewares.concat(middleware.paramsMiddleware(params)));
+      // NOTE skip multipart form data
       urlencoded && (middlewares = middlewares.concat(middleware.urlEncodedMiddleware(urlencoded)));
+      // NOTE allow to take data from "urlencoded" first
+      json && (middlewares = middlewares.concat(middleware.jsonMiddleware(json)));
+      // TODO multipart form data
+      multer && (middlewares = middlewares.concat(middleware.multerMiddleware(multer)));
       // NOTE set up the controller action handler
-      middlewares.push(Ctrl.handle(action));
+      middlewares.push(Ctrl.handle(action))
+      // NOTE pass middlewares of endpoint based on annotation(decorators)
       router[method](path, ...middlewares);
     }
     // NOTE add the controller route
@@ -92,7 +100,7 @@ class Server {
   }
 
   public static async initialize () {
-    Logger.debug('SERVER', 'initialize routes');
+    Logger.info('SERVER', 'initialize routes');
     // NOTE log all connections
     if (DEBUG) { this.expressApp.use(this.logRequest); }
     // NOTE common allow cors to make sure the errors also available ¯\_(ツ)_/¯

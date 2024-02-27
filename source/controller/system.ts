@@ -4,7 +4,7 @@ import * as yup from 'yup';
 // local dependencies
 import { APP_VERSION } from '../constant';
 import { AuthService, Logger, Yup } from '../service';
-import { Controller, API, Endpoint, Auth, URLEncoded, Json, Query, Swagger } from '../server';
+import { Controller, API, Endpoint, Auth, URLEncoded, Json, Query, Params, Swagger } from '../server';
 
 /**
  * system endpoints which not belong to any controllers and mostly unique
@@ -34,30 +34,31 @@ export default class System extends Controller {
     });
   }
 
-  @Json({})
-  @Auth({ optional: false })
-  @Endpoint({ path: '/test', method: Controller.POST })
+  @Auth({ optional: true })
+  @Endpoint({ path: '/test/:testId', method: Controller.POST })
+  @Json({ schema: Yup.create({ test: Yup.POSITIVE.required('is mandatory') }) })
+  @Params({ schema: Yup.create({ testId: Yup.INT.required('testId is mandatory') }) })
   public async test () {
     // TODO remove
     await this.response.status(200).type('json').send({
       body: this.request.body,
+      query: this.request.query,
+      params: this.request.params,
       session: this.request.session,
     });
   }
 
-  public static SigInSchema = Yup.create(yup.object().shape({
+  public static SigInSchema = Yup.create({
     password: Yup.PASSWORD.required('Password is mandatory'),
     email: Yup.EMAIL.required('Email is mandatory'),
-  }));
+  });
 
-  @Query({
-    schema: Yup.create(yup.object().shape({
-      qwe: Yup.INT.min(2, 'should be bigger than 9').required('qwe is mandatory'),
-    }))
-  })
+  // @Json({ schema: System.SigInJsonSchema })
+  // @URLEncoded({ schema: System.SigInURLEncodedSchema, force: false })
+  @URLEncoded({}) // no validation - expect same schema as json
   @Json({ schema: System.SigInSchema })
-  @URLEncoded({ schema: System.SigInSchema })
   @Endpoint({ path: '/sign-in', method: Controller.POST })
+  @Query({ schema: Yup.create({ qwe: Yup.INT.required('qwe is mandatory') }) })
   @Swagger({ summary: 'Sign in to the System' })
   public async signIn () {
     Logger.debug('SYSTEM', 'signIn query', this.request.query);
