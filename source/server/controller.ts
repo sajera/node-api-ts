@@ -58,7 +58,7 @@ export interface Annotation extends ControllerAnnotation {
  * @abstract
  */
 export class Controller {
-  public readonly auth: AuthService.Auth
+  public readonly auth: AuthService.Auth;
 
   public static GET = METHOD.GET;
 
@@ -97,7 +97,7 @@ export class Controller {
   }
 
   public constructor (public readonly request: express.Request, public readonly response: express.Response) {
-    this.auth = request.auth
+    this.auth = request.auth;
     // TODO grab the data prepared by previous middlewares
     // TODO made interfaces
   }
@@ -112,7 +112,7 @@ export class Controller {
           console.error(`\n[CONTROLLER: ${Ctrl.name}.${action}] Execution Error:\n`, error);
           // NOTE handle throwing endpoints
           return response.status(500).type('json')
-            .send({code: 'TODO', error: error.message, stack: DEBUG ? error.stack : undefined });
+            .send({ code: 'TODO', error: error.message, stack: DEBUG ? error.stack : undefined });
         });
     };
   }

@@ -8,6 +8,8 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build:dist": "tsc -p . --sourceMap false --declaration false --skipLibCheck true",
+    "start:dist": "node dist/index.js",
     "start": "ts-node --transpile-only source/index.ts",
     "start:dev": "nodemon --watch source/ --exec ts-node source/index.ts"
   },

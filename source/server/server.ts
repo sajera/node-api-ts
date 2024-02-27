@@ -83,7 +83,7 @@ class Server {
       urlencoded && (middlewares = middlewares.concat(middleware.urlEncodedMiddleware(urlencoded)));
       // NOTE set up the controller action handler
       middlewares.push(Ctrl.handle(action));
-      router[method].apply(router, [path, ...middlewares]);
+      router[method](path, ...middlewares);
     }
     // NOTE add the controller route
     this.instance.router.use(Ctrl.annotation.path, router);

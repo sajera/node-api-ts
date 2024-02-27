@@ -54,21 +54,21 @@ export default class System extends Controller {
   @JSON({ schema: authSchema })
   @Endpoint({ path: '/sign-in', method: Controller.POST })
   public async signIn () {
-    const validation = authSchema.validate(this.request.body)
+    const validation = authSchema.validate(this.request.body);
 
-    Logger.debug('SYSTEM', 'signIn validation', validation)
-    Logger.debug('SYSTEM', 'signIn body', this.request.body)
+    Logger.debug('SYSTEM', 'signIn validation', validation);
+    Logger.debug('SYSTEM', 'signIn body', this.request.body);
     // TODO get user by login
-    const login = this.request.body.login.kbk.jjjj
-    const password = this.request.body.password
-    const passwordHash = 'this.request.body.password'
+    const login = this.request.body.login.kbk.jjjj;
+    const password = this.request.body.password;
+    const passwordHash = 'this.request.body.password';
     // TODO compare passwords
-    const isMatch = await AuthService.comparePassword(password, passwordHash)
+    const isMatch = await AuthService.comparePassword(password, passwordHash);
     if (!isMatch) { return this.response.status(400).type('json').send('Invalid credentials'); }
     // NOTE find existing user auth or create new one
     const auth = await AuthService.createAuth(1, { to: 'think about' });
     // TODO swagger response schema
-    await this.response.status(200).type('json').send({  schema: auth.schema, refresh: auth.refresh, access: auth.access });
+    await this.response.status(200).type('json').send({ schema: auth.schema, refresh: auth.refresh, access: auth.access });
   }
 
   @Auth({})

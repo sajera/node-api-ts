@@ -29,7 +29,18 @@ class Redis {
   // NOTE is singleton
   private static instance: Redis;
 
-  public static create () { this.instance = new Redis({ url: REDIS_URL }); }
+  public static create () {
+    this.instance = new Redis({
+      url: REDIS_URL,
+      pingInterval: 3e4,
+      socket: {
+      // NOTE each try increases the delay until it meets 30s
+      // reconnectStrategy: retries => Math.min(retries * 5e2, 3e4),
+      // NOTE after 20 tries no sense to continue
+        reconnectStrategy: retries => retries > 20 ? false : retries * 5e2,
+      }
+    });
+  }
 
   public static get (key): Promise<string> {
     return this.instance.client.get(key as any);

@@ -1,4 +1,4 @@
-// local dependencies
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require('../../package.json');
 
 // all environment variables

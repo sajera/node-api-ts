@@ -15,10 +15,10 @@ namespace Yup {
 }
 
 export class Yup<Schema> {
-  private readonly OPT: yup.ValidateOptions = { abortEarly: false, recursive: true }
+  private readonly OPT: yup.ValidateOptions = { abortEarly: false, recursive: true };
 
   constructor (private schema: yup.AnySchema, options?: yup.ValidateOptions) {
-    options && (this.OPT = { ...this.OPT, ...options })
+    options && (this.OPT = { ...this.OPT, ...options });
   }
 
   public validate (values): yup.ValidationError|void {
@@ -38,7 +38,7 @@ export class Yup<Schema> {
   private static errorToOutput (error: yup.ValidationError): yup.ValidationError|void {
     // NOTE most simple way to know the yup was thrown ¯\_(ツ)_/¯
     if (error?.name !== 'ValidationError') {
-      return Logger.debug('YUP', 'Failed to validate', error.message)
+      return Logger.debug('YUP', 'Failed to validate', error.message);
     }
     const inner = error?.inner;
     const result = {} as yup.ValidationError;
@@ -52,12 +52,12 @@ export class Yup<Schema> {
       }
       _.set(result, path, message);
     });
-    Logger.debug('YUP', 'errorToOutput result', result)
-    Logger.debug('YUP', 'errorToOutput inner', inner)
+    Logger.debug('YUP', 'errorToOutput result', result);
+    Logger.debug('YUP', 'errorToOutput inner', inner);
     return result;
   }
 
-  public static create (schema) { return new Yup(schema) }
+  public static create (schema) { return new Yup(schema); }
 
   /*******************************************************************
    *        Predefined reusable validators
@@ -70,6 +70,7 @@ export class Yup<Schema> {
   public static readonly NUMBER = yup.number().nullable().strict();
 
   public static readonly POSITIVE = this.NUMBER.min(1, 'Should be positive');
+
   // eslint-disable-next-line no-useless-escape,max-len
   // const portRegExp = /^((6553[0-5])|(655[0-2][0-9])|(65[0-4][0-9]{2})|(6[0-4][0-9]{3})|([1-5][0-9]{4})|([0-5]{0,5})|([0-9]{1,4}))$/;
   // const PORT = STRING.matches(portRegExp, 'Incorrect Port number');
@@ -90,6 +91,7 @@ export class Yup<Schema> {
 
   // eslint-disable-next-line no-useless-escape,max-len
   public static readonly urlRegExp = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
+
   public static readonly URL = this.STRING.matches(this.urlRegExp, 'Please enter correct website url');
 
   public static readonly NAME = () => this.STRING
