@@ -1,12 +1,12 @@
+// outsource dependencies
 
 // local dependencies
 import { DEBUG, LOG_LEVEL } from '../constant';
 
-// TODO better formatting
 
 const rowFormat = (rows: any): string[] => !Array.isArray(rows) ? []
   // : DEBUG ? rows.map(row => JSON.stringify(row, null, 2))
-  : rows.map(row => JSON.stringify(row));
+  : rows.map(v => Logger.stringify(v));
 /**
  * In the future, it is possible to use alternative loggers.
  */
@@ -18,6 +18,18 @@ const doLog = (kind: string = 'LOG', level: number = 100, title: string, ...args
 };
 
 export class Logger {
+
+  public static stringify (value, offset = null) {
+    const catched = [];
+    // NOTE resolve circular structure
+    return JSON.stringify(value, (key, value) => {
+      if (typeof value === 'object' && value !== null) {
+        if (catched.includes(value)) return;
+        catched.push(value);
+      }
+      return value;
+    }, offset);
+  }
 
   /**
    * the logs will be visible at any cases - always

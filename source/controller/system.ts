@@ -4,12 +4,7 @@ import * as yup from 'yup';
 // local dependencies
 import { APP_VERSION } from '../constant';
 import { AuthService, Logger, Yup } from '../service';
-import { Controller, API, Endpoint, Auth, URLEncoded, JSON, Swagger } from '../server';
-
-const authSchema = Yup.create(yup.object().shape({
-  password: Yup.STRING.required('Password is mandatory'),
-  email: Yup.EMAIL.required('Email address is mandatory'),
-}));
+import { Controller, API, Endpoint, Auth, URLEncoded, Json, Query, Swagger } from '../server';
 
 /**
  * system endpoints which not belong to any controllers and mostly unique
@@ -39,7 +34,7 @@ export default class System extends Controller {
     });
   }
 
-  @JSON({})
+  @Json({})
   @Auth({ optional: false })
   @Endpoint({ path: '/test', method: Controller.POST })
   public async test () {
@@ -50,13 +45,22 @@ export default class System extends Controller {
     });
   }
 
-  // TODO validate schema
-  @JSON({ schema: authSchema })
-  @Endpoint({ path: '/sign-in', method: Controller.POST })
-  public async signIn () {
-    const validation = authSchema.validate(this.request.body);
+  public static SigInSchema = Yup.create(yup.object().shape({
+    password: Yup.PASSWORD.required('Password is mandatory'),
+    email: Yup.EMAIL.required('Email is mandatory'),
+  }));
 
-    Logger.debug('SYSTEM', 'signIn validation', validation);
+  @Query({
+    schema: Yup.create(yup.object().shape({
+      qwe: Yup.INT.min(2, 'should be bigger than 9').required('qwe is mandatory'),
+    }))
+  })
+  @Json({ schema: System.SigInSchema })
+  @URLEncoded({ schema: System.SigInSchema })
+  @Endpoint({ path: '/sign-in', method: Controller.POST })
+  @Swagger({ summary: 'Sign in to the System' })
+  public async signIn () {
+    Logger.debug('SYSTEM', 'signIn query', this.request.query);
     Logger.debug('SYSTEM', 'signIn body', this.request.body);
     // TODO get user by login
     const login = this.request.body.login.kbk.jjjj;

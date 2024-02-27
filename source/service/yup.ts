@@ -15,7 +15,11 @@ namespace Yup {
 }
 
 export class Yup<Schema> {
-  private readonly OPT: yup.ValidateOptions = { abortEarly: false, recursive: true };
+  private readonly OPT: yup.ValidateOptions = {
+    // stripUnknown: true, // note sure
+    abortEarly: false,
+    recursive: true,
+  };
 
   constructor (private schema: yup.AnySchema, options?: yup.ValidateOptions) {
     options && (this.OPT = { ...this.OPT, ...options });
@@ -46,14 +50,12 @@ export class Yup<Schema> {
       const path = nestedError?.path;
       const inner = nestedError?.inner;
       let message: yup.ValidationError|string = nestedError?.message;
-      // NOTE allow deep form schema
-      if (_.size(inner)) {
-        message = Yup.errorToOutput(nestedError) as yup.ValidationError;
-      }
+      // FIXME allow deep form schema
+      _.size(inner) && (message = Yup.errorToOutput(nestedError) as yup.ValidationError)
       _.set(result, path, message);
     });
-    Logger.debug('YUP', 'errorToOutput result', result);
-    Logger.debug('YUP', 'errorToOutput inner', inner);
+    // Logger.debug('YUP', 'errorToOutput result', result);
+    // Logger.debug('YUP', 'errorToOutput inner', inner);
     return result;
   }
 
@@ -66,6 +68,8 @@ export class Yup<Schema> {
    *******************************************************************/
 
   public static readonly DATE = yup.date().nullable().strict();
+
+  public static readonly INT = yup.string().nullable().strict().matches(/^\d+$/, 'Should be an integer');
 
   public static readonly NUMBER = yup.number().nullable().strict();
 

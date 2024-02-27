@@ -8,12 +8,10 @@ import { Logger } from '../service';
 import { Annotation } from './controller';
 import { PORT, HOST, API_PATH, APP_VERSION, APP_NAME, NODE_ENV, DEBUG, SWAGGER_PATH } from '../constant';
 
-// configure
-export const ANNOTATION_SWAGGER = Symbol('SWAGGER');
 /**
  * Swagger addition data annotation restriction
  */
-interface SwaggerAnnotation {
+export interface SwaggerAnnotation {
   description?: string;
   operationId?: string;
   summary?: string;
@@ -22,12 +20,6 @@ interface SwaggerAnnotation {
   produces?: string[];
   parameters?: Array<any>; // TODO define schema
   responses?: Partial<any>; // TODO define schema
-}
-/**
- * Swagger addition data annotation restriction
- */
-export interface SwaggerEndpoint extends SwaggerAnnotation {
-  any?: any;
 }
 /**
  * Define addition data for swagger endpoints
@@ -41,6 +33,7 @@ export interface SwaggerEndpoint extends SwaggerAnnotation {
  * }
  * @decorator
  */
+export const ANNOTATION_SWAGGER = Symbol('SWAGGER');
 export function Swagger (pathOptions: SwaggerAnnotation) {
   return Reflect.metadata(ANNOTATION_SWAGGER, pathOptions);
 }

@@ -31,10 +31,11 @@ export interface EndpointAnnotation {
 export interface Endpoint extends EndpointAnnotation {
   action: string;
   // NOTE without final implementation - define only idea
-  urlencoded?: middleware.URLEncodedEndpoint;
-  multer?: middleware.MulterEndpoint;
-  swagger?: swagger.SwaggerEndpoint;
-  json?: middleware.JSONEndpoint;
+  urlencoded?: middleware.URLEncodedAnnotation;
+  multer?: middleware.MulterAnnotation;
+  swagger?: swagger.SwaggerAnnotation;
+  query?: middleware.QueryAnnotation;
+  json?: middleware.JSONAnnotation;
   auth?: middleware.AuthEndpoint;
   // TODO
   any?: any;
@@ -89,6 +90,7 @@ export class Controller {
         action: name,
         auth: Reflect.getMetadata(middleware.ANNOTATION_AUTH, target, name),
         json: Reflect.getMetadata(middleware.ANNOTATION_JSON, target, name),
+        query: Reflect.getMetadata(middleware.ANNOTATION_QUERY, target, name),
         swagger: Reflect.getMetadata(swagger.ANNOTATION_SWAGGER, target, name),
         multer: Reflect.getMetadata(middleware.ANNOTATION_MULTER, target, name),
         urlencoded: Reflect.getMetadata(middleware.ANNOTATION_URLENCODED, target, name),
@@ -104,15 +106,15 @@ export class Controller {
 
   public static handle (action) {
     const Ctrl = this;
-    return function handle (request, response, next: express.NextFunction) {
+    return function handle (request: express.Request, response: express.Response, next: express.NextFunction) {
       const instance = new Ctrl(request, response);
       instance[action](request, response, next)
         .then(() => !response.headersSent && next())
         .catch((error: Error) => {
-          console.error(`\n[CONTROLLER: ${Ctrl.name}.${action}] Execution Error:\n`, error);
+          console.error(`\nCONTROLLER: ${Ctrl.name}.${action}`, 'Execution Error:\n', error);
           // NOTE handle throwing endpoints
           return response.status(500).type('json')
-            .send({ code: 'TODO', error: error.message, stack: DEBUG ? error.stack : undefined });
+            .send({ code: 'ENDPOINT_INTERNAL', error: error.message, stack: DEBUG ? error.stack : undefined });
         });
     };
   }

@@ -10,6 +10,7 @@ import { Logger } from '../service';
 import * as middleware from './middleware';
 import { Controller, Annotation } from './controller';
 import { HOST, PORT, API_PATH, DEBUG, SWAGGER_PATH, STATIC_PATH, COOKIE_SECRET } from '../constant';
+import * as url from 'node:url';
 
 
 class Server {
@@ -73,12 +74,13 @@ class Server {
     // NOTE create controller router
     const router = express.Router();
     // NOTE setup all endpoints of controller
-    for (const { path, method, action, urlencoded, json, auth, multer } of Ctrl.annotation.endpoints) {
+    for (const { path, method, action, urlencoded, json, auth, query, multer } of Ctrl.annotation.endpoints) {
       Logger.info('SUBSCRIBE', `${Ctrl.annotation.name} => ${method.toUpperCase()}(${action}) ${API_PATH}${Ctrl.annotation.path}${path}`);
       let middlewares = [];
       // NOTE middlewares of endpoint based on annotation(decorators)
       auth && (middlewares = middlewares.concat(middleware.authMiddleware(auth)));
       json && (middlewares = middlewares.concat(middleware.jsonMiddleware(json)));
+      query && (middlewares = middlewares.concat(middleware.queryMiddleware(query)));
       multer && (middlewares = middlewares.concat(middleware.multerMiddleware(multer)));
       urlencoded && (middlewares = middlewares.concat(middleware.urlEncodedMiddleware(urlencoded)));
       // NOTE set up the controller action handler
