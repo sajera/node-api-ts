@@ -59,6 +59,9 @@ export class Yup<Schema> {
     return result;
   }
 
+  /**
+   * there is know and expected each validator will work only with object schemas
+   */
   public static create (options) { return new Yup(yup.object().shape(options)); }
 
   /*******************************************************************
@@ -69,7 +72,7 @@ export class Yup<Schema> {
 
   public static readonly DATE = yup.date().nullable().strict();
 
-  public static readonly INT = yup.string().nullable().strict().matches(/^\d+$/, 'Should be an integer');
+  public static readonly INT = yup.number().transform((value, originalValue) => Number(originalValue)).nullable();
 
   public static readonly NUMBER = yup.number().nullable().strict();
 

@@ -22,9 +22,9 @@ function createValidatorMiddleware<Schema> (schema: Yup<Schema>, reg: RegExp|nul
   return forceCast<express.Handler>((request: express.Request, response: express.Response, next: express.NextFunction) => {
     if (response.headersSent) return;
     if (reg && !reg.test(request.header('Content-Type')))  return next();
-    const errors = schema.validate(request[prop])
-    if (!errors) { return next(); }
-    return response.status(422).type('json').send({ code, errors });
+    const error = schema.validate(request[prop])
+    if (!error) { return next(); }
+    return response.status(422).type('json').send({ code, error });
   })
 }
 
@@ -48,7 +48,7 @@ export interface JSONAnnotation { // TODO import * as bodyParser from 'body-pars
   schema?: Yup<unknown>
 }
 
-export function jsonMiddleware ({ schema, force = true, ...options }: JSONAnnotation) {
+export function jsonMiddleware ({ schema, force, ...options }: JSONAnnotation) {
   options = { // @see https://www.npmjs.com/package/body-parser#options
     type: '*/json',  // type: '*'
     inflate: true, // false => reject compressed body
@@ -97,7 +97,7 @@ export interface URLEncodedAnnotation {
   // validation
   schema?: Yup<unknown>
 }
-export function urlEncodedMiddleware ({ schema, force = true, ...options }: URLEncodedAnnotation) {
+export function urlEncodedMiddleware ({ schema, force, ...options }: URLEncodedAnnotation) {
   options = { // @see https://www.npmjs.com/package/body-parser#options-3
     type: '*/x-www-form-urlencoded', // type: '*'
     extended: true,
@@ -242,7 +242,7 @@ export function authMiddleware ({ optional, lightweight }: AuthAnnotation) {
       // NOTE allow to "try" to get auth and pass in case it missing
       if (optional) { return next(); }
       Logger.debug('AUTH:401', error.message);
-      return response.status(401).type('json').send('Unauthorized');
+      return response.status(401).type('json').send({ code: 401, error: 'Unauthorized' });
     }
   };
 }

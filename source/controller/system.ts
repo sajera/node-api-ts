@@ -58,7 +58,7 @@ export default class System extends Controller {
   @URLEncoded({}) // no validation - expect same schema as json
   @Json({ schema: System.SigInSchema })
   @Endpoint({ path: '/sign-in', method: Controller.POST })
-  @Query({ schema: Yup.create({ qwe: Yup.INT.required('qwe is mandatory') }) })
+  @Query({ schema: Yup.create({ qwe: Yup.INT.required('qwe is mandatory'), test: Yup.STRING }) })
   @Swagger({ summary: 'Sign in to the System' })
   public async signIn () {
     Logger.debug('SYSTEM', 'signIn query', this.request.query);

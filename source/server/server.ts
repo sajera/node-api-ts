@@ -10,8 +10,6 @@ import { Logger } from '../service';
 import * as middleware from './middleware';
 import { Controller, Annotation } from './controller';
 import { HOST, PORT, API_PATH, DEBUG, SWAGGER_PATH, STATIC_PATH, COOKIE_SECRET } from '../constant';
-import * as url from 'node:url';
-import { paramsMiddleware } from './middleware';
 
 
 class Server {
@@ -66,7 +64,7 @@ class Server {
   private static notFound (request: express.Request, response: express.Response) {
     // NOTE actually it should not be used
     Logger.error('SERVER:404', `${request.method}: ${request.originalUrl}`);
-    return response.status(404).type('json').send('Not Found');
+    return response.status(404).type('json').send({ code: '404', error: 'Not Found' });
   }
 
   public static subscribe (Ctrl: typeof Controller) {

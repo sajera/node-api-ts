@@ -116,7 +116,7 @@ export class Controller {
           console.error(`\nCONTROLLER: ${Ctrl.name}.${action}`, 'Execution Error:\n', error);
           // NOTE handle throwing endpoints
           return response.status(500).type('json')
-            .send({ code: 'ENDPOINT_INTERNAL', error: error.message, stack: DEBUG ? error.stack : undefined });
+            .send({ code: 'INTERNAL', message: error.message, stack: DEBUG ? error.stack : undefined });
         });
     };
   }
