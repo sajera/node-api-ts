@@ -84,7 +84,7 @@ export default class SwaggerServer {
     },
   };
 
-  private get R401 () {
+  private get S401 () {
     return {
       description: 'Unauthorized',
       schema: this.schemaFromSample({
@@ -94,7 +94,7 @@ export default class SwaggerServer {
     }
   }
 
-  private get R404 () {
+  private get S404 () {
     return {
       description: 'Not Found',
       schema: this.schemaFromSample({
@@ -104,12 +104,22 @@ export default class SwaggerServer {
     }
   }
 
-  private get R500 () {
+  private get S422 () {
+    return {
+      description: 'Unprocessable Entity',
+      schema: this.schemaFromSample({
+        code: '...VALIDATION',
+        error: { filed: '... message' }
+      })
+    }
+  }
+
+  private get S500 () {
     return {
       description: 'Internal Server Error',
       schema: this.schemaFromSample({
         code: 'INTERNAL',
-        error: 'Cannot read properties of undefined (reading "id")'
+        error: '... message'
       })
     }
   }
@@ -120,7 +130,7 @@ export default class SwaggerServer {
       // incoming data definition https://swagger.io/docs/specification/2-0/describing-parameters/
       parameters: [],
       // NOTE response definitions https://swagger.io/docs/specification/2-0/describing-responses/
-      responses: { 404: this.R404, 500: this.R500 },
+      responses: { 404: this.S404, 500: this.S500, 422: this.S422 },
       // NOTE MIME Type definitions https://swagger.io/docs/specification/2-0/mime-types/
       consumes: ['application/json'],
       produces: ['application/json'],
@@ -145,7 +155,7 @@ export default class SwaggerServer {
         // NOTE Authorization declaration
         if (endpoint.auth) {
           swEP.security.push({ Authorization: [] });
-          _.set(swEP, 'responses.401', this.R401);
+          _.set(swEP, 'responses.401', this.S401);
         }
         // NOTE path definition https://swagger.io/docs/specification/2-0/paths-and-operations/
         let path = `${controller.path}/${endpoint.path}`.replace(/\/+/g, '/');
@@ -230,10 +240,11 @@ export default class SwaggerServer {
     return result
   }
 
+  // TODO
   private schemaFromYup (data) {
     const result = []
     for (const [name, value] of Object.entries(data)) {
-      const parameter = { name,  in: from, type: _.get(value, 'type') }
+      const parameter = { name,  in: 'from', type: _.get(value, 'type') }
       console.log(`schemaType => ${name}:`, value);
       console.log(`schemaType => ${name}:`, parameter);
 
