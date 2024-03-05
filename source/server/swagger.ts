@@ -152,11 +152,6 @@ export default class SwaggerServer {
         const swEP: SwEP = { ...this.COMMON, ...endpoint.swagger, operationId: endpoint.action };
         // NOTE mark as part of controller
         swEP.tags.push(controller.name)
-        // NOTE Authorization declaration
-        if (endpoint.auth) {
-          swEP.security.push({ Authorization: [] });
-          _.set(swEP, 'responses.401', this.S401);
-        }
         // NOTE path definition https://swagger.io/docs/specification/2-0/paths-and-operations/
         let path = `${controller.path}/${endpoint.path}`.replace(/\/+/g, '/');
         for (const name of path.match(/:[^/]+/g) || []) {
@@ -165,32 +160,33 @@ export default class SwaggerServer {
           // NOTE definition from path <=> params
           swEP.parameters.push({ name: name.substring(1), in: 'path', type: 'string', required: true });
         }
-
         // NOTE query support only primitive values
         const queryFields = _.get(endpoint, 'query.schema.schema.fields')
-        if (queryFields) {// NOTE support only primitive values
-          for (const [name, value] of Object.entries(queryFields)) {
-            swEP.parameters.push({ name, in: 'query', type: _.get(value, 'type'), required: !_.get(value, 'spec.optional') })
-          }
+        queryFields && _.entries(queryFields).map(([name, value]) => swEP.parameters.push({
+          name,
+          in: 'query',
+          type: _.get(value, 'type'),
+          required: !_.get(value, 'spec.optional')
+        }))
+        // NOTE json | urlencoded - body
+        const bodySchema = _.get(endpoint, 'json.schema.schema') || _.get(endpoint, 'urlencoded.schema.schema')
+        bodySchema && swEP.parameters.push({
+          in: 'body',
+          name: 'body',
+          required: true,
+          description: 'Input Schema',
+          schema: this.schemaFromYup(bodySchema),
+        })
+        // NOTE Authorization declaration
+        if (endpoint.auth) {
+          swEP.security.push({ Authorization: [] });
+          _.set(swEP, 'responses.401', this.S401);
         }
-        // TODO json - body
-        const jsonFields = _.get(endpoint, 'json.schema.schema.fields')
-        if (jsonFields) {// NOTE support only primitive values
-          const body = { in: 'body', name: 'body', required: true, description: 'JSON Schema', schema: { type: 'object' } }
-          console.log('json', body)
-
-          for (const [name, value] of Object.entries(jsonFields)) {
-            console.log('json:field', name, value)
-            _.set(body, `schema.properties.${name}`, {
-              required: !_.get(value, 'spec.optional'),
-              type: _.get(value, 'type'),
-            })
-          }
-          console.log(`Controller ${path} => JSON`, body);
-          swEP.parameters.push(body)
-        }
-        // TODO urlencoded - body
-
+        // TODO output schema from sample
+        // if (endpoint.auth) {
+        //   swEP.security.push({ Authorization: [] });
+        //   _.set(swEP, 'responses.200', this.S401);
+        // }
         // NOTE include to "path" definition
         _.set(this.content.paths, `${path}.${endpoint.method}`, swEP);
         // console.log(`Controller ${path} => \n`
@@ -240,42 +236,20 @@ export default class SwaggerServer {
     return result
   }
 
-  // TODO
   private schemaFromYup (data) {
-    const result = []
-    for (const [name, value] of Object.entries(data)) {
-      const parameter = { name,  in: 'from', type: _.get(value, 'type') }
-      console.log(`schemaType => ${name}:`, value);
-      console.log(`schemaType => ${name}:`, parameter);
-
-      result.push(parameter)
+    // NOTE common schema for all types
+    const schema = { type: _.get(data, 'type'), required: !_.get(data, 'spec.optional') };
+    switch (schema.type) {
+      default: return schema;
+      // NOTE complex data types
+      case 'array': return _.set(schema, 'items', this.schemaFromYup(data.innerType));
+      case 'object':
+        for (const [name, value] of _.entries(data.fields)) {
+          _.set(schema, `properties.${name}`, this.schemaFromYup(value));
+        }
+        return schema;
     }
-
-    return result
   }
-
-  // TODO define parameters https://swagger.io/docs/specification/2-0/describing-parameters/
-  // parameters: [
-  //   {
-  //     "in": "body",
-  //     "name": "credantional",
-  //     "description": "user credential",
-  //     "required": true,
-  //     "schema": {
-  //       "type": "object",
-  //       "properties": {
-  //         "email": {
-  //           "type": "string"
-  //         },
-  //         "password": {
-  //           "type": "string"
-  //         }
-  //       }
-  //     }
-  //   }
-  // ],
-
-
 
   private static instance: SwaggerServer;
 

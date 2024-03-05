@@ -51,6 +51,15 @@ export default class System extends Controller {
   public static SigInSchema = Yup.create({
     password: Yup.PASSWORD.required('Password is mandatory'),
     email: Yup.EMAIL.required('Email is mandatory'),
+    testObj: yup.object().shape({
+      password: Yup.STRING.required('mandatory'),
+      email: Yup.NUMBER.required('mandatory'),
+    }).required('mandatory'),
+    testArr: yup.array().of(yup.object().shape({
+      str:  Yup.STRING,
+      num:  Yup.NUMBER,
+      bool: yup.boolean(),
+    })).required('mandatory'),
   });
 
   // @Json({ schema: System.SigInJsonSchema })
