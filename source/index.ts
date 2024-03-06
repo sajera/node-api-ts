@@ -40,8 +40,8 @@ class API {
 Logger.debug('CONFIG', config);
 API.start()
   .then(() => Logger.important('API', 'Successfully started'))
-  .catch(async (error: unknown) => {
+  .catch(async error => {
     await API.stop();
-    Logger.error('API', error);
+    Logger.error('API', error.message, error.stack);
     process.exit(100500);
   });

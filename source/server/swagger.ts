@@ -16,10 +16,12 @@ export interface SwaggerAnnotation {
   description?: string;
   summary: string;
   tags?: string[];
-  parameters?: Array<any>; // TODO define schema
-  responses?: Partial<any>; // TODO define schema
+  sample?: any;
+  // parameters?: Array<any>; // TODO define schema
+  // responses?: Partial<any>; // TODO define schema
 }
-export interface SwEP extends SwaggerAnnotation {
+type SA = Omit<SwaggerAnnotation, 'sample'>
+interface SwEP extends SA {
   tags: string[];
   operationId: string;
   consumes: string[];
@@ -91,7 +93,7 @@ export default class SwaggerServer {
         code: '401',
         error: 'Unauthorized'
       })
-    }
+    };
   }
 
   private get S404 () {
@@ -101,7 +103,7 @@ export default class SwaggerServer {
         code: '404',
         error: 'Not Found'
       })
-    }
+    };
   }
 
   private get S422 () {
@@ -111,7 +113,7 @@ export default class SwaggerServer {
         code: '...VALIDATION',
         error: { filed: '... message' }
       })
-    }
+    };
   }
 
   private get S500 () {
@@ -121,7 +123,7 @@ export default class SwaggerServer {
         code: 'INTERNAL',
         error: '... message'
       })
-    }
+    };
   }
 
   private get COMMON () {
@@ -149,9 +151,15 @@ export default class SwaggerServer {
         // IMPORTANT skip in case definition absent
         if (!endpoint.swagger) { continue; }
         // NOTE definition of endpoint
-        const swEP: SwEP = { ...this.COMMON, ...endpoint.swagger, operationId: endpoint.action };
+        const { sample, ...sw } = endpoint.swagger;
+        const swEP: SwEP = { ...this.COMMON, operationId: endpoint.action, ...sw };
         // NOTE mark as part of controller
-        swEP.tags.push(controller.name)
+        swEP.tags.push(controller.name);
+        // NOTE response output from sample
+        sample && _.set(swEP.responses, 200, {
+          description: 'Output Schema sample',
+          schema: this.schemaFromSample(sample),
+        });
         // NOTE path definition https://swagger.io/docs/specification/2-0/paths-and-operations/
         let path = `${controller.path}/${endpoint.path}`.replace(/\/+/g, '/');
         for (const name of path.match(/:[^/]+/g) || []) {
@@ -161,26 +169,26 @@ export default class SwaggerServer {
           swEP.parameters.push({ name: name.substring(1), in: 'path', type: 'string', required: true });
         }
         // NOTE query support only primitive values
-        const queryFields = _.get(endpoint, 'query.schema.schema.fields')
+        const queryFields = _.get(endpoint, 'query.schema.schema.fields');
         queryFields && _.entries(queryFields).map(([name, value]) => swEP.parameters.push({
           name,
           in: 'query',
           type: _.get(value, 'type'),
           required: !_.get(value, 'spec.optional')
-        }))
+        }));
         // NOTE json | urlencoded - body
-        const bodySchema = _.get(endpoint, 'json.schema.schema') || _.get(endpoint, 'urlencoded.schema.schema')
+        const bodySchema = _.get(endpoint, 'json.schema.schema') || _.get(endpoint, 'urlencoded.schema.schema');
         bodySchema && swEP.parameters.push({
           in: 'body',
           name: 'body',
           required: true,
-          description: 'Input Schema',
+          description: 'Input Schema sample',
           schema: this.schemaFromYup(bodySchema),
-        })
+        });
         // NOTE Authorization declaration
         if (endpoint.auth) {
           swEP.security.push({ Authorization: [] });
-          _.set(swEP, 'responses.401', this.S401);
+          _.set(swEP.responses, 401, this.S401);
         }
         // TODO output schema from sample
         // if (endpoint.auth) {
@@ -204,36 +212,26 @@ export default class SwaggerServer {
     );
   }
 
-  private schemaFromSample (data, enums?: Array<string|number>) {
-    const result = { type: typeof data }
+  private schemaFromSample (data) {
+    // NOTE common schema for all types
+    const schema = { type: typeof data, example: data };
 
-    if (Array.isArray(data)) {
-      _.set(result, 'type', 'array')
-      _.set(result, 'items', this.schemaFromSample(_.first(data)))
-      enums && _.set(result, 'items.enum', enums)
+    switch (schema.type) {
+      default: return schema;
+      // NOTE edge-cases
+      case 'number': return { ...schema, type: 'integer' };
+      case 'object':
+        if (!data) { return schema; }
+        if (Array.isArray(data)) {
+          return { type: 'array', items: this.schemaFromSample(_.first(data)) };
+        }
+        // no-case-declarations
+        const properties = {};
+        for (const field in data) {
+          _.set(properties, field, this.schemaFromSample(_.get(data, field)));
+        }
+        return { type: 'object', properties };
     }
-
-    if (result.type === 'object') {
-      _.set(result, 'type', 'object')
-      for (const key in data) {
-        _.set(result, `properties.${key}`, this.schemaFromSample(_.get(data, key)))
-      }
-    }
-
-    if (result.type === 'string') {
-      _.set(result, 'type', 'string')
-      _.set(result, 'example', data)
-      enums && _.set(result, 'enum', enums)
-    }
-
-    if (result.type === 'number') {
-      _.set(result, 'type', 'integer')
-      _.set(result, 'format', 'int32')
-      _.set(result, 'example', data)
-      enums && _.set(result, 'enum', enums)
-    }
-
-    return result
   }
 
   private schemaFromYup (data) {

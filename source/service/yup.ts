@@ -8,13 +8,13 @@ import { Logger } from './logger';
 // configure
 const OPT = { abortEarly: false, recursive: true };
 
-namespace Yup {
-  export interface ValidationSchema<Schema> {
-    (values: unknown): yup.ValidationError|void
-  }
-}
+// namespace Yup {
+//   export interface ValidationSchema<Schema> {
+//     (values: unknown): yup.ValidationError|void
+//   }
+// }
 
-export class Yup<Schema> {
+export class Yup {
   private readonly OPT: yup.ValidateOptions = {
     // stripUnknown: true, // note sure
     abortEarly: false,
@@ -51,7 +51,7 @@ export class Yup<Schema> {
       const inner = nestedError?.inner;
       let message: yup.ValidationError|string = nestedError?.message;
       // FIXME allow deep form schema
-      _.size(inner) && (message = Yup.errorToOutput(nestedError) as yup.ValidationError)
+      _.size(inner) && (message = Yup.errorToOutput(nestedError) as yup.ValidationError);
       _.set(result, path, message);
     });
     // Logger.debug('YUP', 'errorToOutput result', result);

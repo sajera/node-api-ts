@@ -49,7 +49,7 @@ class AuthService {
    * create session ID by encrypt user ID to avoid compromising
    * NOTE by changing the salt we may invalidate all current session
    */
-  private sid (id: string|number): string {
+  private static sid (id: string|number): string {
     // NOTE mandatory to use predefined salt on order to define relation session with user
     const hmac = createHmac('sha256', SID_SECRET || 'sid');
     return hmac.update(String(id)).digest('hex');
@@ -97,7 +97,7 @@ class AuthService {
    * @param payload
    */
   public static async createAuth (userId: string|number, payload) {
-    const sid = this.instance.sid(userId);
+    const sid = this.sid(userId);
     const cached = await this.getStoredAuth(userId, sid);
     // NOTE return existing auth
     if (cached) { return cached; }
@@ -118,13 +118,13 @@ class AuthService {
   }
 
   public static async getStoredAuth (userId: string|number|null, sid: string = null): Promise<AuthService.Auth|null> {
-    !sid && (sid = this.instance.sid(userId));
+    !sid && (sid = this.sid(userId));
     const cached = await Redis.get(sid);
     return !cached ? null : JSON.parse(cached);
   }
 
   public static invalidateStoredAuth (userId: string|number|null, sid: string = null): Promise<number> {
-    !sid && (sid = this.instance.sid(userId));
+    !sid && (sid = this.sid(userId));
     return Redis.del(sid);
   }
 

@@ -89,7 +89,7 @@ class Server {
       // TODO multipart form data
       multer && (middlewares = middlewares.concat(middleware.multerMiddleware(multer)));
       // NOTE set up the controller action handler
-      middlewares.push(Ctrl.handle(action))
+      middlewares.push(Ctrl.handle(action));
       // NOTE pass middlewares of endpoint based on annotation(decorators)
       router[method](path, ...middlewares);
     }

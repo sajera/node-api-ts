@@ -43,11 +43,11 @@ class Redis {
   }
 
   public static get (key): Promise<string> {
-    return this.instance.client.get(key as any);
+    return this.instance.client.get(key);
   }
 
   public static del (key): Promise<number> {
-    return this.instance.client.del(key as any);
+    return this.instance.client.del(key);
   }
 
   public static set (key, value): Promise<unknown> {

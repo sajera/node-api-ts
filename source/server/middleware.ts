@@ -18,14 +18,14 @@ declare module 'express' {
 /**
  * to avoid code repeating for validation
  */
-function createValidatorMiddleware<Schema> (schema: Yup<Schema>, reg: RegExp|null, prop: string, code: string) {
+function createValidatorMiddleware (schema: Yup, reg: RegExp|null, prop: string, code: string) {
   return forceCast<express.Handler>((request: express.Request, response: express.Response, next: express.NextFunction) => {
-    if (response.headersSent) return;
-    if (reg && !reg.test(request.header('Content-Type')))  return next();
-    const error = schema.validate(request[prop])
+    if (response.headersSent) { return; }
+    if (reg && !reg.test(request.header('Content-Type'))) { return next(); }
+    const error = schema.validate(request[prop]);
     if (!error) { return next(); }
     return response.status(422).type('json').send({ code, error });
-  })
+  });
 }
 
 
@@ -45,7 +45,7 @@ export interface JSONAnnotation { // TODO import * as bodyParser from 'body-pars
    */
   force?: boolean
   // validation
-  schema?: Yup<unknown>
+  schema?: Yup
 }
 
 export function jsonMiddleware ({ schema, force, ...options }: JSONAnnotation) {
@@ -56,12 +56,12 @@ export function jsonMiddleware ({ schema, force, ...options }: JSONAnnotation) {
     limit: '5mb',
     // NOTE that is a default setting, and decorator allows to override for every specific endpoint
     ...options,
-  }
+  };
   return !schema ? [express.json(options)] : [
     // NOTE parse middleware
     express.json(options),
     // NOTE validation middleware right after parse
-    createValidatorMiddleware(schema, force ? null : /json/i, 'body','JSON_VALIDATION')
+    createValidatorMiddleware(schema, force ? null : /json/i, 'body', 'JSON_VALIDATION')
   ];
 }
 /**
@@ -95,7 +95,7 @@ export interface URLEncodedAnnotation {
    */
   force?: boolean
   // validation
-  schema?: Yup<unknown>
+  schema?: Yup
 }
 export function urlEncodedMiddleware ({ schema, force, ...options }: URLEncodedAnnotation) {
   options = { // @see https://www.npmjs.com/package/body-parser#options-3
@@ -105,12 +105,12 @@ export function urlEncodedMiddleware ({ schema, force, ...options }: URLEncodedA
     limit: '2mb',
     // NOTE that is a default setting, and decorator allows to override for every specific endpoint
     ...options
-  }
+  };
   return !schema ? [express.urlencoded(options)] : [
     // NOTE parse middleware
     express.urlencoded(options),
     // NOTE validation middleware right after parse
-    createValidatorMiddleware(schema, force ? null : /form-urlencoded/i, 'body','FORM_VALIDATION')
+    createValidatorMiddleware(schema, force ? null : /form-urlencoded/i, 'body', 'FORM_VALIDATION')
   ];
 }
 /**
@@ -130,8 +130,8 @@ export function URLEncoded (options: URLEncodedAnnotation) {
 }
 
 
-export interface QueryAnnotation { schema?: Yup<unknown> }
-export function queryMiddleware ({ schema, ...options }: QueryAnnotation) {
+export interface QueryAnnotation { schema?: Yup }
+export function queryMiddleware ({ schema }: QueryAnnotation) {
   // FIXME in case we need to customize parse query rules
   // // outsource dependencies
   // // import * as qs from 'qs';
@@ -153,7 +153,7 @@ export function queryMiddleware ({ schema, ...options }: QueryAnnotation) {
   // ];
   return !schema ? [] : [
     // NOTE for sure the express already parse the query
-    createValidatorMiddleware(schema, null, 'query','QUERY_VALIDATION')
+    createValidatorMiddleware(schema, null, 'query', 'QUERY_VALIDATION')
   ];
 }
 /**
@@ -173,11 +173,11 @@ export function Query (options: QueryAnnotation) {
 }
 
 
-export interface ParamsAnnotation { schema?: Yup<unknown> }
-export function paramsMiddleware ({ schema, ...options }: ParamsAnnotation) {
+export interface ParamsAnnotation { schema?: Yup }
+export function paramsMiddleware ({ schema }: ParamsAnnotation) {
   return !schema ? [] : [
     // NOTE for sure the express already parse the query
-    createValidatorMiddleware(schema, null, 'params','PARAMS_VALIDATION')
+    createValidatorMiddleware(schema, null, 'params', 'PARAMS_VALIDATION')
   ];
 }
 /**
@@ -195,7 +195,6 @@ export const ANNOTATION_PARAMS = Symbol('PARAMS');
 export function Params (options: ParamsAnnotation) {
   return Reflect.metadata(ANNOTATION_PARAMS, options);
 }
-
 
 
 export interface MulterAnnotation { // TODO to know more

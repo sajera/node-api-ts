@@ -4,7 +4,7 @@
 import { DEBUG, LOG_LEVEL } from '../constant';
 
 
-const rowFormat = (rows: any): string[] => !Array.isArray(rows) ? []
+const rowFormat = (rows: unknown): string[] => !Array.isArray(rows) ? []
   // : DEBUG ? rows.map(row => JSON.stringify(row, null, 2))
   : rows.map(v => Logger.stringify(v));
 /**
@@ -24,7 +24,7 @@ export class Logger {
     // NOTE resolve circular structure
     return JSON.stringify(value, (key, value) => {
       if (typeof value === 'object' && value !== null) {
-        if (catched.includes(value)) return;
+        if (catched.includes(value)) { return; }
         catched.push(value);
       }
       return value;

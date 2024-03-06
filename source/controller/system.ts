@@ -56,8 +56,8 @@ export default class System extends Controller {
       email: Yup.NUMBER.required('mandatory'),
     }).required('mandatory'),
     testArr: yup.array().of(yup.object().shape({
-      str:  Yup.STRING,
-      num:  Yup.NUMBER,
+      str: Yup.STRING,
+      num: Yup.NUMBER,
       bool: yup.boolean(),
     })).required('mandatory'),
   });
@@ -68,7 +68,12 @@ export default class System extends Controller {
   @Json({ schema: System.SigInSchema })
   @Endpoint({ path: '/sign-in', method: Controller.POST })
   @Query({ schema: Yup.create({ qwe: Yup.INT.required('qwe is mandatory'), test: Yup.STRING }) })
-  @Swagger({ summary: 'Sign in to the System' })
+  @Swagger({
+    summary: 'Sign in to the System',
+    // sample: [{ wer: 'qwe' }],
+    sample: { list: [{ wer: 'qwe', null: null, 0: 0 }] },
+    tags: ['one', 'or more'],
+  })
   public async signIn () {
     Logger.debug('SYSTEM', 'signIn query', this.request.query);
     Logger.debug('SYSTEM', 'signIn body', this.request.body);
