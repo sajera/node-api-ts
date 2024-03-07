@@ -1,13 +1,12 @@
+// outsource dependencies
 
 // local dependencies
-import { DEBUG, LOG_LEVEL, APP_NAME, APP_VERSION } from './constant';
+import { DEBUG, LOG_LEVEL } from '../constant';
 
-// TODO move to "service" ???
-// TODO better formatting
 
-const rowFormat = (rows: any): string[] => !Array.isArray(rows) ? []
-  : DEBUG ? rows.map(row => JSON.stringify(row, null, 2))
-    : rows.map(row => JSON.stringify(row));
+const rowFormat = (rows: unknown): string[] => !Array.isArray(rows) ? []
+  // : DEBUG ? rows.map(row => JSON.stringify(row, null, 2))
+  : rows.map(v => Logger.stringify(v));
 /**
  * In the future, it is possible to use alternative loggers.
  */
@@ -20,6 +19,18 @@ const doLog = (kind: string = 'LOG', level: number = 100, title: string, ...args
 
 export class Logger {
 
+  public static stringify (value, offset = null) {
+    const catched = [];
+    // NOTE resolve circular structure
+    return JSON.stringify(value, (key, value) => {
+      if (typeof value === 'object' && value !== null) {
+        if (catched.includes(value)) { return; }
+        catched.push(value);
+      }
+      return value;
+    }, offset);
+  }
+
   /**
    * the logs will be visible at any cases - always
    */
@@ -31,28 +42,28 @@ export class Logger {
    * the logs will be visible at any cases - always
    */
   public static important (title: string, ...args: any[]) {
-    doLog('INFO', -1, title, ...args);
+    doLog('INFO ', -1, title, ...args);
   }
 
   /**
    * will be visible at DEBUG>=2
    */
   public static warn (title: string, ...args: any[]) {
-    doLog('WARN', 2, title, ...args);
+    doLog('WARN ', 2, title, ...args);
   }
 
   /**
    * will be visible at DEBUG>=4
    */
   public static info (title: string, ...args: any[]) {
-    doLog('INFO', 4, title, ...args);
+    doLog('INFO ', 4, title, ...args);
   }
 
   /**
    * will be visible at DEBUG>=6
    */
   public static log (title: string, ...args: any[]) {
-    doLog('LOG', 6, title, ...args);
+    doLog('LOG  ', 6, title, ...args);
   }
 
   /**
@@ -62,5 +73,3 @@ export class Logger {
     doLog('DEBUG', 10, title, ...args);
   }
 }
-
-export default Logger
