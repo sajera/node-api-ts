@@ -5,7 +5,6 @@ import * as express from 'express';
 // local dependencies
 import { DEBUG } from '../constant';
 import * as swagger from './swagger';
-import { AuthService } from '../service';
 import * as middleware from './middleware';
 
 /**
@@ -28,14 +27,12 @@ export interface Endpoint extends EndpointAnnotation {
   swagger?: swagger.SwaggerAnnotation;
   query?: middleware.QueryAnnotation;
   json?: middleware.JSONAnnotation;
-  auth?: middleware.AuthEndpoint;
+  auth?: middleware.AuthAnnotation;
 }
 /**
  * Controller annotation restriction
  */
-export interface ControllerAnnotation {
-  path: string;
-}
+export interface ControllerAnnotation { path: string; }
 /**
  * Controller annotation
  */
@@ -45,12 +42,10 @@ export interface Annotation extends ControllerAnnotation {
 }
 
 /**
- * Implemented base application controller
+ * Base application controller
  * @abstract
  */
 export class Controller {
-  public readonly auth: AuthService.Auth;
-
   public static GET = 'get' as const;
 
   public static PUT = 'put' as const;
@@ -61,9 +56,9 @@ export class Controller {
 
   public static annotation: Annotation;
 
-  public static formatAnnotation (rootOptions: ControllerAnnotation) {
+  public static formatAnnotation (options: ControllerAnnotation) {
     const target = this.prototype;
-    this.annotation = { ...rootOptions, name: this.name, endpoints: [] };
+    this.annotation = { ...options, name: this.name, endpoints: [] };
     const endpointNames: string[] = [];
     // NOTE take only annotated as endpoint
     for (const name of Object.keys(target)) {
@@ -89,16 +84,13 @@ export class Controller {
     }
   }
 
-  public constructor (public readonly request: express.Request, public readonly response: express.Response) {
-    this.auth = request.auth;
-    // TODO grab the data prepared by previous middlewares
-    // TODO made interfaces
-  }
+  // FIXME is it useful to expand by data from request ?
+  public constructor (public readonly request: express.Request, public readonly response: express.Response) {}
 
   public static handle (action) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const Controller = this;
-    return function handle (request: express.Request, response: express.Response, next: express.NextFunction) {
+    return function handler (request: express.Request, response: express.Response, next: express.NextFunction) {
       const instance = new Controller(request, response);
       instance[action](request, response, next)
         .then(() => !response.headersSent && next())
@@ -112,36 +104,31 @@ export class Controller {
   }
 }
 
-export const ANNOTATION_ENDPOINT = Symbol('ENDPOINT');
 /**
  * Define correct metadata for API endpoints
- *
  * @example
- * /@APIController({ path: '/ctrl-prefix' })
+ * @API({ path: '/entity' })
  * export default class My extends Controller {
- *     @APIEndpoint({ method: METHOD.GET, path: '/express/:path' })
+ *     @Endpoint({ path: '/:path' })
  *     public async endpoint () { ... }
  * }
  * @decorator
  */
+export const ANNOTATION_ENDPOINT = Symbol('ENDPOINT');
 export function Endpoint (endpoint: EndpointAnnotation) {
   return Reflect.metadata(ANNOTATION_ENDPOINT, endpoint);
 }
 
 /**
- * Wrap the original controller definition with a function
- * that will first save relevant annotation
- *
+ * Wrap the original controller definition with a function that will first save relevant annotation
  * @example
- * /@APIController({path: '/ctrl-prefix'})
+ * @API({ path: '/entity' })
  * export default class My extends Controller { ... }
  * @decorator
  */
 export function API<T> (options: ControllerAnnotation) {
   return (Ctrl: typeof Controller) => {
     Ctrl.formatAnnotation(options);
-    // NOTE store data which was grabbed from annotations
-    // Ctrl.annotation = formatAnnotation(Ctrl, options);
     return Ctrl as T;
   };
 }

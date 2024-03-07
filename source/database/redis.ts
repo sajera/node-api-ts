@@ -9,10 +9,8 @@ class Redis {
   private CONNECTED = false;
 
   private client: redis.RedisClientType<redis.RedisDefaultModules & redis.RedisModules, redis.RedisFunctions, redis.RedisScripts>;
-  // private client: redis.RedisClientType;
 
   constructor (options: redis.RedisClientOptions) {
-    // this.client = forceCast<redis.RedisClientType>(redis.createClient(options));
     this.client = redis.createClient(options);
     this.client.on('connect', () => Logger.important('REDIS', `Trying to establish Redis connection ${REDIS_URL}`));
     this.client.on('error', error => Logger.error('REDIS', { message: error.message, stack: error.stack }));
@@ -34,9 +32,9 @@ class Redis {
       url: REDIS_URL,
       pingInterval: 3e4,
       socket: {
-      // NOTE each try increases the delay until it meets 30s
-      // reconnectStrategy: retries => Math.min(retries * 5e2, 3e4),
-      // NOTE after 20 tries no sense to continue
+        // NOTE each try increases the delay until it meets 30s
+        // reconnectStrategy: retries => Math.min(retries * 5e2, 3e4),
+        // NOTE after 20 tries no sense to continue
         reconnectStrategy: retries => retries > 20 ? false : retries * 5e2,
       }
     });

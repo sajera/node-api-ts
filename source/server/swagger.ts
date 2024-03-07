@@ -43,10 +43,10 @@ interface SwEP extends Omit<SwaggerAnnotation, 'sample'> {
  * Define addition data for swagger endpoints
  *
  * @example
- * /@APIController({path: '/ctrl-prefix'})
+ * @API({ path: '/entity' })
  * export default class My extends Controller {
  *     @Swagger({ ... })
- *     @APIEndpoint({method: API_METHOD.GET, path: '/express/:path'})
+ *     @Endpoint({ path: '/:path' })
  *     public async endpoint () { ... }
  * }
  * @decorator
@@ -67,20 +67,20 @@ export default class SwaggerServer {
     schemes: ['http', 'https'],
     externalDocs: { url: 'http://swagger.io', description: 'Find out more about Swagger' },
     info: {
-      title: `${APP_NAME}:${NODE_ENV} API url definition`,
+      title: `${APP_NAME} API of ${NODE_ENV}`,
       contact: { email: 'allsajera@gmail.com' },
       license: { name: 'MIT', url: 'https://opensource.org/licenses/MIT' },
-      description: `Base definition for API url format. Presentation example. Path generating rules {VERSION} / {CONTROLLER} [/ {QUANTITY}] [/ {ADDITION}]
-      1. VERSION -  means API version and using as base path for all urls "${API_PATH}"
-      2. CONTROLLER - logic entity - handler/worker which will determine actions for specific entity or api module
-      3. [QUANTITY] - mark used to determine response type as list or single item
-          single - GET: api/user/{id}
-          list - GET: api/user/list
-      4. [ADDITION] - provide logic to define complicate actions
-          DELETE: api/user/{id}/status/DISABLED
-          POST: api/user/{id}/status/DISABLED
-          PUT: api/user/{id}/status/{status}
-          POST: api/user/filter`,
+      description: `Base definition for API URL format. Presentation example. Path generating rules <strong>{VERSION}</strong> / <strong>{CONTROLLER}</strong> [/ <strong>{QUANTITY}</strong>] [/ <strong>{ADDITION}</strong>]
+        <br /><strong>{VERSION}</strong>: API version, serving as the base path for all URLs, represented as "/api".
+        <strong>{CONTROLLER}</strong>: Logic entity - handler/worker determining actions for a specific entity or API module.
+        Example: api/entity/* demonstrates controller abstraction within URL definition.
+        <strong>{QUANTITY}</strong>: Marker used to determine the response type as a list or single item.
+        GET: api/entity/{id} - Example of retrieving an entity by ID.
+        POST: api/entity/filter - Example of retrieving an entity list by filters.
+        <strong>{ADDITION}</strong>: Provides logic to define complex actions.
+        GET: api/entity/{id}/specific-thing - Example of retrieving a specific part/parts of an entity.
+        PUT: api/entity/{id}/status - Example of an action to update entity status.
+        GET: api/user/{id}/roles - Example of retrieving entity roles.`,
     },
     securityDefinitions: {
       Authorization: { type: 'apiKey', name: 'Authorization', in: 'header', description: 'Authorization: Bearer <ACCESS_TOKEN>' }

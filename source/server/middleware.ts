@@ -67,10 +67,10 @@ export function jsonMiddleware ({ schema, force, ...options }: JSONAnnotation) {
 /**
  * settings of the "body-parse".json middleware
  * @example
- * /@API({ path: '/ctrl-prefix' })
+ * @API({ path: '/entity' })
  * export default class My extends Controller {
  *     @Json({ ... })
- *     @Endpoint({ method: API_METHOD.PUT, path: '/express/:path' })
+ *     @Endpoint({ path: '/:path' })
  *     public async endpoint () { ... }
  * }
  * @decorator
@@ -116,10 +116,10 @@ export function urlEncodedMiddleware ({ schema, force, ...options }: URLEncodedA
 /**
  * settings of the "body-parse".urlencoded middleware
  * @example
- * /@API({ path: '/ctrl-prefix' })
+ * @API({ path: '/entity' })
  * export default class My extends Controller {
  *     @URLEncoded({ ... })
- *     @Endpoint({ method: API_METHOD.POST, path: '/express/:path' })
+ *     @Endpoint({ path: '/:path' })
  *     public async endpoint () { ... }
  * }
  * @decorator
@@ -159,10 +159,10 @@ export function queryMiddleware ({ schema }: QueryAnnotation) {
 /**
  * settings of the "query" middleware
  * @example
- * /@API({ path: '/ctrl-prefix' })
+ * @API({ path: '/entity' })
  * export default class My extends Controller {
  *     @Query({ ... })
- *     @Endpoint({ path: '/express/:path' })
+ *     @Endpoint({ path: '/:path' })
  *     public async endpoint () { ... }
  * }
  * @decorator
@@ -183,10 +183,10 @@ export function paramsMiddleware ({ schema }: ParamsAnnotation) {
 /**
  * settings of the "query" middleware
  * @example
- * /@API({ path: '/ctrl-prefix' })
+ * @API({ path: '/entity' })
  * export default class My extends Controller {
  *     @Params({ ... })
- *     @Endpoint({ path: '/express/:path' })
+ *     @Endpoint({ path: '/:path' })
  *     public async endpoint () { ... }
  * }
  * @decorator
@@ -209,10 +209,10 @@ export function multerMiddleware (options: MulterAnnotation) {
 /**
  * settings of the "multer" middleware
  * @example
- * /@API({path: '/ctrl-prefix'})
+ * @API({ path: '/entity' })
  * export default class My extends Controller {
  *     @Multer({ ... })
- *     @Endpoint({ path: '/express/:path' })
+ *     @Endpoint({ path: '/:path' })
  *     public async endpoint () { ... }
  * }
  * @decorator
@@ -223,11 +223,10 @@ export function Multer (options: MulterAnnotation) {
 }
 
 
-interface AuthAnnotation {
+export interface AuthAnnotation {
   lightweight?: boolean; // not sure it useful
   optional?: boolean;
 }
-export interface AuthEndpoint extends AuthAnnotation {}
 export function authMiddleware ({ optional, lightweight }: AuthAnnotation) {
   // NOTE that is a default setting, and decorator allows to override for every specific endpoint
   return async (request: express.Request, response: express.Response, next: express.NextFunction) => {
@@ -248,15 +247,15 @@ export function authMiddleware ({ optional, lightweight }: AuthAnnotation) {
 /**
  * settings of the "auth" middleware
  * @example
- * /@API({path: '/ctrl-prefix'})
+ * @API({ path: '/entity' })
  * export default class My extends Controller {
  *     @Auth({ ... })
- *     @Endpoint({ path: '/express/:path' })
+ *     @Endpoint({ path: '/:path' })
  *     public async endpoint () { ... }
  * }
  * @decorator
  */
 export const ANNOTATION_AUTH = Symbol('AUTH');
-export function Auth (options: AuthEndpoint) {
+export function Auth (options: AuthAnnotation) {
   return Reflect.metadata(ANNOTATION_AUTH, options);
 }
