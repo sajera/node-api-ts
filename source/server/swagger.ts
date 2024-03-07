@@ -13,22 +13,31 @@ import { PORT, HOST, API_PATH, APP_VERSION, APP_NAME, NODE_ENV, DEBUG, SWAGGER_P
  * Swagger addition data annotation restriction
  */
 export interface SwaggerAnnotation {
-  description?: string;
+  sample?: unknown;
+  // NOTE swagger annotation as is
   summary: string;
   tags?: string[];
-  sample?: any;
-  // parameters?: Array<any>; // TODO define schema
-  // responses?: Partial<any>; // TODO define schema
+  description?: string;
+  parameters?: Array<SwParam>;
+  responses?: { [key: number]: SwResponse };
 }
-type SA = Omit<SwaggerAnnotation, 'sample'>
-interface SwEP extends SA {
-  tags: string[];
+interface SwParam {
+  in: string;
+  name: string;
+  type?: string;
+  schema?: unknown;
+  required?: boolean;
+  description?: string;
+}
+interface SwResponse {
+  schema?: unknown;
+  description?: string;
+}
+interface SwEP extends Omit<SwaggerAnnotation, 'sample'> {
   operationId: string;
   consumes: string[];
   produces: string[];
-  security: Array<any>;
-  parameters: Array<any>;
-  responses: any;
+  security: Array<unknown>;
 }
 /**
  * Define addition data for swagger endpoints
@@ -43,8 +52,8 @@ interface SwEP extends SA {
  * @decorator
  */
 export const ANNOTATION_SWAGGER = Symbol('SWAGGER');
-export function Swagger (pathOptions: SwaggerAnnotation) {
-  return Reflect.metadata(ANNOTATION_SWAGGER, pathOptions);
+export function Swagger (options: SwaggerAnnotation) {
+  return Reflect.metadata(ANNOTATION_SWAGGER, options);
 }
 
 export default class SwaggerServer {
@@ -156,7 +165,7 @@ export default class SwaggerServer {
         // NOTE mark as part of controller
         swEP.tags.push(controller.name);
         // NOTE response output from sample
-        sample && _.set(swEP.responses, 200, {
+        sample && (swEP.responses[200] = {
           description: 'Output Schema sample',
           schema: this.schemaFromSample(sample),
         });
@@ -190,11 +199,6 @@ export default class SwaggerServer {
           swEP.security.push({ Authorization: [] });
           _.set(swEP.responses, 401, this.S401);
         }
-        // TODO output schema from sample
-        // if (endpoint.auth) {
-        //   swEP.security.push({ Authorization: [] });
-        //   _.set(swEP, 'responses.200', this.S401);
-        // }
         // NOTE include to "path" definition
         _.set(this.content.paths, `${path}.${endpoint.method}`, swEP);
         // console.log(`Controller ${path} => \n`

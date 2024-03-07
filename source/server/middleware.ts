@@ -34,10 +34,10 @@ export interface JSONAnnotation { // TODO import * as bodyParser from 'body-pars
   limit?: string;
   inflate?: boolean;
   strict?: boolean;
-  // @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#syntax
-  reviver?(key: string, value: any): any;
   // @see https://www.npmjs.com/package/body-parser#verify
   verify?(req: http.IncomingMessage, res: http.ServerResponse, buf: Buffer, encoding: string): void;
+  // @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#syntax
+  // reviver?(key: string, value: any): any;
   /**
    * case couple handlers for different content types might be made optional for one of decorator
    * @Json({ schema, force: true })

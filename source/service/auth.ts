@@ -19,6 +19,7 @@ interface TokenPayload {
   // FIXME is it safe for users ?
   // email?: string;
 }
+// eslint-disable-next-line @typescript-eslint/no-namespace
 namespace AuthService {
   export interface AccessTokenPayload extends TokenPayload {}
   export interface RefreshTokenPayload extends TokenPayload {}

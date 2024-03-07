@@ -9,28 +9,19 @@ import { AuthService } from '../service';
 import * as middleware from './middleware';
 
 /**
- * list of allowed to use express methods for API endpoints
- */
-export enum METHOD {
-  GET = 'get',
-  PUT = 'put',
-  POST = 'post',
-  DELETE = 'delete'
-}
-
-/**
  * Endpoint annotation restriction
  */
 export interface EndpointAnnotation {
   path: string;
-  method?: METHOD;
+  // list of allowed to use express methods for API endpoints
+  method?: 'get'|'put'|'post'|'delete';
 }
 /**
  * Endpoint annotation restriction
  */
 export interface Endpoint extends EndpointAnnotation {
   action: string;
-  // NOTE without final implementation - define only idea
+  // NOTE predefined middlewares options
   urlencoded?: middleware.URLEncodedAnnotation;
   params?: middleware.ParamsAnnotation;
   multer?: middleware.MulterAnnotation;
@@ -38,8 +29,6 @@ export interface Endpoint extends EndpointAnnotation {
   query?: middleware.QueryAnnotation;
   json?: middleware.JSONAnnotation;
   auth?: middleware.AuthEndpoint;
-  // TODO
-  any?: any;
 }
 /**
  * Controller annotation restriction
@@ -62,13 +51,13 @@ export interface Annotation extends ControllerAnnotation {
 export class Controller {
   public readonly auth: AuthService.Auth;
 
-  public static GET = METHOD.GET;
+  public static GET = 'get' as const;
 
-  public static PUT = METHOD.PUT;
+  public static PUT = 'put' as const;
 
-  public static POST = METHOD.POST;
+  public static POST = 'post' as const;
 
-  public static DELETE = METHOD.DELETE;
+  public static DELETE = 'delete' as const;
 
   public static annotation: Annotation;
 
@@ -84,7 +73,7 @@ export class Controller {
     }
     // NOTE grab all relevant annotations of each endpoint
     for (const name of endpointNames) {
-      const { path, method = METHOD.GET }: EndpointAnnotation = Reflect.getMetadata(ANNOTATION_ENDPOINT, target, name);
+      const { path, method = Controller.GET }: EndpointAnnotation = Reflect.getMetadata(ANNOTATION_ENDPOINT, target, name);
       this.annotation.endpoints.push({
         path,
         method,
@@ -107,16 +96,17 @@ export class Controller {
   }
 
   public static handle (action) {
-    const Ctrl = this;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const Controller = this;
     return function handle (request: express.Request, response: express.Response, next: express.NextFunction) {
-      const instance = new Ctrl(request, response);
+      const instance = new Controller(request, response);
       instance[action](request, response, next)
         .then(() => !response.headersSent && next())
         .catch((error: Error) => {
-          console.error(`\nCONTROLLER: ${Ctrl.name}.${action}`, 'Execution Error:\n', error);
+          console.error(`\nCONTROLLER: ${Controller.name}.${action}`, 'Execution Error:\n', error);
           // NOTE handle throwing endpoints
           return response.status(500).type('json')
-            .send({ code: 'INTERNAL', message: error.message, stack: DEBUG ? error.stack : undefined });
+            .send({ code: error.message || 'INTERNAL', debug: !DEBUG ? void(0) : error.stack });
         });
     };
   }

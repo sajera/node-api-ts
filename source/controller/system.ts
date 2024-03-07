@@ -1,10 +1,9 @@
 // outsource dependencies
-import * as yup from 'yup';
 
 // local dependencies
 import { APP_VERSION } from '../constant';
 import { AuthService, Logger, Yup } from '../service';
-import { Controller, API, Endpoint, Auth, URLEncoded, Json, Query, Params, Swagger } from '../server';
+import { Controller, API, Endpoint, Auth, URLEncoded, Json, Params, Swagger } from '../server';
 
 /**
  * system endpoints which not belong to any controllers and mostly unique
@@ -48,32 +47,19 @@ export default class System extends Controller {
     });
   }
 
-  public static SigInSchema = Yup.create({
+  public static sigInInput = Yup.create({
     password: Yup.PASSWORD.required('Password is mandatory'),
     email: Yup.EMAIL.required('Email is mandatory'),
-    testObj: yup.object().shape({
-      password: Yup.STRING.required('mandatory'),
-      email: Yup.NUMBER.required('mandatory'),
-    }).required('mandatory'),
-    testArr: yup.array().of(yup.object().shape({
-      str: Yup.STRING,
-      num: Yup.NUMBER,
-      bool: yup.boolean(),
-    })).required('mandatory'),
   });
 
-  // @Json({ schema: System.SigInJsonSchema })
-  // @URLEncoded({ schema: System.SigInURLEncodedSchema, force: false })
+  public static sigInOutput = { schema: 'bearer', access: '<ACCESS_TOKEN>', refresh: '<REFRESH_TOKEN>' };
+
+  // @Json({ schema: System.sigInInput })
+  // @URLEncoded({ schema: System.sigInInput, force: false })
   @URLEncoded({}) // no validation - expect same schema as json
-  @Json({ schema: System.SigInSchema })
+  @Json({ schema: System.sigInInput })
   @Endpoint({ path: '/sign-in', method: Controller.POST })
-  @Query({ schema: Yup.create({ qwe: Yup.INT.required('qwe is mandatory'), test: Yup.STRING }) })
-  @Swagger({
-    summary: 'Sign in to the System',
-    // sample: [{ wer: 'qwe' }],
-    sample: { list: [{ wer: 'qwe', null: null, 0: 0 }] },
-    tags: ['one', 'or more'],
-  })
+  @Swagger({ summary: 'Sign in to the System', tags: ['to-check'], sample: System.sigInOutput })
   public async signIn () {
     Logger.debug('SYSTEM', 'signIn query', this.request.query);
     Logger.debug('SYSTEM', 'signIn body', this.request.body);
