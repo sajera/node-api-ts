@@ -80,7 +80,7 @@ export default class SwaggerServer {
         <strong>{ADDITION}</strong>: Provides logic to define complex actions.
         GET: api/entity/{id}/specific-thing - Example of retrieving a specific part/parts of an entity.
         PUT: api/entity/{id}/status - Example of an action to update entity status.
-        GET: api/user/{id}/roles - Example of retrieving entity roles.`,
+        GET: api/user/{id}/roles - Example of retrieving user roles.`,
     },
     securityDefinitions: {
       Authorization: { type: 'apiKey', name: 'Authorization', in: 'header', description: 'Authorization: Bearer <ACCESS_TOKEN>' }
