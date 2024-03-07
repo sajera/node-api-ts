@@ -60,4 +60,3 @@ class Redis {
 // NOTE create server instance
 Redis.create();
 export { Redis };
-export default Redis;

@@ -41,4 +41,3 @@ class Mongoose {
 // NOTE create server instance
 Mongoose.create();
 export { Mongoose };
-export default Mongoose;

@@ -12,16 +12,18 @@ import SystemCtrl from './controller/system';
 class API {
 
   public static async start () {
-    // NOTE subscribe controllers
-    await Server.subscribe(SystemCtrl);
     // NOTE non-business DB
     await Redis.initialize();
     // NOTE business DB
     await Mongoose.initialize();
-    // TODO initialize database connection
-    // DB.initialize();
-    // TODO initialize models
-    // Model.initialize(DB);
+    // TODO business DB @see https://www.npmjs.com/package/pg
+    // await Postgres.initialize();
+
+    // NOTE subscribe controllers
+    await Server.subscribe(SystemCtrl);
+    // await Server.subscribe(SystemCtrl);
+    // await Server.subscribe(SystemCtrl);
+    // await Server.subscribe(SystemCtrl);
     // NOTE initialize express server
     await Server.initialize();
     // NOTE start express server
