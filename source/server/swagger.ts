@@ -225,7 +225,7 @@ export default class SwaggerServer {
         if (Array.isArray(data)) {
           return { type: 'array', items: this.schemaFromSample(_.first(data)) };
         }
-        // no-case-declarations
+        // eslint-disable-next-line no-case-declarations
         const properties = {};
         for (const field in data) {
           _.set(properties, field, this.schemaFromSample(_.get(data, field)));

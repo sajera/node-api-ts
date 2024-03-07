@@ -94,7 +94,7 @@ export default class System extends Controller {
   @Endpoint({ path: '/sign-out' })
   public async signOut () {
     // TODO kill session and authorization tokens
-    await (new Promise((resolve, reject) => {
+    await (new Promise(resolve => {
 
       // emulation ... some code
 
