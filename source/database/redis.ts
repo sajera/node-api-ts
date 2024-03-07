@@ -19,8 +19,8 @@ class Redis {
       this.CONNECTED = true;
     });
     this.client.on('stopped', () => {
-      Logger.debug('REDIS', 'Connection stopped');
-      this.CONNECTED = true;
+      Logger.debug('REDIS', 'Connection closed');
+      this.CONNECTED = false;
     });
   }
 

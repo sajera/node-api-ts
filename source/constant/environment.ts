@@ -41,3 +41,5 @@ export const PWD_HASH = varNumber(process.env.PWD_HASH);
 export const PWD_SALT = varString(process.env.PWD_SALT);
 
 export const REDIS_URL = varString(process.env.REDIS_URL);
+
+export const MONGO_URL = varString(process.env.MONGO_URL)

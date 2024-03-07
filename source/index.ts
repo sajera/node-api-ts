@@ -3,8 +3,8 @@
 // local dependencies
 import { Server } from './server';
 import { Logger } from './service';
-import { Redis } from './database';
 import * as config from './constant';
+import { Redis, Mongoose } from './database';
 
 // NOTE controllers
 import SystemCtrl from './controller/system';
@@ -16,6 +16,8 @@ class API {
     await Server.subscribe(SystemCtrl);
     // NOTE non-business DB
     await Redis.initialize();
+    // NOTE business DB
+    await Mongoose.initialize();
     // TODO initialize database connection
     // DB.initialize();
     // TODO initialize models

@@ -21,8 +21,14 @@ export default class System extends Controller {
     });
   }
 
-  @URLEncoded({})
+  public static sigUpInput = Yup.create({
+    password: Yup.PASSWORD.required(),
+    email: Yup.EMAIL.required(),
+  });
+
+  @Json({ schema: System.sigUpInput })
   @Endpoint({ path: '/sign-up', method: Controller.POST })
+  @Swagger({ summary: 'Create the user', sample: { schema: 'bearer', access: '<ACCESS_TOKEN>', refresh: '<REFRESH_TOKEN>' } })
   public async signUp () {
     // TODO implement user creation
 
@@ -33,33 +39,10 @@ export default class System extends Controller {
     });
   }
 
-  @Auth({ optional: true })
-  @Endpoint({ path: '/test/:testId', method: Controller.POST })
-  @Json({ schema: Yup.create({ test: Yup.POSITIVE.required('is mandatory') }) })
-  @Params({ schema: Yup.create({ testId: Yup.INT.required('testId is mandatory') }) })
-  public async test () {
-    // TODO remove
-    await this.response.status(200).type('json').send({
-      body: this.request.body,
-      query: this.request.query,
-      params: this.request.params,
-      session: this.request.session,
-    });
-  }
-
-  public static sigInInput = Yup.create({
-    password: Yup.PASSWORD.required('Password is mandatory'),
-    email: Yup.EMAIL.required('Email is mandatory'),
-  });
-
-  public static sigInOutput = { schema: 'bearer', access: '<ACCESS_TOKEN>', refresh: '<REFRESH_TOKEN>' };
-
-  // @Json({ schema: System.sigInInput })
-  // @URLEncoded({ schema: System.sigInInput, force: false })
   @URLEncoded({}) // no validation - expect same schema as json
-  @Json({ schema: System.sigInInput })
   @Endpoint({ path: '/sign-in', method: Controller.POST })
-  @Swagger({ summary: 'Sign in to the System', tags: ['to-check'], sample: System.sigInOutput })
+  @Json({ schema: Yup.create({ password: Yup.PASSWORD.required(), email: Yup.EMAIL.required() }) })
+  @Swagger({ summary: 'Sign in to the System', sample: { schema: 'bearer', access: '<ACCESS_TOKEN>', refresh: '<REFRESH_TOKEN>' } })
   public async signIn () {
     Logger.debug('SYSTEM', 'signIn query', this.request.query);
     Logger.debug('SYSTEM', 'signIn body', this.request.body);
@@ -101,6 +84,21 @@ export default class System extends Controller {
       health: 'UP',
       auth: 'Authorization',
       version: APP_VERSION,
+    });
+  }
+
+
+  @Auth({ optional: true })
+  @Endpoint({ path: '/test/:testId', method: Controller.POST })
+  @Json({ schema: Yup.create({ test: Yup.POSITIVE.required('is mandatory') }) })
+  @Params({ schema: Yup.create({ testId: Yup.INT.required('testId is mandatory') }) })
+  public async test () {
+    // TODO remove
+    await this.response.status(200).type('json').send({
+      body: this.request.body,
+      query: this.request.query,
+      params: this.request.params,
+      session: this.request.session,
     });
   }
 
