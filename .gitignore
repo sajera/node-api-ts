@@ -51,17 +51,14 @@ Thumbs.db
 ##################################
 org.eclipse.jdt.core.prefs
 node_modules
-
-# deploy keys
-credentials.json
+.npm
 
 # source of ui design
 wiki
 
 # app ignores
-data
-es5
+dist
 
 # local environment config
-local.*
-*.local.*
+*.local*
+*local.*

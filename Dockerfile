@@ -1,0 +1,22 @@
+# this is the stage one, also know as the build step
+FROM node:20-alpine AS build
+# NOTE take in mind - only production usage
+ENV HOST=0.0.0.0 \
+    PORT=3838 \
+    LOG_LEVEL=2 \
+    REDIS_URL=""
+
+USER node
+WORKDIR /home/node
+COPY package.json package-lock.json tsconfig.json .env ./
+COPY source/ ./source
+RUN npm install --no-package-lock
+RUN npm run build:dist
+# this is stage two, where the app actually runs
+FROM node:20-alpine
+COPY package.json package-lock.json .env ./
+COPY --from=build /home/node/dist/ ./dist
+RUN npm install --omit=dev
+
+EXPOSE 3838
+CMD ["npm", "run", "start:dist"]
