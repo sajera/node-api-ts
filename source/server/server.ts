@@ -57,7 +57,10 @@ class Server {
   }
 
   private static logRequest (request: express.Request, response: express.Response, next: express.NextFunction) {
-    Logger.important('REQUEST', `${request.method}: ${request.originalUrl}`);
+    const starts = Date.now();
+    const from = `${request.method}: ${request.originalUrl}`;
+    Logger.log('REQUEST', from);
+    response.on('finish', () => Logger.log('RESPONSE', `${from} => ${response.statusCode}:${response.statusMessage} in ${Date.now() - starts}ms`));
     return next();
   }
 
@@ -74,7 +77,7 @@ class Server {
     const router = express.Router();
     // NOTE setup all endpoints of controller
     for (const { path, method, action, urlencoded, json, auth, query, params, multer } of Ctrl.annotation.endpoints) {
-      Logger.log('SUBSCRIBE', `${Ctrl.annotation.name} => ${method.toUpperCase()}(${action}) ${API_PATH}${Ctrl.annotation.path}${path}`);
+      Logger.log('SUBSCRIBE', `${Ctrl.annotation.name}.${action} => ${method.toUpperCase()} ${API_PATH}${Ctrl.annotation.path}${path}`);
       let middlewares = [];
       // NOTE check auth first
       auth && (middlewares = middlewares.concat(middleware.authMiddleware(auth)));
