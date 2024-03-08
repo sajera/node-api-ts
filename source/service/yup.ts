@@ -101,7 +101,7 @@ export class Yup {
 
   public static readonly URL = this.STRING.matches(this.urlRegExp, 'Please enter correct website url');
 
-  public static readonly NAME = () => this.STRING
+  public static readonly NAME = this.STRING
     .min(2, 'Should be at least 2 characters in a length')
     .max(16, 'Should be at less than 16 characters in a length');
 

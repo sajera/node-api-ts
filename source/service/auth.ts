@@ -4,8 +4,9 @@ import { createHmac } from 'node:crypto';
 // local dependencies
 import { Logger } from './logger';
 import { Redis } from '../database';
+import { Exception } from '../server';
 import { JwtToken } from './jwt-token';
-import { PWD_SALT, PWD_HASH, SID_SECRET } from '../constant';
+import { PWD_SALT, PWD_ROUNDS, SID_SECRET } from '../constant';
 
 // JSON Web Token Claims @see https://www.iana.org/assignments/jwt/jwt.xhtml
 interface TokenPayload {
@@ -19,6 +20,7 @@ interface TokenPayload {
   // FIXME is it safe for users ?
   // email?: string;
 }
+// eslint-disable-next-line @typescript-eslint/no-namespace
 namespace AuthService {
   export interface AccessTokenPayload extends TokenPayload {}
   export interface RefreshTokenPayload extends TokenPayload {}
@@ -31,7 +33,11 @@ namespace AuthService {
     payload?: unknown
   }
 }
-
+class Unauthorized extends Error {
+  constructor (public code = 403) {
+    super('ACCESS_DENIED');
+  }
+}
 class AuthService {
   private readonly schema = 'bearer';
 
@@ -44,6 +50,8 @@ class AuthService {
   private constructor () {
     Logger.log('AUTH', 'service TODO');
   }
+
+  public static Exception = Unauthorized;
 
   /**
    * create session ID by encrypt user ID to avoid compromising
@@ -60,15 +68,12 @@ class AuthService {
 
   public static create () { this.instance = new AuthService(); }
 
-
   /**
-   * TODO
    * generate password hash to avoid passing it into DB or to know what it is
    */
   public static async encryptPassword (password: string): Promise<unknown> {
     // FIXME should we use predefined salt ?
-    const saltOrHashRounds = PWD_SALT || PWD_HASH || 10;
-    // FIXME how much rounds we may allow to generate random hash
+    const saltOrHashRounds = PWD_SALT || PWD_ROUNDS || 10;
     // const salt = await bcrypt.genSalt(PWD_HASH);
     return await bcrypt.hash(password, saltOrHashRounds);
   }
@@ -78,6 +83,19 @@ class AuthService {
    */
   public static comparePassword (password: string, passwordHash: string): Promise<boolean> {
     return bcrypt.compare(password, passwordHash);
+  }
+
+  /**
+   * parse an email address
+   */
+  public static parseEmail (email: string) {
+    let [login, domain] = email.toLowerCase().split(/@/);
+    // NOTE remove aliases and tags
+    login = login.replace(/\.|\+.*$/g, '');
+    // NOTE alis of "gmail.com"
+    domain = domain.replace(/googlemail.com/, 'gmail.com');
+    // FIXME I am sure that is not all tricks
+    return { login, domain, email: `${login}@${domain}` };
   }
 
   /**
@@ -93,8 +111,6 @@ class AuthService {
 
   /**
    * create pseudo-session - allow to pass there some payload
-   * @param userId
-   * @param payload
    */
   public static async createAuth (userId: string|number, payload) {
     const sid = this.sid(userId);
@@ -102,12 +118,30 @@ class AuthService {
     // NOTE return existing auth
     if (cached) { return cached; }
     // NOTE create new auth
-    const tokenPayload = { sid, name: 'not in use', roles: ['will', 'be', 'implemented'] };
-    const schema = this.instance.schema;
-    const access = this.instance.access.sign(tokenPayload);
-    const refresh = this.instance.refresh.sign(tokenPayload);
-    const auth = { userId, payload, ...tokenPayload, schema, access, refresh };
+    const access = this.instance.access.sign({ sid });
+    const refresh = this.instance.refresh.sign({ sid });
+    const auth = { userId, payload, sid, schema: this.instance.schema, access, refresh };
     // NOTE store "auth" into Redis
+    return await this.storeAuth(sid, auth);
+  }
+
+  /**
+   * update access token
+   */
+  public static async refreshAuth (refresh: string) {
+    const { sid } = this.instance.refresh.verify(refresh);
+    const auth = await this.getStoredAuth(null, sid);
+    // NOTE session absent
+    if (!auth) { throw new AuthService.Exception(); }
+    try {
+      this.instance.access.verify(auth.access);
+      // NOTE access token within session still valid
+      return auth;
+    } catch (error) {
+      // NOTE means the "auth.access" require refreshing
+    }
+    auth.access = this.instance.access.sign({ sid });
+    // NOTE update "auth" within Redis
     return await this.storeAuth(sid, auth);
   }
 
@@ -127,10 +161,9 @@ class AuthService {
     !sid && (sid = this.sid(userId));
     return Redis.del(sid);
   }
-
 }
 
-// NOTE create servis instance
+// NOTE create service instance
 AuthService.create();
 export { AuthService };
 export default AuthService;

@@ -3,8 +3,9 @@
 // local dependencies
 import { Server } from './server';
 import { Logger } from './service';
-import { Redis } from './database';
 import * as config from './constant';
+import { Counter } from './model';
+import { Redis, Mongoose } from './database';
 
 // NOTE controllers
 import SystemCtrl from './controller/system';
@@ -12,14 +13,20 @@ import SystemCtrl from './controller/system';
 class API {
 
   public static async start () {
-    // NOTE subscribe controllers
-    await Server.subscribe(SystemCtrl);
     // NOTE non-business DB
     await Redis.initialize();
-    // TODO initialize database connection
-    // DB.initialize();
-    // TODO initialize models
-    // Model.initialize(DB);
+    // NOTE business DB
+    await Mongoose.initialize();
+    // NOTE integer autoincrement for MongoDB
+    await Counter.initialize();
+    // TODO business DB @see https://www.npmjs.com/package/pg
+    // await Postgres.initialize();
+
+    // NOTE subscribe controllers
+    await Server.subscribe(SystemCtrl);
+    // await Server.subscribe(SystemCtrl);
+    // await Server.subscribe(SystemCtrl);
+    // await Server.subscribe(SystemCtrl);
     // NOTE initialize express server
     await Server.initialize();
     // NOTE start express server

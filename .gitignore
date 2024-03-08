@@ -58,6 +58,10 @@ wiki
 
 # app ignores
 dist
+redis/*
+!redis/.gitkeep
+mongodb/*
+!mongodb/.gitkeep
 
 # local environment config
 *.local*
