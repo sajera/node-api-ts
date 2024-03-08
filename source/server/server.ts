@@ -60,7 +60,7 @@ class Server {
     const starts = Date.now();
     const from = `${request.method}: ${request.originalUrl}`;
     Logger.log('REQUEST', from);
-    response.on('finish', () => Logger.log('RESPONSE', `${from} => ${response.statusCode}:${response.statusMessage} in ${Date.now() - starts}ms`));
+    response.on('finish', () => Logger.log('RESPONSE', `${from} => ${response.statusCode}: ${response.statusMessage} in ${Date.now() - starts}ms`));
     return next();
   }
 

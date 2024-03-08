@@ -37,9 +37,9 @@ export const COOKIE_SECRET = varString(process.env.COOKIE_SECRET);
 export const JWT_SECRET = varString(process.env.JWT_SECRET);
 export const SID_SECRET = varString(process.env.SID_SECRET);
 
-export const PWD_HASH = varNumber(process.env.PWD_HASH);
 export const PWD_SALT = varString(process.env.PWD_SALT);
+export const PWD_ROUNDS = varNumber(process.env.PWD_ROUNDS);
 
 export const REDIS_URL = varString(process.env.REDIS_URL);
 
-export const MONGO_URL = varString(process.env.MONGO_URL)
+export const MONGO_URL = varString(process.env.MONGO_URL);

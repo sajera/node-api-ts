@@ -233,8 +233,11 @@ export function authMiddleware ({ optional, lightweight }: AuthAnnotation) {
     try {
       // NOTE verify token sign and expiration only
       const auth = AuthService.verifyAuthAccess(request.header('Authorization'));
-      // NOTE throw in case "Session Interrupted/Invalidated"
-      !lightweight && (request.auth = await AuthService.getStoredAuth(null, auth.sid));
+      if (!lightweight) {
+        // NOTE check session with the DB for case it was Interrupted by sign out or similar mechanism
+        request.auth = await AuthService.getStoredAuth(null, auth.sid);
+        if (!request.auth) { throw new Error('Session Interrupted/Invalidated'); }
+      }
       return next();
     } catch (error) {
       // NOTE allow to "try" to get auth and pass in case it missing

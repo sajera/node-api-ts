@@ -94,10 +94,10 @@ export class Controller {
       const instance = new Controller(request, response);
       instance[action](request, response, next)
         .then(() => !response.headersSent && next())
-        .catch((error: Error) => {
+        .catch((error: Exception) => {
           console.error(`\nCONTROLLER: ${Controller.name}.${action}`, 'Execution Error:\n', error);
           // NOTE handle throwing endpoints
-          return response.status(500).type('json')
+          return response.status(error.code || 500).type('json')
             .send({ code: error.message || 'INTERNAL', debug: !DEBUG ? void(0) : error.stack });
         });
     };
@@ -131,4 +131,10 @@ export function API<T> (options: ControllerAnnotation) {
     Ctrl.formatAnnotation(options);
     return Ctrl as T;
   };
+}
+
+export class Exception extends Error {
+  constructor (message = 'BAD_REQUEST', public code = 400) {
+    super(message);
+  }
 }

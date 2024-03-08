@@ -8,7 +8,7 @@ import { MONGO_URL } from '../constant';
 class Mongoose {
   private CONNECTED = false;
 
-  private options: mongoose.ConnectOptions = { bufferCommands: false, autoIndex: true, autoCreate: true }
+  private options: mongoose.ConnectOptions = { bufferCommands: false, autoIndex: true, autoCreate: true };
 
   private client: mongoose.Connection;
 

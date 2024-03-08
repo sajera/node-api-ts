@@ -126,13 +126,9 @@
     "lines-between-class-members": ["error", "always"],
     "no-duplicate-imports": ["error", { "includeExports": true }],
     "func-style": ["error", "declaration", { "allowArrowFunctions": true }],
-    "no-underscore-dangle": ["warn", { "allow": ["_object", "_number", "_instance", "__REDUX_DEVTOOLS_EXTENSION_COMPOSE__"] }],
+    // "no-underscore-dangle": ["warn", { "allow": ["_object", "_number", "_instance", "__REDUX_DEVTOOLS_EXTENSION_COMPOSE__"] }],
     "no-mixed-operators": ["error", { "groups": [["&&", "||"]] }],
-    "camelcase": ["error", {
-      "properties": "always",
-      "ignoreDestructuring": true,
-      "allow": ["access_token", "refresh_token"]
-    }],
+    // "camelcase": ["error", { "properties": "always", "ignoreDestructuring": true, "allow": ["access_token", "refresh_token"] }],
     "no-restricted-imports": ["error", {
       "paths": ["import1", "import2"],
       "patterns": ["import1/private/*", "import2/*", "!import2/good"]

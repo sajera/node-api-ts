@@ -4,6 +4,7 @@
 import { Server } from './server';
 import { Logger } from './service';
 import * as config from './constant';
+import { Counter } from './model';
 import { Redis, Mongoose } from './database';
 
 // NOTE controllers
@@ -16,6 +17,8 @@ class API {
     await Redis.initialize();
     // NOTE business DB
     await Mongoose.initialize();
+    // NOTE integer autoincrement for MongoDB
+    await Counter.initialize();
     // TODO business DB @see https://www.npmjs.com/package/pg
     // await Postgres.initialize();
 

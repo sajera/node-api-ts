@@ -5,7 +5,7 @@ import { createHmac } from 'node:crypto';
 import { Logger } from './logger';
 import { Redis } from '../database';
 import { JwtToken } from './jwt-token';
-import { PWD_SALT, PWD_HASH, SID_SECRET } from '../constant';
+import { PWD_SALT, PWD_ROUNDS, SID_SECRET } from '../constant';
 
 // JSON Web Token Claims @see https://www.iana.org/assignments/jwt/jwt.xhtml
 interface TokenPayload {
@@ -61,15 +61,12 @@ class AuthService {
 
   public static create () { this.instance = new AuthService(); }
 
-
   /**
-   * TODO
    * generate password hash to avoid passing it into DB or to know what it is
    */
   public static async encryptPassword (password: string): Promise<unknown> {
     // FIXME should we use predefined salt ?
-    const saltOrHashRounds = PWD_SALT || PWD_HASH || 10;
-    // FIXME how much rounds we may allow to generate random hash
+    const saltOrHashRounds = PWD_SALT || PWD_ROUNDS || 10;
     // const salt = await bcrypt.genSalt(PWD_HASH);
     return await bcrypt.hash(password, saltOrHashRounds);
   }
@@ -79,6 +76,19 @@ class AuthService {
    */
   public static comparePassword (password: string, passwordHash: string): Promise<boolean> {
     return bcrypt.compare(password, passwordHash);
+  }
+
+  /**
+   * parse an email address
+   */
+  public static parseEmail (email: string) {
+    let [login, domain] = email.toLowerCase().split(/@/);
+    // NOTE remove aliases and tags
+    login = login.replace(/\.|\+.*$/g, '');
+    // NOTE alis of "gmail.com"
+    domain = domain.replace(/googlemail.com/, 'gmail.com');
+    // FIXME I am sure that is not all
+    return { login, domain, email: `${login}@${domain}` };
   }
 
   /**
@@ -103,11 +113,9 @@ class AuthService {
     // NOTE return existing auth
     if (cached) { return cached; }
     // NOTE create new auth
-    const tokenPayload = { sid, name: 'not in use', roles: ['will', 'be', 'implemented'] };
-    const schema = this.instance.schema;
-    const access = this.instance.access.sign(tokenPayload);
-    const refresh = this.instance.refresh.sign(tokenPayload);
-    const auth = { userId, payload, ...tokenPayload, schema, access, refresh };
+    const access = this.instance.access.sign({ sid });
+    const refresh = this.instance.refresh.sign({ sid });
+    const auth = { userId, payload, sid, schema: this.instance.schema, access, refresh };
     // NOTE store "auth" into Redis
     return await this.storeAuth(sid, auth);
   }
@@ -131,7 +139,7 @@ class AuthService {
 
 }
 
-// NOTE create servis instance
+// NOTE create service instance
 AuthService.create();
 export { AuthService };
 export default AuthService;
