@@ -68,13 +68,11 @@ export default class System extends Controller {
   public async signIn () {
     // NOTE normalized "login" value to exclude abnormal parts
     const { email: login } = AuthService.parseEmail(this.request.body.email);
-    // NOTE check login to make sure it is new
     const user = await User.findOne({ login }).exec();
     if (!user) { throw new AuthService.Exception(); }
     const isMatch = await AuthService.comparePassword(this.request.body.password, user.password);
     if (!isMatch) { throw new AuthService.Exception(); }
-    // NOTE find existing user auth or create new one
-    const auth = await AuthService.createAuth(user.id, { to: 'think about session payload' });
+    const auth = await AuthService.findOrCreateAuth(user.id, { to: 'think about session payload' });
     await this.response.status(200).type('json').send({
       refresh: auth.refresh,
       access: auth.access,
