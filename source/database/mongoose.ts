@@ -6,7 +6,7 @@ import { Logger } from '../service';
 import { MONGO_URL } from '../constant';
 
 class Mongoose {
-  private CONNECTED = false;
+  public static CONNECTED = false;
 
   private options: mongoose.ConnectOptions = { bufferCommands: false, autoIndex: true, autoCreate: true };
 
@@ -18,11 +18,11 @@ class Mongoose {
     this.client.on('error', error => Logger.error('MONGOOSE', { message: error.message, stack: error.stack }));
     this.client.on('connected', () => {
       Logger.debug('MONGOOSE', 'Connection ready');
-      this.CONNECTED = true;
+      Mongoose.CONNECTED = true;
     });
     this.client.on('disconnected', () => {
       Logger.debug('MONGOOSE', 'Connection closed');
-      this.CONNECTED = false;
+      Mongoose.CONNECTED = false;
       // FIXME should we try to reconnect ? - btw the Mongoose has their own strategy to reconnect and 'disconnected' fired in case it fail
       // Mongoose.initialize();
     });

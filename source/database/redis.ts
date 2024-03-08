@@ -6,7 +6,7 @@ import { Logger } from '../service';
 import { REDIS_URL } from '../constant';
 
 class Redis {
-  private CONNECTED = false;
+  public static CONNECTED = false;
 
   private client: redis.RedisClientType<redis.RedisDefaultModules & redis.RedisModules, redis.RedisFunctions, redis.RedisScripts>;
 
@@ -16,11 +16,11 @@ class Redis {
     this.client.on('error', error => Logger.error('REDIS', { message: error.message, stack: error.stack }));
     this.client.on('ready', () => {
       Logger.debug('REDIS', 'Connection ready');
-      this.CONNECTED = true;
+      Redis.CONNECTED = true;
     });
     this.client.on('stopped', () => {
       Logger.debug('REDIS', 'Connection closed');
-      this.CONNECTED = false;
+      Redis.CONNECTED = false;
     });
   }
 

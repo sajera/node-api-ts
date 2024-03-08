@@ -236,7 +236,7 @@ export function authMiddleware ({ optional, lightweight }: AuthAnnotation) {
       if (!lightweight) {
         // NOTE check session with the DB for case it was Interrupted by sign out or similar mechanism
         request.auth = await AuthService.getStoredAuth(null, auth.sid);
-        if (!request.auth) { throw new Error('Session Interrupted/Invalidated'); }
+        if (!request.auth) { throw new AuthService.Exception(); }
       }
       return next();
     } catch (error) {

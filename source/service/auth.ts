@@ -4,6 +4,7 @@ import { createHmac } from 'node:crypto';
 // local dependencies
 import { Logger } from './logger';
 import { Redis } from '../database';
+import { Exception } from '../server';
 import { JwtToken } from './jwt-token';
 import { PWD_SALT, PWD_ROUNDS, SID_SECRET } from '../constant';
 
@@ -32,7 +33,11 @@ namespace AuthService {
     payload?: unknown
   }
 }
-
+class Unauthorized extends Error {
+  constructor (public code = 403) {
+    super('ACCESS_DENIED');
+  }
+}
 class AuthService {
   private readonly schema = 'bearer';
 
@@ -45,6 +50,8 @@ class AuthService {
   private constructor () {
     Logger.log('AUTH', 'service TODO');
   }
+
+  public static Exception = Unauthorized;
 
   /**
    * create session ID by encrypt user ID to avoid compromising
@@ -87,7 +94,7 @@ class AuthService {
     login = login.replace(/\.|\+.*$/g, '');
     // NOTE alis of "gmail.com"
     domain = domain.replace(/googlemail.com/, 'gmail.com');
-    // FIXME I am sure that is not all
+    // FIXME I am sure that is not all tricks
     return { login, domain, email: `${login}@${domain}` };
   }
 
@@ -104,8 +111,6 @@ class AuthService {
 
   /**
    * create pseudo-session - allow to pass there some payload
-   * @param userId
-   * @param payload
    */
   public static async createAuth (userId: string|number, payload) {
     const sid = this.sid(userId);
@@ -117,6 +122,26 @@ class AuthService {
     const refresh = this.instance.refresh.sign({ sid });
     const auth = { userId, payload, sid, schema: this.instance.schema, access, refresh };
     // NOTE store "auth" into Redis
+    return await this.storeAuth(sid, auth);
+  }
+
+  /**
+   * update access token
+   */
+  public static async refreshAuth (refresh: string) {
+    const { sid } = this.instance.refresh.verify(refresh);
+    const auth = await this.getStoredAuth(null, sid);
+    // NOTE session absent
+    if (!auth) { throw new AuthService.Exception(); }
+    try {
+      this.instance.access.verify(auth.access);
+      // NOTE access token within session still valid
+      return auth;
+    } catch (error) {
+      // NOTE means the "auth.access" require refreshing
+    }
+    auth.access = this.instance.access.sign({ sid });
+    // NOTE update "auth" within Redis
     return await this.storeAuth(sid, auth);
   }
 
@@ -136,7 +161,6 @@ class AuthService {
     !sid && (sid = this.sid(userId));
     return Redis.del(sid);
   }
-
 }
 
 // NOTE create service instance

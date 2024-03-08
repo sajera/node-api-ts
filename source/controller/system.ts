@@ -1,11 +1,12 @@
 // outsource dependencies
 
 // local dependencies
+import { User } from '../model';
 import { APP_VERSION } from '../constant';
+import { Mongoose, Redis } from '../database';
 import { AuthService, Logger, Yup } from '../service';
 import { Controller, API, Endpoint, Exception, Auth, URLEncoded, Json, Params, Swagger } from '../server';
 
-import { User } from '../model';
 
 /**
  * system endpoints which not belong to any controllers and mostly unique
@@ -58,7 +59,6 @@ export default class System extends Controller {
       refresh: auth.refresh,
       access: auth.access,
     });
-
   }
 
   @URLEncoded({}) // no validation - expect same schema as json
@@ -70,9 +70,9 @@ export default class System extends Controller {
     const { email: login } = AuthService.parseEmail(this.request.body.email);
     // NOTE check login to make sure it is new
     const user = await User.findOne({ login }).exec();
-    if (!user) { throw new Exception('ACCESS_DENIED'); }
+    if (!user) { throw new AuthService.Exception(); }
     const isMatch = await AuthService.comparePassword(this.request.body.password, user.password);
-    if (!isMatch) { throw new Exception('ACCESS_DENIED'); }
+    if (!isMatch) { throw new AuthService.Exception(); }
     // NOTE find existing user auth or create new one
     const auth = await AuthService.createAuth(user.id, { to: 'think about session payload' });
     await this.response.status(200).type('json').send({
@@ -81,14 +81,23 @@ export default class System extends Controller {
     });
   }
 
+  @Endpoint({ path: '/refresh', method: Controller.POST })
+  @Json({ schema: Yup.create({ token: Yup.STRING.required() }) })
+  @Swagger({ summary: 'Refresh tokens', sample: { access: '<ACCESS_TOKEN>', refresh: '<REFRESH_TOKEN>' } })
+  public async refresh () {
+    Logger.debug('SYSTEM', 'refresh', this.request.body);
+    const auth = await AuthService.refreshAuth(this.request.body.token);
+    await this.response.status(200).type('json').send({
+      refresh: auth.refresh,
+      access: auth.access,
+    });
+  }
+
   @Auth({ optional: true })
-  @Endpoint({ path: '/sign-out' })
+  @Endpoint({ path: '/sign-out', method: Controller.DELETE })
   @Swagger({ summary: 'Invalidate all tokens', sample: 'OK' })
   public async signOut () {
-    // Logger.debug('SYSTEM', 'signOut', this.request.auth);
-    if (this.request.auth?.sid) {
-      await AuthService.invalidateStoredAuth(null, this.request.auth?.sid);
-    }
+    await AuthService.invalidateStoredAuth(null, this.request.auth?.sid);
     await this.response.status(200).type('json').send('"OK"');
   }
 
@@ -100,9 +109,10 @@ export default class System extends Controller {
       token: 'Bearer ',
       auth: 'Authorization',
       version: APP_VERSION,
+      redis: Redis.CONNECTED,
+      mongoose: Mongoose.CONNECTED,
     });
   }
-
 
   // TODO remove
   @Auth({ optional: true })
