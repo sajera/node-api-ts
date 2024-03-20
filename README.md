@@ -83,7 +83,6 @@ In our project, environment variables, such as database URLs or API keys, are ma
     * [x] Include Server(s) life cycle
     * [x] Include Controllers life cycle
     * [ ] Include Database(s) life cycle
-    * [ ] Include models life cycle
     * [x] Generate documentation (Swagger or ...)
     * [x] Provide configurable lint rules
     * [x] Provide intuitive developer process (care about helps from IDE of developers)
@@ -101,26 +100,20 @@ In our project, environment variables, such as database URLs or API keys, are ma
     * [x] Provide controllers entry point
     * [x] Provide functionality from express
     * [x] Implement Controller life cycle - each call to API will be handled of its own controller instance
-    * [x] Provide `endpoint` as controller `public async` method with access to controller instance for current call
+    * [x] Provide `endpoint` as controller `public async` method with access to controller instance of current call
     * [x] Provide Decorators `API`
         * [x] @API({ ...options }) - define `class` as API controller - read annotations of controller
-        * [x] @Endpoint({ ...options }) - define `public async` method of `{@API}` as endpoint - setup annotation endpoint
+        * [x] @Endpoint({ ...options }) - define `public async` method of `@API` as endpoint - setup annotation endpoint
     * [x] Provide Decorators `@Endpoint`
-        * [x] @Swagger({ ...options }) - expand `{@Endpoint}` annotation - provide ability to auto generate documentation of endpoint using **[Swagger](https://www.npmjs.com/package/swagger-ui-express/ "swagger-ui-express")**
+        * [x] @Swagger({ ...options }) - expand `@Endpoint` annotation - provide ability to auto generate documentation of endpoint using **[Swagger](https://www.npmjs.com/package/swagger-ui-express/ "swagger-ui-express")**
         * [x] @Auth({…options…}) - check/restore `Authorization` and handle 401 Unathorized
         * [x] @Validate - ??? "schema" as a part of data parse middlewares
+        * [ ]
     * [x] Provide examples of usage
 
 * [ ] `DB` Project database life cycle
-    * [ ] Provide customization from configuration file
-    * [x] Provide MongoDB with Mongoose initialization
-    * [ ] PostgreSQL based on "pg" initialization
-    * [x] Provide MongoDB initialization
-    * [ ] Provide examples of usage
-
-* [ ] `Model` Project model life cycle
-    * [ ] Abstract helpers for model creation such as (Base)Controller
-    * [ ] Provide huge customizable Models
-    * [ ] Implement ability to connect models in the same way for different DB
-    * [ ] Provide examples of usage
-
+    * [ ] customization from configuration file
+    * [x] MongoDB with Mongoose
+    * [ ] PostgreSQL with "pg"
+    * [x] Redis
+    * [ ] examples of usage
