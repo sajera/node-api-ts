@@ -37,7 +37,10 @@ Run the application in development mode:
 npm run start:dev
 ```
 
-### Deployment TODO
+### Deployment
+
+The application is designed to be deployed using [Docker](https://www.docker.com/get-started/) with configuration set up using environment variables
+> Please utilize the `Dockerfile:production` file for deployment
 
 
 ### Application configuration
