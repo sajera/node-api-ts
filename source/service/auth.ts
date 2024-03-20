@@ -2,8 +2,8 @@
 import * as bcrypt from 'bcryptjs';
 import { createHmac } from 'node:crypto';
 // local dependencies
+import { Redis } from './redis';
 import { Logger } from './logger';
-import { Redis } from '../database';
 import { JwtToken } from './jwt-token';
 import { PWD_SALT, PWD_ROUNDS, SID_SECRET } from '../constant';
 
@@ -186,4 +186,3 @@ class AuthService {
 // NOTE create service instance
 AuthService.create();
 export { AuthService };
-export default AuthService;

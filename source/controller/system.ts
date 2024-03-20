@@ -1,10 +1,9 @@
 // outsource dependencies
 
 // local dependencies
-import { User } from '../model';
+import { User } from '../mongoose';
 import { APP_VERSION } from '../constant';
-import { Mongoose, Redis } from '../database';
-import { AuthService, Logger, Yup } from '../service';
+import { AuthService, Logger, Yup, Mongoose, Redis } from '../service';
 import { Controller, API, Endpoint, Exception, Auth, URLEncoded, Json, Params, Swagger } from '../server';
 
 

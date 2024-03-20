@@ -2,10 +2,9 @@
 
 // local dependencies
 import { Server } from './server';
-import { Logger } from './service';
 import * as config from './constant';
-import { Counter } from './model';
-import { Redis, Mongoose } from './database';
+import { Counter } from './mongoose';
+import { Logger, Redis, Mongoose } from './service';
 
 // NOTE controllers
 import SystemCtrl from './controller/system';
