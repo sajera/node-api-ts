@@ -2,15 +2,47 @@
 
 To expedite the development process, a dummy application with fundamental features was created, demonstrating typical functionalities found in a Node.js application using TypeScript. This includes setting up TypeScript configuration, initiating an Express server, configuring server routes, implementing CORS, serving static content, enabling file uploads, and parsing request bodies. Additionally, code linters adhering to the company's coding standards were applied.
 
-### Development TODO
 
+### Development Environment Setup
+
+Configuring the development process may vary depending on the capabilities of your system. This allows developers to choose the approach that best fits their environment and preferences.
+> docker-compose.yaml - the simplest way to use [Docker](https://www.docker.com/get-started/) in the project, the development environment is set up with all the necessary services.
+
+#### Infrastructure with Docker
+1. Launch Docker [Docker](https://www.docker.com/get-started/)
+2. Run the server in development mode
+```
+ docker compose up
+```
+
+#### Manual Infrastructure Setup
+For manual infrastructure setup, you need to install and run the required services on your computer. Currently, these are:
+1. [Redis](https://redis.io/)
+2. [MongoDB](https://www.mongodb.com/)
+
+Connect to remote/local services, create an `env.local` file in the project's main directory and describe the variables specific to your environment:
+```
+# with running locally instance of Redis
+REDIS_URL=redis://127.0.0.1:6379
+# with running locally instance of Mongo
+MONGO_URL=mongodb://127.0.0.1:27017/node-api-ts
+```
+
+Install the application dependencies:
+```
+npm install
+```
+Run the application in development mode:
+```
+npm run start:dev
+```
 
 ### Deployment TODO
 
 
 ### Application configuration
 
-"In our project, environment variables, such as database URLs or API keys, are managed using a `.env` file. This file, formatted as `KEY=VALUE` pairs, stores configuration data. During local development, developers create and modify this file to suit their testing needs, optionally overriding specific variables in a `.env.local` file. However, in production deployments, we avoid using `.env` files to protect sensitive information. Instead, environment variables are securely passed to the application server or container during deployment, a process handled by deployment scripts or configuration management tools. Within the Node.js application, environment variables are accessed using `process.env.VARIABLE_NAME`, simplifying configuration management without requiring direct modification of the application's code."
+In our project, environment variables, such as database URLs or API keys, are managed using a `.env` file. This file, formatted as `KEY=VALUE` pairs, stores configuration data. During local development, developers create and modify this file to suit their testing needs, optionally overriding specific variables in a `.env.local` file. However, in production deployments, we avoid using `.env` files to protect sensitive information. Instead, environment variables are securely passed to the application server or container during deployment, a process handled by deployment scripts or configuration management tools. Within the Node.js application, environment variables are accessed using `process.env.VARIABLE_NAME`, simplifying configuration management without requiring direct modification of the application's code.
 
 1. **Understanding the `.env` File:**
   - Explain that the `.env` file is a plain text file where environment variables are stored.
@@ -49,7 +81,7 @@ To expedite the development process, a dummy application with fundamental featur
     * [x] Include Controllers life cycle
     * [ ] Include Database(s) life cycle
     * [ ] Include models life cycle
-    * [ ] Generate documentation (Swagger or ...)
+    * [x] Generate documentation (Swagger or ...)
     * [x] Provide configurable lint rules
     * [x] Provide intuitive developer process (care about helps from IDE of developers)
 
@@ -62,26 +94,25 @@ To expedite the development process, a dummy application with fundamental featur
     * [x] **[cookie/session](https://www.npmjs.com/package/express-session "express-session")** with options from project config 
     * [ ] multipart with options from project config 
 
-* [ ] `API Controller` Project controllers
+* [x] `API Controller` Project controllers
     * [x] Provide controllers entry point
     * [x] Provide functionality from express
     * [x] Implement Controller life cycle - each call to API will be handled of its own controller instance
     * [x] Provide `endpoint` as controller `public async` method with access to controller instance for current call
     * [x] Provide Decorators `API`
-        * [x] @APIController({...options...}) - define `class` as API controller - read annotations of controller
-        * [x] @APIEndpoint({...options...}) - define `public async` method of `{APIController}` as endpoint - setup annotation endpoint
-    * [ ] Provide Decorators `@APIEndpoint` (Proxy)  
-        * [x] @Swagger({...options...}) - expand `{@APIEndpoint}` annotation - provide ability to auto generate documentation of endpoint using **[Swagger](https://www.npmjs.com/package/swagger-ui-express/ "swagger-ui-express")**
+        * [x] @API({ ...options }) - define `class` as API controller - read annotations of controller
+        * [x] @Endpoint({ ...options }) - define `public async` method of `{@API}` as endpoint - setup annotation endpoint
+    * [x] Provide Decorators `@Endpoint`
+        * [x] @Swagger({ ...options }) - expand `{@Endpoint}` annotation - provide ability to auto generate documentation of endpoint using **[Swagger](https://www.npmjs.com/package/swagger-ui-express/ "swagger-ui-express")**
         * [x] @Auth({…options…}) - check/restore `Authorization` and handle 401 Unathorized
-        * [ ] @Validate - ??? or it can be as @APIEndpointSchema
-        * [ ] @??? - ???
+        * [x] @Validate - ??? "schema" as a part of data parse middlewares
     * [x] Provide examples of usage
 
 * [ ] `DB` Project database life cycle
     * [ ] Provide customization from configuration file
-    * [ ] Provide MongoDB with Mongoose initialization
+    * [x] Provide MongoDB with Mongoose initialization
     * [ ] PostgreSQL based on "pg" initialization
-    * [ ] Provide MongoDB initialization
+    * [x] Provide MongoDB initialization
     * [ ] Provide examples of usage
 
 * [ ] `Model` Project model life cycle
@@ -90,4 +121,3 @@ To expedite the development process, a dummy application with fundamental featur
     * [ ] Implement ability to connect models in the same way for different DB
     * [ ] Provide examples of usage
 
-* [ ] `Documentation` generate project swagger
