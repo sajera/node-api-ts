@@ -91,10 +91,10 @@ In our project, environment variables, such as database URLs or API keys, are ma
     * [x] **[express server](https://expressjs.com/ "express")** and provide to use original express with options from project config 
     * [x] **[cors](https://www.npmjs.com/package/cors "CORS")** with options from project config
     * [x] **[static server](https://expressjs.com/en/4x/api.html#express.static "express static")** with options from project config
-    * [x] **[parse json](https://www.npmjs.com/package/body-parser "body-parser => JSON")** with options from project config
-    * [x] **[parse urlencoded](https://www.npmjs.com/package/body-parser "body-parser => URLENCODED")** with options from project config
     * [x] **[cookie/session](https://www.npmjs.com/package/express-session "express-session")** with options from project config 
-    * [ ] multipart with options from project config 
+    * [x] **[parse json](https://www.npmjs.com/package/body-parser "body-parser => JSON")** with options and validation
+    * [x] **[parse urlencoded](https://www.npmjs.com/package/body-parser "body-parser => URLENCODED")** with  options and validation
+    * [ ] **[multer](https://www.npmjs.com/package/multer)** with options and validation - FILES|multipart/form-data
 
 * [x] `API Controller` Project controllers
     * [x] Provide controllers entry point
@@ -112,6 +112,7 @@ In our project, environment variables, such as database URLs or API keys, are ma
         * [x] @URLEncoded({ ...options }) - configure parsing body to get data from */x-www-form-urlencoded
         * [x] @Query({ ...options }) - configure parsing query parameters
         * [x] @Params({ ...options }) - configure parsing url path parameters
+        * [ ] @Multer({ ...options }) - configure parsing */form-data with files
         * [x] ({ ...options, schema: Yup }) - all parsing decorators are connected with the Swagger documentation and have ability to validate data using **[Yup](https://www.npmjs.com/package/yup) validators
     * [x] Provide examples of usage
 
