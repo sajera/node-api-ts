@@ -83,11 +83,11 @@ In our project, environment variables, such as database URLs or API keys, are ma
     * [x] Include Server(s) life cycle
     * [x] Include Controllers life cycle
     * [ ] Include Database(s) life cycle
-    * [x] Generate documentation (Swagger or ...)
+    * [x] Generate documentation Swagger
     * [x] Provide configurable lint rules
     * [x] Provide intuitive developer process (care about helps from IDE of developers)
 
-* [ ] `Server` Project server life cycle
+* [ ] `Server` Project server
     * [x] **[express server](https://expressjs.com/ "express")** and provide to use original express with options from project config 
     * [x] **[cors](https://www.npmjs.com/package/cors "CORS")** with options from project config
     * [x] **[static server](https://expressjs.com/en/4x/api.html#express.static "express static")** with options from project config
@@ -106,12 +106,16 @@ In our project, environment variables, such as database URLs or API keys, are ma
         * [x] @Endpoint({ ...options }) - define `public async` method of `@API` as endpoint - setup annotation endpoint
     * [x] Provide Decorators `@Endpoint`
         * [x] @Swagger({ ...options }) - expand `@Endpoint` annotation - provide ability to auto generate documentation of endpoint using **[Swagger](https://www.npmjs.com/package/swagger-ui-express/ "swagger-ui-express")**
-        * [x] @Auth({…options…}) - check/restore `Authorization` and handle 401 Unathorized
-        * [x] @Validate - ??? "schema" as a part of data parse middlewares
-        * [ ]
+        * [x] @Auth({ ...options }) - check `Authorization` and handle 401 Unathorized
+        * [x] @Json({ ...options }) - parse body to get data from JSON
+        * [x] @URLEncoded({ ...options }) - configure parsing body to get data from */x-www-form-urlencoded
+        * [x] @URLEncoded({ ...options }) - configure parsing body to get data from */x-www-form-urlencoded
+        * [x] @Query({ ...options }) - configure parsing query parameters
+        * [x] @Params({ ...options }) - configure parsing url path parameters
+        * [x] ({ ...options, schema: Yup }) - all parsing decorators are connected with the Swagger documentation and have ability to validate data using **[Yup](https://www.npmjs.com/package/yup) validators
     * [x] Provide examples of usage
 
-* [ ] `DB` Project database life cycle
+* [ ] `DB` Project databases
     * [ ] customization from configuration file
     * [x] MongoDB with Mongoose
     * [ ] PostgreSQL with "pg"
