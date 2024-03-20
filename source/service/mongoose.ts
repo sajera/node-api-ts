@@ -2,7 +2,7 @@
 import * as mongoose from 'mongoose';
 
 // local dependencies
-import { Logger } from '../service';
+import { Logger } from './logger';
 import { MONGO_URL } from '../constant';
 
 class Mongoose {

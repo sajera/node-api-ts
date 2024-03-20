@@ -2,9 +2,8 @@
 import * as bcrypt from 'bcryptjs';
 import { createHmac } from 'node:crypto';
 // local dependencies
+import { Redis } from './redis';
 import { Logger } from './logger';
-import { Redis } from '../database';
-import { Exception } from '../server';
 import { JwtToken } from './jwt-token';
 import { PWD_SALT, PWD_ROUNDS, SID_SECRET } from '../constant';
 
@@ -43,13 +42,9 @@ class AuthService {
 
   private readonly schemaReplacer = /^Bearer /i;
 
-  private readonly access = JwtToken.create<AuthService.AccessTokenPayload>({ expiresIn: '1m' });
+  private readonly access = JwtToken.create<AuthService.AccessTokenPayload>({ expiresIn: '15m' });
 
   private readonly refresh = JwtToken.create<AuthService.RefreshTokenPayload>({ expiresIn: '7d' });
-
-  private constructor () {
-    Logger.log('AUTH', 'service TODO');
-  }
 
   public static Exception = Unauthorized;
 
@@ -58,7 +53,7 @@ class AuthService {
    * NOTE by changing the salt we may invalidate all current session
    */
   private static sid (id: string|number): string {
-    // NOTE mandatory to use predefined salt on order to define relation session with user
+    // NOTE mandatory to use predefined salt in order to define relation session with user
     const hmac = createHmac('sha256', SID_SECRET || 'sid');
     return hmac.update(String(id)).digest('hex');
   }
@@ -110,14 +105,37 @@ class AuthService {
   }
 
   /**
-   * create pseudo-session - allow to pass there some payload
+   * find existing or create new pseudo-session - allow to pass there some payload
+   */
+  public static async findOrCreateAuth (userId: string|number, payload) {
+    try { // NOTE trying to find existing
+      const sid = this.sid(userId);
+      const auth = await this.getStoredAuth(userId, sid);
+      // NOTE apply updates of payload - also will throw in case "auth" absent
+      auth.payload = payload;
+      this.instance.refresh.verify(auth.refresh);
+      // NOTE refresh token within session still valid
+      try {
+        this.instance.access.verify(auth.access);
+        // NOTE access token within session still valid
+      } catch (error) {
+        // NOTE means the "auth.access" require refreshing
+        auth.access = this.instance.access.sign({ sid });
+        Logger.debug('AUTH', 'findOrCreateAuth => refreshing access');
+      }
+      // NOTE update "auth" within Redis
+      return await this.storeAuth(sid, auth);
+    } catch (error) {
+      // NOTE means the "auth" Interrupted/Invalidated
+      return await this.createAuth(userId, payload);
+    }
+  }
+
+  /**
+   * create new pseudo-session - allow to pass there some payload
    */
   public static async createAuth (userId: string|number, payload) {
     const sid = this.sid(userId);
-    const cached = await this.getStoredAuth(userId, sid);
-    // NOTE return existing auth
-    if (cached) { return cached; }
-    // NOTE create new auth
     const access = this.instance.access.sign({ sid });
     const refresh = this.instance.refresh.sign({ sid });
     const auth = { userId, payload, sid, schema: this.instance.schema, access, refresh };
@@ -126,10 +144,12 @@ class AuthService {
   }
 
   /**
-   * update access token
+   * update access token of session using refresh token
    */
   public static async refreshAuth (refresh: string) {
+    // NOTE make sure the refresh token alive and valid
     const { sid } = this.instance.refresh.verify(refresh);
+    // NOTE make sure the session valid
     const auth = await this.getStoredAuth(null, sid);
     // NOTE session absent
     if (!auth) { throw new AuthService.Exception(); }
@@ -166,4 +186,3 @@ class AuthService {
 // NOTE create service instance
 AuthService.create();
 export { AuthService };
-export default AuthService;

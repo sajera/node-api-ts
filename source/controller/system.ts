@@ -1,10 +1,9 @@
 // outsource dependencies
 
 // local dependencies
-import { User } from '../model';
+import { User } from '../mongoose';
 import { APP_VERSION } from '../constant';
-import { Mongoose, Redis } from '../database';
-import { AuthService, Logger, Yup } from '../service';
+import { AuthService, Logger, Yup, Mongoose, Redis } from '../service';
 import { Controller, API, Endpoint, Exception, Auth, URLEncoded, Json, Params, Swagger } from '../server';
 
 
@@ -68,13 +67,11 @@ export default class System extends Controller {
   public async signIn () {
     // NOTE normalized "login" value to exclude abnormal parts
     const { email: login } = AuthService.parseEmail(this.request.body.email);
-    // NOTE check login to make sure it is new
     const user = await User.findOne({ login }).exec();
     if (!user) { throw new AuthService.Exception(); }
     const isMatch = await AuthService.comparePassword(this.request.body.password, user.password);
     if (!isMatch) { throw new AuthService.Exception(); }
-    // NOTE find existing user auth or create new one
-    const auth = await AuthService.createAuth(user.id, { to: 'think about session payload' });
+    const auth = await AuthService.findOrCreateAuth(user.id, { to: 'think about session payload' });
     await this.response.status(200).type('json').send({
       refresh: auth.refresh,
       access: auth.access,

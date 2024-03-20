@@ -2,15 +2,50 @@
 
 To expedite the development process, a dummy application with fundamental features was created, demonstrating typical functionalities found in a Node.js application using TypeScript. This includes setting up TypeScript configuration, initiating an Express server, configuring server routes, implementing CORS, serving static content, enabling file uploads, and parsing request bodies. Additionally, code linters adhering to the company's coding standards were applied.
 
-### Development TODO
 
+### Development Environment Setup
 
-### Deployment TODO
+Configuring the development process may vary depending on the capabilities of your system. This allows developers to choose the approach that best fits their environment and preferences.
+> docker-compose.yaml - the simplest way to use [Docker](https://www.docker.com/get-started/) in the project, the development environment is set up with all the necessary services.
+
+#### Infrastructure with Docker
+1. Launch Docker [Docker](https://www.docker.com/get-started/)
+2. Run the server in development mode
+```
+ docker compose up
+```
+
+#### Manual Infrastructure Setup
+For manual infrastructure setup, you need to install and run the required services on your computer. Currently, these are:
+1. [Redis](https://redis.io/)
+2. [MongoDB](https://www.mongodb.com/)
+
+Connect to remote/local services, create an `env.local` file in the project's main directory and describe the variables specific to your environment:
+```
+# with running locally instance of Redis
+REDIS_URL=redis://127.0.0.1:6379
+# with running locally instance of Mongo
+MONGO_URL=mongodb://127.0.0.1:27017/node-api-ts
+```
+
+Install the application dependencies:
+```
+npm install
+```
+Run the application in development mode:
+```
+npm run start:dev
+```
+
+### Deployment
+
+The application is designed to be deployed using [Docker](https://www.docker.com/get-started/) with configuration set up using environment variables
+> Please utilize the `Dockerfile:production` file for deployment
 
 
 ### Application configuration
 
-"In our project, environment variables, such as database URLs or API keys, are managed using a `.env` file. This file, formatted as `KEY=VALUE` pairs, stores configuration data. During local development, developers create and modify this file to suit their testing needs, optionally overriding specific variables in a `.env.local` file. However, in production deployments, we avoid using `.env` files to protect sensitive information. Instead, environment variables are securely passed to the application server or container during deployment, a process handled by deployment scripts or configuration management tools. Within the Node.js application, environment variables are accessed using `process.env.VARIABLE_NAME`, simplifying configuration management without requiring direct modification of the application's code."
+In our project, environment variables, such as database URLs or API keys, are managed using a `.env` file. This file, formatted as `KEY=VALUE` pairs, stores configuration data. During local development, developers create and modify this file to suit their testing needs, optionally overriding specific variables in a `.env.local` file. However, in production deployments, we avoid using `.env` files to protect sensitive information. Instead, environment variables are securely passed to the application server or container during deployment, a process handled by deployment scripts or configuration management tools. Within the Node.js application, environment variables are accessed using `process.env.VARIABLE_NAME`, simplifying configuration management without requiring direct modification of the application's code.
 
 1. **Understanding the `.env` File:**
   - Explain that the `.env` file is a plain text file where environment variables are stored.
@@ -48,46 +83,42 @@ To expedite the development process, a dummy application with fundamental featur
     * [x] Include Server(s) life cycle
     * [x] Include Controllers life cycle
     * [ ] Include Database(s) life cycle
-    * [ ] Include models life cycle
-    * [ ] Generate documentation (Swagger or ...)
+    * [x] Generate documentation Swagger
     * [x] Provide configurable lint rules
     * [x] Provide intuitive developer process (care about helps from IDE of developers)
 
-* [ ] `Server` Project server life cycle
+* [ ] `Server` Project server
     * [x] **[express server](https://expressjs.com/ "express")** and provide to use original express with options from project config 
     * [x] **[cors](https://www.npmjs.com/package/cors "CORS")** with options from project config
     * [x] **[static server](https://expressjs.com/en/4x/api.html#express.static "express static")** with options from project config
-    * [x] **[parse json](https://www.npmjs.com/package/body-parser "body-parser => JSON")** with options from project config
-    * [x] **[parse urlencoded](https://www.npmjs.com/package/body-parser "body-parser => URLENCODED")** with options from project config
     * [x] **[cookie/session](https://www.npmjs.com/package/express-session "express-session")** with options from project config 
-    * [ ] multipart with options from project config 
+    * [x] **[parse json](https://www.npmjs.com/package/body-parser "body-parser => JSON")** with options and validation
+    * [x] **[parse urlencoded](https://www.npmjs.com/package/body-parser "body-parser => URLENCODED")** with  options and validation
+    * [ ] **[multer](https://www.npmjs.com/package/multer)** with options and validation - FILES|multipart/form-data
 
-* [ ] `API Controller` Project controllers
+* [x] `API Controller` Project controllers
     * [x] Provide controllers entry point
     * [x] Provide functionality from express
     * [x] Implement Controller life cycle - each call to API will be handled of its own controller instance
-    * [x] Provide `endpoint` as controller `public async` method with access to controller instance for current call
+    * [x] Provide `endpoint` as controller `public async` method with access to controller instance of current call
     * [x] Provide Decorators `API`
-        * [x] @APIController({...options...}) - define `class` as API controller - read annotations of controller
-        * [x] @APIEndpoint({...options...}) - define `public async` method of `{APIController}` as endpoint - setup annotation endpoint
-    * [ ] Provide Decorators `@APIEndpoint` (Proxy)  
-        * [x] @Swagger({...options...}) - expand `{@APIEndpoint}` annotation - provide ability to auto generate documentation of endpoint using **[Swagger](https://www.npmjs.com/package/swagger-ui-express/ "swagger-ui-express")**
-        * [x] @Auth({…options…}) - check/restore `Authorization` and handle 401 Unathorized
-        * [ ] @Validate - ??? or it can be as @APIEndpointSchema
-        * [ ] @??? - ???
+        * [x] @API({ ...options }) - define `class` as API controller - read annotations of controller
+        * [x] @Endpoint({ ...options }) - define `public async` method of `@API` as endpoint - setup annotation endpoint
+    * [x] Provide Decorators `@Endpoint`
+        * [x] @Swagger({ ...options }) - expand `@Endpoint` annotation - provide ability to auto generate documentation of endpoint using **[Swagger](https://www.npmjs.com/package/swagger-ui-express/ "swagger-ui-express")**
+        * [x] @Auth({ ...options }) - check `Authorization` and handle 401 Unathorized
+        * [x] @Json({ ...options }) - parse body to get data from JSON
+        * [x] @URLEncoded({ ...options }) - configure parsing body to get data from */x-www-form-urlencoded
+        * [x] @URLEncoded({ ...options }) - configure parsing body to get data from */x-www-form-urlencoded
+        * [x] @Query({ ...options }) - configure parsing query parameters
+        * [x] @Params({ ...options }) - configure parsing url path parameters
+        * [ ] @Multer({ ...options }) - configure parsing */form-data with files
+        * [x] ({ ...options, schema: Yup }) - all parsing decorators are connected with the Swagger documentation and have ability to validate data using **[Yup](https://www.npmjs.com/package/yup) validators
     * [x] Provide examples of usage
 
-* [ ] `DB` Project database life cycle
-    * [ ] Provide customization from configuration file
-    * [ ] Provide MongoDB with Mongoose initialization
-    * [ ] PostgreSQL based on "pg" initialization
-    * [ ] Provide MongoDB initialization
-    * [ ] Provide examples of usage
-
-* [ ] `Model` Project model life cycle
-    * [ ] Abstract helpers for model creation such as (Base)Controller
-    * [ ] Provide huge customizable Models
-    * [ ] Implement ability to connect models in the same way for different DB
-    * [ ] Provide examples of usage
-
-* [ ] `Documentation` generate project swagger
+* [ ] `DB` Project databases
+    * [ ] customization from configuration file
+    * [x] MongoDB with Mongoose
+    * [ ] PostgreSQL with "pg"
+    * [x] Redis
+    * [ ] examples of usage

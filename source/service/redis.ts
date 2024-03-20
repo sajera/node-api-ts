@@ -2,7 +2,7 @@
 import * as redis from 'redis';
 
 // local dependencies
-import { Logger } from '../service';
+import { Logger } from './logger';
 import { REDIS_URL } from '../constant';
 
 class Redis {

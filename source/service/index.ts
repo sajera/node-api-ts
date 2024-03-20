@@ -1,6 +1,8 @@
 
-export * from './logger';
-export * from './auth';
-export * from './yup';
+export { Mongoose } from './mongoose';
+export { AuthService } from './auth';
+export { Logger } from './logger';
+export { Redis } from './redis';
+export { Yup } from './yup';
 // FIXME private ?
 // export * from './token'
