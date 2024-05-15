@@ -1,0 +1,51 @@
+
+version: "3.8"
+# NOTE take in mind - only for development usage
+services:
+  main:
+    build:
+      context: .
+    tty: true
+    environment:
+      DEBUG: 1
+      PORT: 3838
+      REDIS_URL: redis://redis:6379/0
+      MONGO_URL: mongodb://mongodb:27017/node-api-ts
+#      RABBITMQ_URL: amqp://queue:5672
+    depends_on:
+      - redis
+      - mongodb
+    ports:
+      - '3838:3838'
+    command: npm run start:dev
+    volumes:
+      - .:/home/node/
+      - /usr/app/node_modules
+
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - ./redis:/data/redis
+
+  mongodb:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./mongodb:/data/db
+
+#  queue:
+#    image: rabbitmq:management
+#    restart: always
+#    ports:
+#      - '5672:5672'
+#      - '15672:15672'
+#    volumes:
+#      - cache:/data/queue
+
+volumes:
+  cache:

@@ -1,20 +1,21 @@
 {
-    "compilerOptions": {
-        "target": "es5",
-        "module": "commonjs",
-        "sourceMap": true,
-        "lib": ["es2015"],
-        "declaration": true,
-        "experimentalDecorators": true,
-        "resolveJsonModule": true,
-        "outDir": "es5"
-    },
-    "include": [
-        "source/**/*",
-    ],
-    "exclude": [
-        "swagger",
-        "node_modules",
-        "**/*.spec.ts"
-    ]
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "sourceMap": true,
+    "lib": ["es2015"],
+    "declaration": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
+    "outDir": "dist"
+  },
+  "include": [
+    "source/**/*",
+  ],
+  "exclude": [
+    "public",
+    "node_modules",
+    "**/*.spec.ts"
+  ]
 }

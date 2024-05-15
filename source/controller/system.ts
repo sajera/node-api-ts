@@ -1,81 +1,129 @@
-
 // outsource dependencies
-import { Request, Response } from 'express';
 
 // local dependencies
-import Configuration from '../configuration';
-import Controller, { METHOD, WithSelf } from './base';
+import { User } from '../mongoose';
+import { APP_VERSION } from '../constant';
+import { AuthService, Logger, Yup, Mongoose, Redis } from '../service';
+import { Controller, API, Endpoint, Exception, Auth, URLEncoded, Json, Params, Swagger } from '../server';
+
 
 /**
  * system endpoints which not belong to any controllers and mostly unique
  */
+@API({ path: '/system' })
 export default class System extends Controller {
-    public static readonly prefix: string = '/system';
 
-    /**
-     * implement user self
-     */
-    @WithSelf
-    @System.Endpoint({action: 'getSelf', path: '/self', method: METHOD.GET})
-    public async getSelf (request: Request, response: Response) {
-        // TODO must prepare user self data to send only public information
-        const user = this.self;
-        // NOTE very simple solution to take logged user using decorator "WithSelf"
-        await response.status(200).type('json').send(user);
-    }
+  @Auth({})
+  @Endpoint({ path: '/self' })
+  @Swagger({ summary: 'Get self information' })
+  public async getSelf () {
+    Logger.debug('SYSTEM', 'getSelf', this.request.auth);
+    const user = await User.findById(this.request.auth.userId).exec();
+    // NOTE very simple solution to take logged user using decorator "WithSelf"
+    await this.response.status(200).type('json').send({
+      login: user.login,
+      email: user.email,
+      name: user.name,
+    });
+  }
 
-    /**
-     * implement user sign up
-     */
-    @System.Endpoint({action: 'signUp', path: '/sign-up', method: METHOD.POST})
-    public async signUp (request: Request, response: Response) {
-        // TODO implement user creation
-        const user = request.body;
-        // NOTE very simple solution without email verification to delegate authorization to authorization action
-        await this.signIn(request, response);
-    }
+  public static sigUpInput = Yup.create({
+    password: Yup.PASSWORD.required(),
+    email: Yup.EMAIL.required(),
+    name: Yup.NAME.required(),
+  });
 
-    /**
-     * implement user sign in
-     */
-    @System.Endpoint({action: 'signIn', path: '/sign-in', method: METHOD.POST})
-    public async signIn (request: Request, response: Response) {
-        // TODO implement authorization flow
-        // NOTE currently fake authorization token
-        await response.status(200).type('json').send({
-            access_token: 'my_fake_authorization_token',
-            refresh_token: '',
-        });
-    }
+  @Json({ schema: System.sigUpInput })
+  @Endpoint({ path: '/sign-up', method: Controller.POST })
+  @Swagger({ summary: 'Create the user', sample: { access: '<ACCESS_TOKEN>', refresh: '<REFRESH_TOKEN>' } })
+  public async signUp () {
+    // NOTE normalized "login" value to exclude abnormal parts
+    const { email: login } = AuthService.parseEmail(this.request.body.email);
+    // NOTE check login to make sure it is new
+    const exist = await User.findOne({ login }).exec();
+    if (exist) { throw new Exception('LOGIN_EXIST'); }
+    const password = await AuthService.encryptPassword(this.request.body.password);
+    // NOTE create a user
+    const user = new User({
+      login,
+      password,
+      name: this.request.body.name,
+      // NOTE save email as is ¯\_(ツ)_/¯
+      email: this.request.body.email,
+    });
+    await user.save();
+    // NOTE find existing user auth or create new one
+    const auth = await AuthService.createAuth(user.id, { to: 'think about session payload' });
+    await this.response.status(200).type('json').send({
+      refresh: auth.refresh,
+      access: auth.access,
+    });
+  }
 
-    /**
-     * implement user sign out
-     */
-    @System.Endpoint({action: 'signOut', path: '/sign-out', method: METHOD.GET})
-    public async signOut (request: Request, response: Response) {
-        // TODO kill session and authorization tokens
-        await (new Promise((resolve, reject) => {
+  @URLEncoded({}) // no validation - expect same schema as json
+  @Endpoint({ path: '/sign-in', method: Controller.POST })
+  @Json({ schema: Yup.create({ password: Yup.PASSWORD.required(), email: Yup.EMAIL.required() }) })
+  @Swagger({ summary: 'Sign in to the System', sample: { access: '<ACCESS_TOKEN>', refresh: '<REFRESH_TOKEN>' } })
+  public async signIn () {
+    // NOTE normalized "login" value to exclude abnormal parts
+    const { email: login } = AuthService.parseEmail(this.request.body.email);
+    const user = await User.findOne({ login }).exec();
+    if (!user) { throw new AuthService.Exception(); }
+    const isMatch = await AuthService.comparePassword(this.request.body.password, user.password);
+    if (!isMatch) { throw new AuthService.Exception(); }
+    const auth = await AuthService.findOrCreateAuth(user.id, { to: 'think about session payload' });
+    await this.response.status(200).type('json').send({
+      refresh: auth.refresh,
+      access: auth.access,
+    });
+  }
 
-            // emulation ... some code
+  @Endpoint({ path: '/refresh', method: Controller.POST })
+  @Json({ schema: Yup.create({ token: Yup.STRING.required() }) })
+  @Swagger({ summary: 'Refresh tokens', sample: { access: '<ACCESS_TOKEN>', refresh: '<REFRESH_TOKEN>' } })
+  public async refresh () {
+    Logger.debug('SYSTEM', 'refresh', this.request.body);
+    const auth = await AuthService.refreshAuth(this.request.body.token);
+    await this.response.status(200).type('json').send({
+      refresh: auth.refresh,
+      access: auth.access,
+    });
+  }
 
-            // NOTE all done
-            resolve({});
-        }));
-        // NOTE in any case 200: "ok"
-        await response.status(200).type('json').send({});
-    }
-    
-    /**
-     * provide public system info
-     */
-    @System.Endpoint({action: 'information', path: '/info', method: METHOD.GET})
-    public async information (request: Request, response: Response) {
-        await response.status(200).type('json').send({
-            base: false,
-            health: 'UP',
-            auth: 'Authorization',
-            version: Configuration.get('version', 1),
-        });
-    }
+  @Auth({ optional: true })
+  @Endpoint({ path: '/sign-out', method: Controller.DELETE })
+  @Swagger({ summary: 'Invalidate all tokens', sample: 'OK' })
+  public async signOut () {
+    await AuthService.invalidateStoredAuth(null, this.request.auth?.sid);
+    await this.response.status(200).type('json').send('"OK"');
+  }
 
+  @Endpoint({ path: '/info', method: Controller.GET })
+  public async information () {
+    await this.response.status(200).type('json').send({
+      base: false,
+      health: 'UP',
+      token: 'Bearer ',
+      auth: 'Authorization',
+      version: APP_VERSION,
+      redis: Redis.CONNECTED,
+      mongoose: Mongoose.CONNECTED,
+    });
+  }
+
+  // TODO remove
+  @Auth({ optional: true })
+  @Endpoint({ path: '/test/:testId', method: Controller.POST })
+  @Json({ force: true, schema: Yup.create({ test: Yup.POSITIVE.required('is mandatory') }) })
+  @URLEncoded({}) // same as json - let it validate all requests ¯\_(ツ)_/¯
+  @Params({ schema: Yup.create({ testId: Yup.INT.required('testId is mandatory') }) })
+  public async test () {
+    await this.response.status(200).type('json').send({
+      body: this.request.body,
+      auth: this.request.auth,
+      query: this.request.query,
+      params: this.request.params,
+      session: this.request.session,
+    });
+  }
 }

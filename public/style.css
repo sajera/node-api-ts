@@ -1,0 +1,168 @@
+.app-preloader {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  vertical-align: middle;
+}
+.app-preloader > * {
+  vertical-align: middle;
+}
+.app-preloader:after {
+  content: "";
+  height: 100%;
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+}
+#SPW {
+  width: 234px;
+  height: 28px;
+  margin: auto;
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+#SPW .sp {
+  top: 0;
+  width: 28px;
+  height: 28px;
+  position: absolute;
+  -webkit-transform: scale(0.3);
+  -moz-transform: scale(0.3);
+  -o-transform: scale(0.3);
+  -ms-transform: scale(0.3);
+  transform: scale(0.3);
+  border-radius: 19px;
+  background-color: #0257d5;
+  -webkit-animation: playSP 1500ms infinite normal;
+  -moz-animation: playSP 1500ms infinite normal;
+  animation: playSP 1500ms infinite normal;
+}
+@-webkit-keyframes playSP {
+  0% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -o-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+    background-color: #0257d5;
+  }
+  100% {
+    -webkit-transform: scale(0.3);
+    -moz-transform: scale(0.3);
+    -o-transform: scale(0.3);
+    -ms-transform: scale(0.3);
+    transform: scale(0.3);
+    background-color: transparent;
+  }
+}
+@-moz-keyframes playSP {
+  0% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -o-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+    background-color: #0257d5;
+  }
+  100% {
+    -webkit-transform: scale(0.3);
+    -moz-transform: scale(0.3);
+    -o-transform: scale(0.3);
+    -ms-transform: scale(0.3);
+    transform: scale(0.3);
+    background-color: transparent;
+  }
+}
+@-ms-keyframes playSP {
+  0% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -o-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+    background-color: #0257d5;
+  }
+  100% {
+    -webkit-transform: scale(0.3);
+    -moz-transform: scale(0.3);
+    -o-transform: scale(0.3);
+    -ms-transform: scale(0.3);
+    transform: scale(0.3);
+    background-color: transparent;
+  }
+}
+@keyframes playSP {
+  0% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -o-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+    background-color: #0257d5;
+  }
+  100% {
+    -webkit-transform: scale(0.3);
+    -moz-transform: scale(0.3);
+    -o-transform: scale(0.3);
+    -ms-transform: scale(0.3);
+    transform: scale(0.3);
+    background-color: transparent;
+  }
+}
+#SPW #SP_1 {
+  left: 0;
+  -webkit-animation-delay: 0.1s;
+  -moz-animation-delay: 0.1s;
+  -o-animation-delay: 0.1s;
+  animation-delay: 0.1s;
+}
+#SPW #SP_2 {
+  left: 29px;
+  -webkit-animation-delay: 0.25s;
+  -moz-animation-delay: 0.25s;
+  -o-animation-delay: 0.25s;
+  animation-delay: 0.25s;
+}
+#SPW #SP_3 {
+  left: 58px;
+  -webkit-animation-delay: 0.4s;
+  -moz-animation-delay: 0.4s;
+  -o-animation-delay: 0.4s;
+  animation-delay: 0.4s;
+}
+#SPW #SP_4 {
+  left: 88px;
+  -webkit-animation-delay: 0.55s;
+  -moz-animation-delay: 0.55s;
+  -o-animation-delay: 0.55s;
+  animation-delay: 0.55s;
+}
+#SPW #SP_5 {
+  left: 117px;
+  -webkit-animation-delay: 0.7s;
+  -moz-animation-delay: 0.7s;
+  -o-animation-delay: 0.7s;
+  animation-delay: 0.7s;
+}
+#SPW #SP_6 {
+  left: 146px;
+  -webkit-animation-delay: 0.85s;
+  -moz-animation-delay: 0.85s;
+  -o-animation-delay: 0.85s;
+  animation-delay: 0.85s;
+}
+#SPW #SP_7 {
+  left: 175px;
+  -webkit-animation-delay: 1s;
+  -moz-animation-delay: 1s;
+  -o-animation-delay: 1s;
+  animation-delay: 1s;
+}
+#SPW #SP_8 {
+  left: 205px;
+  -webkit-animation-delay: 1.15s;
+  -moz-animation-delay: 1.15s;
+  -o-animation-delay: 1.15s;
+  animation-delay: 1.15s;
+}
