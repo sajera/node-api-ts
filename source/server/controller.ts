@@ -134,7 +134,7 @@ export function API<T> (options: ControllerAnnotation) {
 }
 
 export class Exception extends Error {
-  constructor (message = 'BAD_REQUEST', public code = 400) {
+  constructor (message = 'BAD_REQUEST', public code = 500) {
     super(message);
   }
 }
